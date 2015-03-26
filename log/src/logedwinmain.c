@@ -112,7 +112,7 @@ int PASCAL WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 {
    static char szAppName[] = "loged" ;
    HPALETTE pal;
-   LOGPALETTE l[16];
+   LOGPALETTE *lpal;
    MSG         msg ;
    WNDCLASS    wndclass ;
    HANDLE    hAccel;
@@ -259,12 +259,13 @@ int PASCAL WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
    }
    return msg.wParam ;
 */ 
-  l[0].palVersion=0x300;
-  l[0].palNumEntries=16;
+  lpal=malloc(sizeof(LOGPALETTE)+16*sizeof(PALETTEENTRY));
+  lpal->palVersion=0x300;
+  lpal->palNumEntries=16;
   for(i=0;i<16;i++)
-    l[0].palPalEntry[i]=pals[i];
+    lpal->palPalEntry[i]=pals[i];
  
-  pal=CreatePalette(&l[0]);
+  pal=CreatePalette(lpal);
   SelectPalette(hdc,pal,0);
   RealizePalette(hdc);
   hdc1=CreateCompatibleDC(hdc);
