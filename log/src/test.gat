@@ -1,0 +1,870 @@
+# Created by LOGED on Thu Sep 06 14:52:51 2001
+
+
+kind ALUH
+simtype 16
+grab -56 -40 28 59
+vector 16 -46 27 -24
+vector 16 -46 -65 -46
+vector -65 -46 -15 57
+vector -60 -54 -60 -46
+vector -55 -54 -55 -46
+vector -50 -46 -50 -54
+vector -45 -46 -45 -54
+vector -40 -46 -40 -54
+vector -35 -46 -35 -54
+vector -30 -47 -30 -54
+vector -25 -46 -25 -54
+vector -30 -54 -30 -46
+vector -20 -54 -20 -46
+vector -15 -46 -15 -54
+vector -10 -46 -10 -54
+vector -5 -46 -5 -54
+vector 0 -46 0 -54
+vector 5 -46 5 -54
+vector 10 -46 10 -54
+vector 15 -46 15 -54
+vector -15 57 27 57
+vector 25 65 25 57
+vector 20 57 20 65
+vector 15 65 15 57
+vector 5 65 5 57
+vector 0 65 0 57
+vector -5 57 -5 65
+vector -10 57 -10 65
+vector 10 65 10 57
+vector -46 -5 -65 -5
+vector -65 0 -43 0
+vector -65 5 -40 5
+vector -65 10 -38 10
+vector -43 -5 -43 -10
+vector -43 -10 -40 -5
+vector -40 -5 -40 -10
+vector -40 -3 -37 -3
+vector -37 -3 -40 2
+vector -40 2 -37 2
+vector -37 4 -35 9
+vector -35 9 -33 4
+vector -30 10 -33 10
+vector -33 10 -33 14
+vector -33 14 -30 14
+vector -23 -12 9 -12
+vector 9 -12 -18 22
+vector -18 22 12 22
+pin #1 -60 -55
+pin #2 -55 -55
+pin #3 -50 -55
+pin #4 -45 -55
+pin #5 -40 -55
+pin #6 -35 -55
+pin #7 -30 -55
+pin #8 -25 -55
+pin #9 -20 -55
+pin #10 -15 -55
+pin #11 -10 -55
+pin #12 -5 -55
+pin #13 0 -55
+pin #14 5 -55
+pin #15 10 -55
+pin #16 15 -55
+pin #17 -10 65
+pin #18 -5 65
+pin #19 0 65
+pin #20 5 65
+pin #21 10 65
+pin #22 15 65
+pin #23 20 65
+pin #24 25 65
+pin #25 25 -45
+pin #26 25 -40
+pin #27 25 -35
+pin #28 25 -30
+pin #29 25 -25
+pin #30 25 -20
+pin #31 25 -15
+pin #32 25 -10
+pin #33 25 -5
+pin #34 25 0
+pin #35 25 5
+pin #36 25 10
+pin #37 25 15
+pin #38 25 20
+pin #39 25 25
+pin #40 25 30
+pin #41 25 35
+pin #42 25 40
+pin #43 25 45
+pin #44 25 50
+pin #45 25 55
+pin #46 -65 -5
+pin #47 -65 0
+pin #48 -65 5
+pin #49 -65 10
+connect 9 9
+connect 10 10
+connect 11 11
+connect 12 12
+connect 13 13
+connect 14 14
+connect 15 15
+connect 16 16
+def "F = #42 AND NOT #43 AND NOT #44"
+def "IF F"
+def "C = #41"
+def "#24 = #8 XOR NOT #32 XOR C"
+def "C = (#8 AND NOT #32) OR (C AND (#8 OR NOT #32))"
+def "#23 = #7 XOR NOT #31 XOR C"
+def "C = (#7 AND NOT #31) OR (C AND (#7 OR NOT #31))"
+def "#22 = #6 XOR NOT #30 XOR C"
+def "C = (#6 AND NOT #30) OR (C AND (#6 OR NOT #30))"
+def "#21 = #5 XOR NOT #29 XOR C"
+def "C = (#5 AND NOT #29) OR (C AND (#5 OR NOT #29))"
+def "#20 = #4 XOR NOT #28 XOR C"
+def "C = (#4 AND NOT #28) OR (C AND (#4 OR NOT #28))"
+def "#19 = #3 XOR NOT #27 XOR C"
+def "C = (#3 AND NOT #27) OR (C AND (#3 OR NOT #27))"
+def "#18 = #2 XOR NOT #26 XOR C"
+def "C = (#2 AND NOT #26) OR (C AND (#2 OR NOT #26))"
+def "#17 = #1 XOR NOT #25 XOR C"
+def "#49 = (#1 AND NOT #25) OR (C AND (#1 OR NOT #25))"
+def "#46 = #17"
+def "#48 = #49 XOR C"
+def "END"
+def "F = NOT #42 AND NOT #43 AND NOT #44"
+def "IF F"
+def "#24 = #8 XOR #32 XOR #41"
+def "C = (#8 AND #32) OR (#41 AND (#8 OR #32))"
+def "#23 = #7 XOR #31 XOR C"
+def "C = (#7 AND #31) OR (C AND (#7 OR #31))"
+def "#22 = #6 XOR #30 XOR C"
+def "C = (#6 AND #30) OR (C AND (#6 OR #30))"
+def "#21 = #5 XOR #29 XOR C"
+def "C = (#5 AND #29) OR (C AND (#5 OR #29))"
+def "#20 = #4 XOR #28 XOR C"
+def "C = (#4 AND #28) OR (C AND (#4 OR #28))"
+def "#19 = #3 XOR #27 XOR C"
+def "C = (#3 AND #27) OR (C AND (#3 OR #27))"
+def "#18 = #2 XOR #26 XOR C"
+def "C = (#2 AND #26) OR (C AND (#2 OR #26))"
+def "#17 = #1 XOR #25 XOR C"
+def "#49 = (#1 AND #25) OR (C AND (#1 OR #25))"
+def "#48 = #49 XOR C"
+def "END"
+def "F = NOT #42 AND #43 AND NOT #44"
+def "IF F"
+def "#24 = #8 AND #32"
+def "#23 = #7 AND #31"
+def "#22 = #6 AND #30"
+def "#21 = #5 AND #29"
+def "#20 = #4 AND #28"
+def "#19 = #3 AND #27"
+def "#18 = #2 AND #26"
+def "#17 = #1 AND #25"
+def "END"
+def "F = #42 AND #43 AND NOT #44"
+def "IF F"
+def "#24 = #8 OR #32"
+def "#23 = #7 OR #31"
+def "#22 = #6 OR #30"
+def "#21 = #5 OR #29"
+def "#20 = #4 OR #28"
+def "#19 = #3 OR #27"
+def "#18 = #2 OR #26"
+def "#17 = #1 OR #25"
+def "END"
+def "F = NOT #42 AND NOT #43 AND #44"
+def "IF F"
+def "#24 = #8 XOR #32"
+def "#23 = #7 XOR #31"
+def "#22 = #6 XOR #30"
+def "#21 = #5 XOR #29"
+def "#20 = #4 XOR #28"
+def "#19 = #3 XOR #27"
+def "#18 = #2 XOR #26"
+def "#17 = #1 XOR #25"
+def "END"
+def "#47 = NOT (#17 OR #18 OR #19 OR #20 OR #21 OR #22 OR #23 OR #24) AND #45"
+def "#46 = #17"
+
+kind ALUL
+simtype 16
+grab -69 -41 24 50
+vector 25 -46 -56 -46
+vector -55 -54 -55 -46
+vector -50 -54 -50 -46
+vector -45 -46 -45 -54
+vector -40 -46 -40 -54
+vector -35 -46 -35 -54
+vector -30 -46 -30 -54
+vector -25 -47 -25 -54
+vector -20 -46 -20 -54
+vector -25 -54 -25 -46
+vector -15 -54 -15 -46
+vector -10 -46 -10 -54
+vector -5 -46 -5 -54
+vector 0 -46 0 -54
+vector 5 -46 5 -54
+vector 10 -46 10 -54
+vector 15 -46 15 -54
+vector 20 -46 20 -54
+vector -68 57 -28 57
+vector -30 65 -30 57
+vector -35 57 -35 65
+vector -40 65 -40 57
+vector -50 65 -50 57
+vector -55 65 -55 57
+vector -60 57 -60 65
+vector -65 57 -65 65
+vector -45 65 -45 57
+vector -56 -46 -68 -24
+vector 25 -46 -25 57
+vector -25 57 -30 57
+vector 5 -5 30 -5
+vector 30 0 3 0
+vector 30 5 0 5
+vector 30 10 -2 10
+vector -1 -4 -8 -4
+vector -8 -4 -8 6
+vector -8 0 -3 0
+vector -23 12 -28 12
+vector -28 12 -28 22
+vector -28 22 -23 22
+vector -20 22 -20 17
+vector -20 13 -20 14
+vector -17 22 -17 17
+vector -17 17 -14 17
+vector -14 17 -14 22
+vector -7 20 30 20
+pin #1 -55 -55
+pin #2 -50 -55
+pin #3 -45 -55
+pin #4 -40 -55
+pin #5 -35 -55
+pin #6 -30 -55
+pin #7 -25 -55
+pin #8 -20 -55
+pin #9 -15 -55
+pin #10 -10 -55
+pin #11 -5 -55
+pin #12 0 -55
+pin #13 5 -55
+pin #14 10 -55
+pin #15 15 -55
+pin #16 20 -55
+pin #17 -65 65
+pin #18 -60 65
+pin #19 -55 65
+pin #20 -50 65
+pin #21 -45 65
+pin #22 -40 65
+pin #23 -35 65
+pin #24 -30 65
+pin #25 -70 -45
+pin #26 -70 -40
+pin #27 -70 -35
+pin #28 -70 -30
+pin #29 -70 -25
+pin #30 -70 -20
+pin #31 -70 -15
+pin #32 -70 -10
+pin #33 -70 -5
+pin #34 -70 0
+pin #35 -70 5
+pin #36 -70 10
+pin #37 -70 15
+pin #38 -70 20
+pin #39 -70 25
+pin #40 -70 30
+pin #41 -70 35
+pin #42 -70 40
+pin #43 -70 45
+pin #44 -70 50
+pin #45 -70 55
+pin #46 30 -5
+pin #47 30 0
+pin #48 30 5
+pin #49 30 10
+pin #50 30 20
+connect 1 1
+connect 2 2
+connect 3 3
+connect 4 4
+connect 5 5
+connect 6 6
+connect 7 7
+connect 8 8
+connect 42 42
+connect 43 43
+connect 44 44
+def "F = NOT #42 AND NOT #43 AND NOT #44"
+def "IF F"
+def "#24 = #16 XOR #40 XOR #50"
+def "C = (#16 AND #40) OR (#50 AND (#16 OR #40))"
+def "#23 = #15 XOR #39 XOR C"
+def "C = (#15 AND #39) OR (C AND (#15 OR #39))"
+def "#22 = #14 XOR #38 XOR C"
+def "C = (#14 AND #38) OR (C AND (#14 OR #38))"
+def "#21 = #13 XOR #37 XOR C"
+def "C = (#13 AND #37) OR (C AND (#13 OR #37))"
+def "#20 = #12 XOR #36 XOR C"
+def "C = (#12 AND #36) OR (C AND (#12 OR #36))"
+def "#19 = #11 XOR #35 XOR C"
+def "C = (#11 AND #35) OR (C AND (#11 OR #35))"
+def "#18 = #10 XOR #34 XOR C"
+def "C = (#10 AND #34) OR (C AND (#10 OR #34))"
+def "#17 = #9 XOR #33 XOR C"
+def "#41 = (#9 AND #33) OR (C AND (#9 OR #33))"
+def "END"
+def "F = #42 AND NOT #43 AND NOT #44"
+def "IF F"
+def "#24 = NOT #16 XOR #40 XOR NOT #50"
+def "C = (NOT #16 AND #40) OR (NOT #50 AND (NOT #16 OR #40))"
+def "#23 = NOT #15 XOR #39 XOR C"
+def "C = (NOT #15 AND #39) OR (C AND (NOT #15 OR #39))"
+def "#22 = NOT #14 XOR #38 XOR C"
+def "C = (NOT #14 AND #38) OR (C AND (NOT #14 OR #38))"
+def "#21 = NOT #13 XOR #37 XOR C"
+def "C = (NOT #13 AND #37) OR (C AND (NOT #13 OR #37))"
+def "#20 = NOT #12 XOR #36 XOR C"
+def "C = (NOT #12 AND #36) OR (C AND (NOT #12 OR #36))"
+def "#19 = NOT #11 XOR #35 XOR C"
+def "C = (NOT #11 AND #35) OR (C AND (NOT #11 OR #35))"
+def "#18 = NOT #10 XOR #34 XOR C"
+def "C = (NOT #10 AND #34) OR (C AND (NOT #10 OR #34))"
+def "#17 = NOT #9 XOR #33 XOR C"
+def "#41 = (NOT #9 AND #33) OR (C AND (NOT #9 OR #33))"
+def "END"
+def "F = NOT #42 AND #43 AND NOT #44"
+def "IF F"
+def "#24 = #16 AND #40"
+def "#23 = #15 AND #39"
+def "#22 = #14 AND #38"
+def "#21 = #13 AND #37"
+def "#20 = #12 AND #36"
+def "#19 = #11 AND #35"
+def "#18 = #10 AND #34"
+def "#17 = #9 AND #33"
+def "END"
+def "F = #42 AND #43 AND NOT #44"
+def "IF F"
+def "#24 = #16 OR #40"
+def "#23 = #15 OR #39"
+def "#22 = #14 OR #38"
+def "#21 = #13 OR #37"
+def "#20 = #12 OR #36"
+def "#19 = #11 OR #35"
+def "#18 = #10 OR #34"
+def "#17 = #9 OR #33"
+def "END"
+def "F = NOT #42 AND NOT #43 AND #44"
+def "IF F"
+def "#24 = #16 XOR #40"
+def "#23 = #15 XOR #39"
+def "#22 = #14 XOR #38"
+def "#21 = #13 XOR #37"
+def "#20 = #12 XOR #36"
+def "#19 = #11 XOR #35"
+def "#18 = #10 XOR #34"
+def "#17 = #9 XOR #33"
+def "END"
+def "#45 = NOT (#24 OR #23 OR #22 OR #21 OR #20 OR #19 OR #18 OR #17)"
+
+kind BEND
+grab -58 -45 22 33
+vector 25 -45 20 -45
+vector 20 -45 20 -50
+vector 15 -50 15 -40
+vector 15 -40 25 -40
+vector 25 -35 10 -35
+vector 10 -35 10 -50
+vector 25 -30 5 -30
+vector 5 -30 5 -50
+vector 25 -25 0 -25
+vector 0 -25 0 -50
+vector 25 -20 -5 -20
+vector -5 -20 -5 -50
+vector 25 -15 -10 -15
+vector -10 -15 -10 -50
+vector 25 -10 -15 -10
+vector -15 -10 -15 -50
+vector 25 -5 -20 -5
+vector -20 -5 -20 -50
+vector 25 0 -25 0
+vector -25 0 -25 -50
+vector 25 5 -30 5
+vector -30 5 -30 -50
+vector 25 10 -35 10
+vector -35 10 -35 -50
+vector 25 15 -40 15
+vector -40 15 -40 -50
+vector 25 20 -45 20
+vector -45 20 -45 -50
+vector 25 25 -50 25
+vector -50 25 -50 -50
+vector 25 30 -55 30
+vector -55 30 -55 -50
+pin #1 -55 -50
+pin #2 -50 -50
+pin #3 -45 -50
+pin #4 -40 -50
+pin #5 -35 -50
+pin #6 -30 -50
+pin #7 -25 -50
+pin #8 -20 -50
+pin #9 -15 -50
+pin #10 -10 -50
+pin #11 -5 -50
+pin #12 0 -50
+pin #13 5 -50
+pin #14 10 -50
+pin #15 15 -50
+pin #16 20 -50
+pin #17 25 -45
+pin #18 25 -40
+pin #19 25 -35
+pin #20 25 -30
+pin #21 25 -25
+pin #22 25 -20
+pin #23 25 -15
+pin #24 25 -10
+pin #25 25 -5
+pin #26 25 0
+pin #27 25 5
+pin #28 25 10
+pin #29 25 15
+pin #30 25 20
+pin #31 25 25
+pin #32 25 30
+connect 1 1
+connect 2 2
+connect 3 3
+connect 4 4
+connect 5 5
+connect 6 6
+connect 7 7
+connect 8 8
+connect 9 9
+connect 10 10
+connect 11 11
+connect 12 12
+connect 13 13
+connect 14 14
+connect 15 15
+connect 16 16
+
+kind JOIN
+grab -58 -45 22 33
+vector 20 -45 20 -50
+vector 15 -50 15 -40
+vector 10 -35 10 -50
+vector 5 -30 5 -50
+vector 0 -25 0 -50
+vector -5 -20 -5 -50
+vector -10 -15 -10 -50
+vector -15 -10 -15 -50
+vector -20 -5 -20 -50
+vector -25 0 -25 -50
+vector -30 5 -30 -50
+vector -35 10 -35 -50
+vector -40 15 -40 -50
+vector -45 20 -45 -50
+vector -50 25 -50 -50
+vector -55 30 -55 -50
+pin #1 -55 -50
+pin #2 -50 -50
+pin #3 -45 -50
+pin #4 -40 -50
+pin #5 -35 -50
+pin #6 -30 -50
+pin #7 -25 -50
+pin #8 -20 -50
+pin #9 -15 -50
+pin #10 -10 -50
+pin #11 -5 -50
+pin #12 0 -50
+pin #13 5 -50
+pin #14 10 -50
+pin #15 15 -50
+pin #16 20 -50
+pin #17 20 -45
+pin #18 15 -40
+pin #19 10 -35
+pin #20 5 -30
+pin #21 0 -25
+pin #22 -5 -20
+pin #23 -10 -15
+pin #24 -15 -10
+pin #25 -20 -5
+pin #26 -25 0
+pin #27 -30 5
+pin #28 -35 10
+pin #29 -40 15
+pin #30 -45 20
+pin #31 -50 25
+pin #32 -55 30
+connect 1 1
+connect 2 2
+connect 3 3
+connect 4 4
+connect 5 5
+connect 6 6
+connect 7 7
+connect 8 8
+connect 9 9
+connect 10 10
+connect 11 11
+connect 12 12
+connect 13 13
+connect 14 14
+connect 15 15
+connect 16 16
+
+kind MUXH
+simtype 16
+grab -56 -40 29 59
+vector 16 -46 26 -46
+vector 16 -46 -65 -46
+vector -65 -46 -39 57
+vector -60 -54 -60 -46
+vector -55 -54 -55 -46
+vector -50 -46 -50 -54
+vector -45 -46 -45 -54
+vector -40 -46 -40 -54
+vector -35 -46 -35 -54
+vector -30 -47 -30 -54
+vector -25 -46 -25 -54
+vector -30 -54 -30 -46
+vector -20 -54 -20 -46
+vector -15 -46 -15 -54
+vector -10 -46 -10 -54
+vector -5 -46 -5 -54
+vector 0 -46 0 -54
+vector 5 -46 5 -54
+vector 10 -46 10 -54
+vector 15 -46 15 -54
+vector -39 57 27 57
+vector 25 65 25 57
+vector 20 57 20 65
+vector 15 65 15 57
+vector 5 65 5 57
+vector 0 65 0 57
+vector -5 57 -5 65
+vector -10 57 -10 65
+vector 10 65 10 57
+ellipse -23 -39 -14 -25
+pin #1 -60 -55
+pin #2 -55 -55
+pin #3 -50 -55
+pin #4 -45 -55
+pin #5 -40 -55
+pin #6 -35 -55
+pin #7 -30 -55
+pin #8 -25 -55
+pin #9 -20 -55
+pin #10 -15 -55
+pin #11 -10 -55
+pin #12 -5 -55
+pin #13 0 -55
+pin #14 5 -55
+pin #15 10 -55
+pin #16 15 -55
+pin #17 -10 65
+pin #18 -5 65
+pin #19 0 65
+pin #20 5 65
+pin #21 10 65
+pin #22 15 65
+pin #23 20 65
+pin #24 25 65
+pin #25 25 -45
+pin #26 25 -40
+pin #27 25 -35
+pin #28 25 -30
+pin #29 25 -25
+pin #30 25 -20
+pin #31 25 -15
+pin #32 25 -10
+pin #33 25 -5
+pin #34 25 0
+pin #35 25 5
+pin #36 25 10
+pin #37 25 15
+pin #38 25 20
+pin #39 25 25
+pin #40 25 30
+pin #41 25 35
+pin #42 25 40
+pin #43 25 45
+pin #44 25 50
+pin #45 25 55
+connect 9 9
+connect 10 10
+connect 11 11
+connect 12 12
+connect 13 13
+connect 14 14
+connect 15 15
+connect 16 16
+def "F = #42"
+def "IF F"
+def "#24 = #8"
+def "#23 = #7"
+def "#22 = #6"
+def "#21 = #5"
+def "#20 = #4"
+def "#19 = #3"
+def "#18 = #2"
+def "#17 = #1"
+def "ELSE"
+def "#24 = #32"
+def "#23 = #31"
+def "#22 = #30"
+def "#21 = #29"
+def "#20 = #28"
+def "#19 = #27"
+def "#18 = #26"
+def "#17 = #25"
+def "END"
+
+kind MUXL
+simtype 16
+grab -69 -40 6 45
+vector 25 -46 -56 -46
+vector -55 -54 -55 -46
+vector -50 -54 -50 -46
+vector -45 -46 -45 -54
+vector -40 -46 -40 -54
+vector -35 -46 -35 -54
+vector -30 -46 -30 -54
+vector -25 -47 -25 -54
+vector -20 -46 -20 -54
+vector -25 -54 -25 -46
+vector -15 -54 -15 -46
+vector -10 -46 -10 -54
+vector -5 -46 -5 -54
+vector 0 -46 0 -54
+vector 5 -46 5 -54
+vector 10 -46 10 -54
+vector 15 -46 15 -54
+vector 20 -46 20 -54
+vector -68 57 -1 57
+vector -30 65 -30 57
+vector -35 57 -35 65
+vector -40 65 -40 57
+vector -50 65 -50 57
+vector -55 65 -55 57
+vector -60 57 -60 65
+vector -65 57 -65 65
+vector -45 65 -45 57
+vector -56 -46 -70 -46
+vector 25 -46 2 57
+vector 2 57 -30 57
+vector 16 -5 30 -5
+vector -27 -35 -25 -38
+vector -24 -39 -24 -25
+vector -24 -25 -27 -25
+vector -27 -25 -20 -25
+pin #1 -55 -55
+pin #2 -50 -55
+pin #3 -45 -55
+pin #4 -40 -55
+pin #5 -35 -55
+pin #6 -30 -55
+pin #7 -25 -55
+pin #8 -20 -55
+pin #9 -15 -55
+pin #10 -10 -55
+pin #11 -5 -55
+pin #12 0 -55
+pin #13 5 -55
+pin #14 10 -55
+pin #15 15 -55
+pin #16 20 -55
+pin #17 -65 65
+pin #18 -60 65
+pin #19 -55 65
+pin #20 -50 65
+pin #21 -45 65
+pin #22 -40 65
+pin #23 -35 65
+pin #24 -30 65
+pin #25 -70 -45
+pin #26 -70 -40
+pin #27 -70 -35
+pin #28 -70 -30
+pin #29 -70 -25
+pin #30 -70 -20
+pin #31 -70 -15
+pin #32 -70 -10
+pin #33 -70 -5
+pin #34 -70 0
+pin #35 -70 5
+pin #36 -70 10
+pin #37 -70 15
+pin #38 -70 20
+pin #39 -70 25
+pin #40 -70 30
+pin #41 -70 35
+pin #42 -70 40
+pin #43 -70 45
+pin #44 -70 50
+pin #45 -70 55
+pin #46 30 -5
+connect 1 1
+connect 2 2
+connect 3 3
+connect 4 4
+connect 5 5
+connect 6 6
+connect 7 7
+connect 8 8
+connect 42 42
+def "F = #46"
+def "IF F"
+def "#24 = #16"
+def "#23 = #15"
+def "#22 = #14"
+def "#21 = #13"
+def "#20 = #12"
+def "#19 = #11"
+def "#18 = #10"
+def "#17 = #9"
+def "ELSE"
+def "#24 = #33"
+def "#23 = #34"
+def "#22 = #35"
+def "#21 = #36"
+def "#20 = #37"
+def "#19 = #38"
+def "#18 = #39"
+def "#17 = #40"
+def "END"
+
+kind REGISTER
+simtype 16
+grab -38 -13 43 13
+vector 45 -16 -40 -16
+vector -40 -16 -40 17
+vector -35 -24 -35 -16
+vector -30 -24 -30 -16
+vector -25 -16 -25 -24
+vector -20 -16 -20 -24
+vector -15 -16 -15 -24
+vector -10 -16 -10 -24
+vector -5 -17 -5 -24
+vector 0 -16 0 -24
+vector -5 -24 -5 -16
+vector 5 -24 5 -16
+vector 10 -16 10 -24
+vector 15 -16 15 -24
+vector 20 -16 20 -24
+vector 25 -16 25 -24
+vector 30 -16 30 -24
+vector 35 -16 35 -24
+vector 40 -16 40 -24
+vector -40 17 45 17
+vector 0 25 0 17
+vector -5 17 -5 25
+vector -10 25 -10 17
+vector -20 25 -20 17
+vector -25 25 -25 17
+vector -30 17 -30 25
+vector -35 17 -35 25
+vector -15 25 -15 17
+vector 45 -16 45 17
+vector 5 17 5 25
+vector 10 25 10 17
+vector 15 17 15 25
+vector 20 17 20 25
+vector 25 17 25 25
+vector 30 17 30 25
+vector 35 17 35 25
+vector 40 17 40 25
+vector -40 2 -35 5
+vector -35 5 -40 8
+circle -47 3 -40 7
+vector -50 5 -47 5
+vector -40 -5 -50 -5
+vector -34 -6 -32 -6
+vector -32 -6 -32 -7
+vector -32 -7 -34 -7
+vector -34 -7 -34 -4
+vector -34 -4 -32 -4
+vector 0 -3 0 2
+vector 0 2 -1 1
+vector 0 2 1 1
+ellipse -38 -9 -35 -4
+pin #1 -35 -25
+pin #2 -30 -25
+pin #3 -25 -25
+pin #4 -20 -25
+pin #5 -15 -25
+pin #6 -10 -25
+pin #7 -5 -25
+pin #8 0 -25
+pin #9 5 -25
+pin #10 10 -25
+pin #11 15 -25
+pin #12 20 -25
+pin #13 25 -25
+pin #14 30 -25
+pin #15 35 -25
+pin #16 40 -25
+pin #17 -35 25
+pin #18 -30 25
+pin #19 -25 25
+pin #20 -20 25
+pin #21 -15 25
+pin #22 -10 25
+pin #23 -5 25
+pin #24 0 25
+pin #25 5 25
+pin #26 10 25
+pin #27 15 25
+pin #28 20 25
+pin #29 25 25
+pin #30 30 25
+pin #31 35 25
+pin #32 40 25
+pin #33 -50 5
+pin #34 -50 -5
+def "IF FALL #33"
+def "A = #1"
+def "B = #2"
+def "C = #3"
+def "D = #4"
+def "E = #5"
+def "F = #6"
+def "G = #7"
+def "H = #8"
+def "I = #9"
+def "J = #10"
+def "K = #11"
+def "L = #12"
+def "M = #13"
+def "N = #14"
+def "O = #15"
+def "P = #16"
+def "END"
+def "IF #34"
+def "#17 = A"
+def "#18 = B"
+def "#19 = C"
+def "#20 = D"
+def "#21 = E"
+def "#22 = F"
+def "#23 = G"
+def "#24 = H"
+def "#25 = I"
+def "#26 = J"
+def "#27 = K"
+def "#28 = L"
+def "#29 = M"
+def "#30 = N"
+def "#31 = O"
+def "#32 = P"
+def "END"
+
+
+# End of file.
+

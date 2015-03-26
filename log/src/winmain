@@ -1,0 +1,80 @@
+#include <windows.h>
+extern HWND hwnd;
+LRESULT FAR PASCAL _export WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+
+
+   switch (message)
+   {
+      case WM_PAINT:
+
+      break;
+
+      case WM_ENTERIDLE:
+      
+    
+      
+      break;
+      case WM_COMMAND:
+   
+      break;
+
+      case WM_DESTROY:
+         PostQuitMessage (0) ;
+         return 0 ;
+   }
+   return DefWindowProc (hwnd, message, wParam, lParam) ;
+}
+
+int PASCAL WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
+          LPSTR lpszCmd, int nCmdShow)
+{
+   static char szAppName[] = "CHelp" ;
+   
+   MSG         msg ;
+   WNDCLASS    wndclass ;
+   HANDLE    hAccel;
+
+   if (!hPrevInstance)
+   {
+      wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
+      wndclass.lpfnWndProc   = DefWindowProc;//(WNDPROC)WndProc ;
+      wndclass.cbClsExtra    = 0 ;
+      wndclass.cbWndExtra    = 0 ;
+      wndclass.hInstance     = hInstance ;
+      wndclass.hIcon         = LoadIcon( NULL, IDI_APPLICATION );
+      wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
+      wndclass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+      wndclass.lpszMenuName  = 0; //MAKEINTRESOURCE( CHELPAPMENU );
+      wndclass.lpszClassName = szAppName ;
+
+      RegisterClass (&wndclass) ;
+  }
+
+  hwnd = CreateWindow (szAppName,
+    "Windows Help Example",
+    WS_OVERLAPPEDWINDOW,
+    CW_USEDEFAULT,
+    CW_USEDEFAULT,
+    CW_USEDEFAULT,
+    CW_USEDEFAULT,
+    NULL,
+    NULL,
+    hInstance,
+    NULL) ;
+
+   ShowWindow (hwnd, nCmdShow) ;
+   UpdateWindow (hwnd) ;
+/*
+   while (GetMessage (&msg, NULL, 0, 0))
+   {
+    if ( !TranslateAccelerator( hwnd, hAccel, &msg ))
+    {
+       TranslateMessage (&msg) ;
+       DispatchMessage (&msg) ;
+    }
+   }
+   return msg.wParam ;
+*/
+   logmain();
+}

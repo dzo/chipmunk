@@ -1,0 +1,267 @@
+-5
+f s
+n 13
+32 0
+
+32 0
+
+32 0
+
+32 0
+
+32 0
+
+32 0
+
+32 0
+
+32 0
+
+32 0
+
+32 0
+
+32 0
+
+32 0
+
+32 0
+
+s 0
+w 0
+p 0
+l 22
+3303 3278 43 Lesson 4  Behind the Scenes - Part I
+3304 3286 21 Transistor Models 
+3286 3293 4 Good
+3286 3304 4 Evil
+3294 3290 54 Subthreshold and square-law regions modelled.
+3294 3292 49 Vds >= Vgs-Vt saturation curves modelled.
+3294 3294 51 Complete symmetry between Source and Drain.
+3294 3296 43 Output resistance modelled linearly.
+3294 3301 49 Vt is not a function of circuit voltages.
+3294 3303 31 All capacitors are linear.
+3294 3305 44 No second order effects like velocity
+3294 3307 31 saturation are considered.
+3303 3280 43 ------------------------------------
+3280 3315 28 Some other useful gates:
+3278 3331 16 Step generator
+3293 3323 16 Voltage switch
+3291 3336 19 Current switches
+3324 3336 42 Lesson 5... More backstage secrets.
+3324 3317 44 Except for meters, every gate must be
+3324 3319 45 completely connected for simulation to
+3324 3321 45 proceed. Adding negligible capacitors 
+3324 3323 36 will overcome this difficulty.
+b 3
+3277 3285 3349 3310
+3277 3314 3312 3341
+3315 3315 3371 3327
+g 10
+TIME
+3363 3286 0 16 90 0 0
+
+
+ARROW1
+3364 3311 0 20 0 0 0
+
+
+NUMBERS
+3364 3300 0 3 0 0 16
+
+U5
+U0.1
+U7
+U-2
+U1E-4
+U1E-20
+U1E-40
+U1E-6
+U1E-40
+U1E-9
+U2
+I2
+I30
+R10
+U0.1
+U1E-14
+ TRUE
+ TRUE
+
+CAPFLOAT
+3319 3321 0 17 0 0 1
+2 1
+U1E-12
+-1.00000E+06
+-1.00000E+06
+ 1.00000E-14
+-1.00000E+06
+-1.00000E+06
+ 1.00000E-14
+
+ISWITCH2
+3301 3329 0 5 0 0 12
+3
+U0.1
+V0
+U0
+U1E-8
+U3E-4
+U3E-4
+V0
+U0
+U1E-8
+U3E-4
+U3E-4
+U6E-4
+-1.00000E+06
+-1.00000E+06
+ 1.00000E-14
+ 1.00000E+20
+FALSE
+FALSE
+ 0.00000E+00
+-1.00000E+20
+FALSE
+ 0.00000E+00
+
+ISWITCH1
+3301 3333 0 4 0 0 12
+4
+U0.1
+V0
+U0
+U1E-8
+U3E-4
+U3E-4
+V0
+U0
+U1E-8
+U3E-4
+U3E-4
+U6E-4
+-1.00000E+06
+-1.00000E+06
+ 1.00000E-14
+ 1.00000E+20
+FALSE
+FALSE
+ 0.00000E+00
+-1.00000E+20
+FALSE
+ 0.00000E+00
+
+VSWITCH
+3301 3320 0 3 0 0 12
+5
+U50
+V0
+U0
+U5
+U3E-4
+U3E-4
+V0
+U0
+U5
+U3E-4
+U3E-4
+U6E-4
+-1.00000E+06
+-1.00000E+06
+ 1.00000E-14
+ 1.00000E+20
+FALSE
+FALSE
+ 0.00000E+00
+-1.00000E+20
+FALSE
+ 0.00000E+00
+
+STAIRS
+3286 3326 0 22 0 0 9
+7 6
+B0
+U50
+V0
+U0
+U5
+I5
+U6E-4
+U3E-4
+U0
+-1.00000E+06
+-1.00000E+06
+ 1.00000E-14
+-1.00000E+06
+-1.00000E+06
+ 1.00000E-14
+ 0.00000E+00
+ TRUE
+FALSE
+ 0.00000E+00
+ 0.00000E+00
+ TRUE
+FALSE
+
+NFET4
+3280 3294 2 14 0 0 17
+10 9 8
+X
+X
+X
+X
+X
+X
+X
+X
+X
+U1E-14
+U1E-14
+U1
+U0.9
+U5E-17
+U3.33
+U0.04
+U50
+-1.00000E+06
+-1.00000E+06
+ 1.00000E-14
+-1.00000E+06
+-1.00000E+06
+ 1.00000E-14
+-1.00000E+06
+-1.00000E+06
+ 1.00000E-14
+
+NFET4
+3280 3305 2 15 0 0 17
+13 12 11
+X
+X
+U1E-14
+X
+X
+U1E-14
+X
+X
+U1E-14
+U1E-14
+U1E-14
+U1
+U0.9
+U5E-17
+U3.33
+U0.04
+U50
+-1.00000E+06
+-1.00000E+06
+ 1.00000E-14
+-1.00000E+06
+-1.00000E+06
+ 1.00000E-14
+-1.00000E+06
+-1.00000E+06
+ 1.00000E-14
+
+h 0
+.
