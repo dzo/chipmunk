@@ -1,0 +1,465 @@
+%!Not-Quite-PS-Adobe-1.0
+%%Creator: Loged
+%!PS-Adobe-2.0
+% Caged_date='r% Last change: $x by $u'
+% Last change: Feb 1, 1989 3:16:38 pm by calvin
+/UntilState save def
+180 dict begin
+/UNTILFINISH { end UntilState restore } def
+%%BoundingBox: 20 20 576 756
+% $ Include /lib/laserwriter/texstuff.ps
+%  PS-in-TeX macros
+
+% Determine whether or not we are being called from TeX.  Currently, this
+% relies on GPOSX being defined or not.
+%
+%  Is-TeX <boolean>
+%
+/GPOSX where /Is-TeX exch def Is-TeX {pop} if % Define Is-TeX and eat "dict"
+
+% Try to define the current TeX-MBB.  If not Is-TeX then use the user-supplied
+% TeX-MBB or the whole page if TeX-MBB can not be found.
+%
+%  TeX-MBB <[mbb in TeX space]>
+%
+Is-TeX
+   {/TeX-MBB [GPOSX GPOSY currentpoint] def}
+   {/TeX-MBB where {pop} {/TeX-MBB [20 20 576 756] def} ifelse}
+ifelse
+
+%
+%  Define a couple of macros that do stuff if you are in TeX or not.
+%
+%  <procedure> In-Tex
+%  <procedure> Not-In-Tex
+%
+/In-TeX {Is-TeX exch if} def
+/Not-In-TeX {Is-TeX not exch if} def
+
+%
+%  Set up square scaling given an MBB
+%
+%  <[user-mbb]> TeX-do-square-scale
+%
+/TeX-do-square-scale {
+   % get User mbb
+      aload pop
+      /U-top   exch def
+      /U-right exch def
+      /U-bot   exch def
+      /U-left  exch def
+   % sort MBB
+      U-top U-bot lt    {U-top U-bot /U-top exch def /U-bot exch def} if
+      U-right U-left lt {U-right U-left /U-right exch def /U-left exch def} if
+   /U-height U-top U-bot sub def
+   /U-width  U-right U-left sub def
+   % get TeX MBB
+      TeX-MBB aload pop
+      /T-top   exch def
+      /T-right exch def
+      /T-bot   exch def
+      /T-left  exch def
+   % sort MBB
+      T-top T-bot lt    {T-top T-bot /T-top exch def /T-bot exch def} if
+      T-right T-left lt {T-right T-left /T-right exch def /T-left exch def} if
+   /T-height T-top T-bot sub def
+   /T-width  T-right T-left sub def
+   % Compute scaling in X and Y
+      /S-x T-width  U-width  div def
+      /S-y T-height U-height div def
+   % Make scales equal and center Tex-Mbb
+   % extra height=(T-height - S-x * U-height)
+   % Then divide by 2 and add to bottom (similar for extrawidth) }
+      S-x S-y gt
+      { /S-x S-y def 
+        T-width S-x U-width mul sub 2 div T-left add /T-left exch def }
+      { /S-y S-x def
+        T-height S-x U-height mul sub 2 div T-bot add /T-bot exch def }
+   ifelse
+   % Compute translation
+   T-left T-bot translate
+   S-x S-y scale
+   % Compute translation
+   U-left neg U-bot neg translate
+} def
+
+%
+%  Set up non-square scaling given an MBB
+%
+%  <[user-mbb]> TeX-do-scale
+%
+/TeX-do-scale {
+   aload pop % get User mbb
+   /U-top   exch def
+   /U-right exch def
+   /U-bot   exch def
+   /U-left  exch def
+   /U-height U-top U-bot sub def
+   /U-width  U-right U-left sub def
+   TeX-MBB aload pop % get TeX MBB
+   /T-top   exch def
+   /T-right exch def
+   /T-bot   exch def
+   /T-left  exch def
+   /T-height T-top T-bot sub def
+   /T-width  T-right T-left sub def
+   % Compute scaling in X and Y
+   /S-x T-width  U-width  div def
+   /S-y T-height U-height div def
+   % Compute translation
+   T-left T-bot translate
+   S-x S-y scale
+   % Compute translation
+   U-left neg U-bot neg translate
+} def
+
+%
+% Draw a box around an mbb-array
+%
+% <[mbb]> TeX-mbb-box
+%
+/TeX-mbb-box {
+   aload pop
+   /B-ury exch def
+   /B-urx exch def
+   /B-lly exch def
+   /B-llx exch def
+   newpath B-llx B-lly moveto B-llx B-ury lineto B-urx B-ury
+   lineto B-urx B-lly lineto closepath stroke
+} def
+
+
+
+% <size in points (72 per inch)> pt <size in user-units>
+% Feed pt through the default matrix to get device coordinates,
+% and then reverse transform it through the current matrix to get user units
+/pt { dup matrix defaultmatrix dtransform idtransform pop abs } def
+
+% Macro to define fonts-takes "/ID Size /Font-Name" as params
+/DF { findfont exch pt dup 0.8 mul /STRH exch def scalefont def } def
+% Define a default text font...
+/DT { /DT0 20 /Times-Roman DF DT0 SF } def
+% Macros for positioning Text-take "(string) x y" as params
+/strbox { gsave newpath 0 0 moveto false charpath
+          40 setflat flattenpath pathbbox grestore } def
+%/strsizes { strbox 4 2 roll exch pop } def
+/strsizes { stringwidth pop STRH 0 } def
+% Usage: string    _strsizes_     width height depth
+/TOP { pop -1 mul } def
+/VCENT { pop -.5 mul } def
+/LOW { pop pop 0 } def
+/BOT { exch pop -1 mul } def
+/LEFT { exch pop 0 exch } def
+/HCENT { exch -.5 mul exch } def
+/RIGHT { exch -1 mul exch } def
+
+/DEBUG { (Now showing:) print dup print (\n) print } def
+/TUL { moveto dup strsizes TOP LEFT rmoveto show } def
+/TUC { moveto dup strsizes TOP HCENT rmoveto show } def
+/TUR { moveto dup strsizes TOP RIGHT rmoveto show } def
+/TCL { moveto dup strsizes VCENT LEFT rmoveto show } def
+/TCC { moveto dup strsizes VCENT HCENT rmoveto show } def
+/TCR { moveto dup strsizes VCENT RIGHT rmoveto show } def
+/TLL { moveto dup strsizes LOW LEFT rmoveto show } def
+/TLC { moveto dup strsizes LOW HCENT rmoveto show } def
+/TLR { moveto dup strsizes LOW RIGHT rmoveto show } def
+/TBL { moveto dup strsizes BOT LEFT rmoveto show } def
+/TBC { moveto dup strsizes BOT HCENT rmoveto show } def
+/TBR { moveto dup strsizes BOT RIGHT rmoveto show } def
+% Shorthand for things
+/LD { load def } def
+/S /show LD
+/M /moveto LD
+/L /lineto LD
+/R /rlineto LD
+/DS { /DOTSIZE exch def } def
+5 pt DS
+/DOT { DOTSIZE 0 360 arc } def
+/D { 2 copy lineto stroke moveto } def
+/CT /rcurveto LD
+/CI { 0 360 arc } def
+/CP /closepath LD
+/NP /newpath LD
+/SF /setfont LD
+% defaults to use the old til-type stuff.  (FillPath and StrokePath)
+/FP { finpath } def
+/SP { finpath } def
+% Shorthand for colors
+/FILL { /FP /fill LD /SP /FP LD } def
+/FILLOUT { /FP { gsave gsave fill grestore 0 setgray stroke grestore } def 
+           /SP /FP LD } def
+/FILLSTROKE { /FP /fill LD /SP /stroke LD } def
+/STROKE { /FP /stroke LD /SP /FP LD } def
+/SG /setgray LD
+/SLW /setlinewidth LD
+/SLJ /setlinejoin LD
+/SLC /setlinecap LD
+/SD /setdash LD
+% Stuff to include comments in files
+/CmtY 10 def   % Starting Y position
+/Cmt { 20 CmtY moveto /Helvetica findfont 8 scalefont setfont show 
+       /CmtY CmtY 10 add store } def
+/BOX { 2 copy M 3 index exch L 3 -1 roll 2 index L exch L CP } def
+%%EndProlog
+{/TeX-MBB [0 0 612 792] def} Not-In-TeX
+[ 0 0 8.5 11 ] TeX-do-square-scale
+0 11 translate -90 rotate FILLSTROKE
+/bigfont 40 /Helvetica-Bold DF bigfont SF
+(ALUH)
+0.5 8.2 TUL
+(ALUH)
+10.5 8.2 TUR
+save 3.5 4.5 translate 3 75 div dup scale
+/pinfont 10 /Helvetica DF pinfont SF
+.2 pt SLW 0 SG
+NP 75 dup dup neg dup BOX SP
+2 pt SLW .95 SG
+NP -56 40 28 -59 BOX SP
+.9 SG
+-60 55 5 pt 0 360 arc FP
+-55 55 5 pt 0 360 arc FP
+-50 55 5 pt 0 360 arc FP
+-45 55 5 pt 0 360 arc FP
+-40 55 5 pt 0 360 arc FP
+-35 55 5 pt 0 360 arc FP
+-30 55 5 pt 0 360 arc FP
+-25 55 5 pt 0 360 arc FP
+-20 55 5 pt 0 360 arc FP
+-15 55 5 pt 0 360 arc FP
+-10 55 5 pt 0 360 arc FP
+-5 55 5 pt 0 360 arc FP
+0 55 5 pt 0 360 arc FP
+5 55 5 pt 0 360 arc FP
+10 55 5 pt 0 360 arc FP
+15 55 5 pt 0 360 arc FP
+-10 -65 5 pt 0 360 arc FP
+-5 -65 5 pt 0 360 arc FP
+0 -65 5 pt 0 360 arc FP
+5 -65 5 pt 0 360 arc FP
+10 -65 5 pt 0 360 arc FP
+15 -65 5 pt 0 360 arc FP
+20 -65 5 pt 0 360 arc FP
+25 -65 5 pt 0 360 arc FP
+25 45 5 pt 0 360 arc FP
+25 40 5 pt 0 360 arc FP
+25 35 5 pt 0 360 arc FP
+25 30 5 pt 0 360 arc FP
+25 25 5 pt 0 360 arc FP
+25 20 5 pt 0 360 arc FP
+25 15 5 pt 0 360 arc FP
+25 10 5 pt 0 360 arc FP
+25 5 5 pt 0 360 arc FP
+25 0 5 pt 0 360 arc FP
+25 -5 5 pt 0 360 arc FP
+25 -10 5 pt 0 360 arc FP
+25 -15 5 pt 0 360 arc FP
+25 -20 5 pt 0 360 arc FP
+25 -25 5 pt 0 360 arc FP
+25 -30 5 pt 0 360 arc FP
+25 -35 5 pt 0 360 arc FP
+25 -40 5 pt 0 360 arc FP
+25 -45 5 pt 0 360 arc FP
+25 -50 5 pt 0 360 arc FP
+25 -55 5 pt 0 360 arc FP
+-65 5 5 pt 0 360 arc FP
+-65 0 5 pt 0 360 arc FP
+-65 -5 5 pt 0 360 arc FP
+-65 -10 5 pt 0 360 arc FP
+1 pt SLW 0 SG gsave 1 SLC 1 SLJ
+NP 16 46 M 27 24 L SP
+NP 16 46 M -65 46 L SP
+NP -65 46 M -15 -57 L SP
+NP -60 54 M -60 46 L SP
+NP -55 54 M -55 46 L SP
+NP -50 46 M -50 54 L SP
+NP -45 46 M -45 54 L SP
+NP -40 46 M -40 54 L SP
+NP -35 46 M -35 54 L SP
+NP -30 47 M -30 54 L SP
+NP -25 46 M -25 54 L SP
+NP -30 54 M -30 46 L SP
+NP -20 54 M -20 46 L SP
+NP -15 46 M -15 54 L SP
+NP -10 46 M -10 54 L SP
+NP -5 46 M -5 54 L SP
+NP 0 46 M 0 54 L SP
+NP 5 46 M 5 54 L SP
+NP 10 46 M 10 54 L SP
+NP 15 46 M 15 54 L SP
+NP -15 -57 M 27 -57 L SP
+NP 25 -65 M 25 -57 L SP
+NP 20 -57 M 20 -65 L SP
+NP 15 -65 M 15 -57 L SP
+NP 5 -65 M 5 -57 L SP
+NP 0 -65 M 0 -57 L SP
+NP -5 -57 M -5 -65 L SP
+NP -10 -57 M -10 -65 L SP
+NP 10 -65 M 10 -57 L SP
+NP -46 5 M -65 5 L SP
+NP -65 0 M -43 0 L SP
+NP -65 -5 M -40 -5 L SP
+NP -65 -10 M -38 -10 L SP
+NP -43 5 M -43 10 L SP
+NP -43 10 M -40 5 L SP
+NP -40 5 M -40 10 L SP
+NP -40 3 M -37 3 L SP
+NP -37 3 M -40 -2 L SP
+NP -40 -2 M -37 -2 L SP
+NP -37 -4 M -35 -9 L SP
+NP -35 -9 M -33 -4 L SP
+NP -30 -10 M -33 -10 L SP
+NP -33 -10 M -33 -14 L SP
+NP -33 -14 M -30 -14 L SP
+grestore
+(1)
+-61.47 56.35 TCC
+(2)
+-55 58 TLC
+(3)
+-50 58 TLC
+(4)
+-45 58 TLC
+(5)
+-40 58 TLC
+(6)
+-35 58 TLC
+(7)
+-30 58 TLC
+(8)
+-25 58 TLC
+(9)
+-20 58 TLC
+(10)
+-15 58 TLC
+(11)
+-10 58 TLC
+(12)
+-5 58 TLC
+(13)
+0 58 TLC
+(14)
+5 58 TLC
+(15)
+10 58 TLC
+(16)
+15 58 TLC
+(17)
+-10 -68 TUC
+(18)
+-5 -68 TUC
+(19)
+0 -68 TUC
+(20)
+5 -68 TUC
+(21)
+10 -68 TUC
+(22)
+15 -68 TUC
+(23)
+20 -68 TUC
+(24)
+25 -68 TUC
+(25)
+25 48 TLC
+(26)
+26.06 41.70 TCC
+(27)
+26.16 36.63 TCC
+(28)
+26.28 31.54 TCC
+(29)
+26.41 26.41 TCC
+(30)
+26.56 21.25 TCC
+(31)
+26.71 16.03 TCC
+(32)
+26.86 10.74 TCC
+(33)
+26.96 5.39 TCC
+(34)
+27.00 0.00 TCC
+(35)
+26.96 -5.39 TCC
+(36)
+26.86 -10.74 TCC
+(37)
+26.71 -16.03 TCC
+(38)
+26.56 -21.25 TCC
+(39)
+26.41 -26.41 TCC
+(40)
+26.28 -31.54 TCC
+(41)
+26.16 -36.63 TCC
+(42)
+26.06 -41.70 TCC
+(43)
+25.97 -46.75 TCC
+(44)
+25.89 -51.79 TCC
+(45)
+25.83 -56.82 TCC
+(46)
+-68 5 TCR
+(47)
+-68 0 TCR
+(48)
+-68 -5 TCR
+(49)
+-68 -10 TCR
+restore
+/labelfont 10 /Helvetica DF labelfont SF
+/notefont 8 /Times-Italic DF
+(F = #42 AND NOT #43 AND NOT #44)
+6.80 7.50 TUL
+(IF F)
+6.80 7.35 TUL
+(   C = #41)
+6.80 7.20 TUL
+(   #24 = #8 XOR NOT #32 XOR C)
+6.80 7.05 TUL
+(   C = \(#8 AND NOT #32\) OR \(C AND \(#8 OR NOT #32\)\))
+6.80 6.90 TUL
+(   #23 = #7 XOR NOT #31 XOR C)
+6.80 6.75 TUL
+(   C = \(#7 AND NOT #31\) OR \(C AND \(#7 OR NOT #31\)\))
+6.80 6.60 TUL
+(   #22 = #6 XOR NOT #30 XOR C)
+6.80 6.45 TUL
+(   C = \(#6 AND NOT #30\) OR \(C AND \(#6 OR NOT #30\)\))
+6.80 6.30 TUL
+(   #21 = #5 XOR NOT #29 XOR C)
+6.80 6.15 TUL
+(   C = \(#5 AND NOT #29\) OR \(C AND \(#5 OR NOT #29\)\))
+6.80 6.00 TUL
+(   #20 = #4 XOR NOT #28 XOR C)
+6.80 5.85 TUL
+(   C = \(#4 AND NOT #28\) OR \(C AND \(#4 OR NOT #28\)\))
+6.80 5.70 TUL
+(   #19 = #3 XOR NOT #27 XOR C)
+6.80 5.55 TUL
+(   C = \(#3 AND NOT #27\) OR \(C AND \(#3 OR NOT #27\)\))
+6.80 5.40 TUL
+(   #18 = #2 XOR NOT #26 XOR C)
+6.80 5.25 TUL
+(   C = \(#2 AND NOT #26\) OR \(C AND \(#2 OR NOT #26\)\))
+6.80 5.10 TUL
+(   #17 = #1 XOR NOT #25 XOR C)
+6.80 4.95 TUL
+notefont SF (etc\274) 6.80 4.80 TUL labelfont SF
+.2 pt SLW NP 6.70 4.50 M 6 0 R SP
+/headerfont 12 /Helvetica DF headerfont SF
+(File: cpu.gat)
+0.50 1.20 TLL
+(Group: 0)
+0.50 1.00 TLL
+(Simtype: 16)
+0.50 0.80 TLL
+(Connectivity: 9,33; 10,34; 11,35; 12,36; 13,37; 14,38; 15,39; 16,40)
+2.50 1.00 TLL
+(Flags: None)
+2.50 0.80 TLL
+{showpage} Not-In-TeX UNTILFINISH
+%%EndFile

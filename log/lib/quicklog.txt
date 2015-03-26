@@ -1,0 +1,99 @@
+                          Guida di riferimento veloce
+                               per l' uso di LOG 
+                    sistema per il disegno e la simulazione
+                             di circuiti digitali.
+
+   1.  Digitare "log" per avviare il programma (oppure utilizzare il 
+       file batch fornito che setta le variabili di sistema necessarie).
+       Non modificare le directory di installazione.
+
+   2.  Per uscire da modalitÖ diverse da editing premere CTRL-C.
+
+   3.  Premere la barra spaziatrice per rinfrescare la finestra.
+
+   4.  Per muovere gli oggetti trascinarli con il bottone sinistro del mouse.
+
+   5.  Per cancellare gli oggetti trascinarli verso gli angoli in basso. 
+
+   6.  Cliccare con il bottone sinistro per iniziare il disegno dei fili
+       o sugli oggetti per ruotarli e configurarli.
+
+   7.  Premere il bottone destro per terminare il disegno dei fili
+       e per uscire da altre semplici modalitÖ.
+
+   8.  Per allungare o accorciare i fili trascinarne un estremo.
+
+   9.  Per connettere i gate fare sç che i pin (i punti rossi) tocchino
+       i fili o i pin di altri gate. 
+
+  10.  Cliccare su CAT per entrare nel catalogo dei gate; trascinarli nel 
+       disegno per utilizzarli. Con LIBR si accede alla libreria completa 
+       dei gate.
+
+  11.  Gli incroci a T dei fili sono sempre connettivi; quelli a croce
+       devono essere connessi a mano cliccandoci sopra (appare un puntino).
+
+  12.  Premere i tasti < e > per fare lo zoom; le frecce fanno lo scroll del
+       disegno (il piano di disegno ä infinito in ogni direzione).
+
+  13.  Cliccare per cambiare ROT in MIR e CNFG e quindi poter ruotare, 
+       specchiare e configurare i gate cliccando su essi.
+
+  14.  Nelle schermate di configurazione usare le frecce su/gi£ per 
+       selezionare un attributo, destra/sinistra per cambiarlo.
+
+  15.  RESET riporta il tempo di simulazione a t=0.
+
+  16.  Cliccando su SIMULATION (in editing) o ON-OFF (in SCOPE) la simulazione
+       si attiva/disattiva
+
+  17.  I gate ad 1 pin TO e FROM (equivalenti) servono per dare un
+       nome ai segnali (cliccare su TO o FROM e poi digitare il nome)
+       per poi diagrammarli temporalmente in SCOPE; se due di tali gate 
+       hanno lo stesso nome ä come se fossero collegati con un filo.
+
+  18.  Per diagrammare un segnale in SCOPE digitarne il nome.
+
+  19.  Cliccare su CONFIG o sul nome di un segnale per settare i parametri
+       della modalitÖ SCOPE.
+
+  20.  Per iniziare a diagrammare occorre dare un trigger.
+
+  21.  Nella modalitÖ SCOPE ci sono diverse possibilitÖ di trigger:
+         1. Manual:     il trigger va attivato e disattivato a mano cliccando
+                        su TRIGGER.
+         2. On Reset:   come in Manual ma il trigger ä anche automatico
+                        su RESET.
+         3. Triggered:  come in Manual ma il trigger ä anche automatico con
+                        un impulso su un segnale specificato.
+         4. Continuous: il trigger ä manuale o su reset ma quando la memoria
+                        si esaurisce vengono sovrascritti i primi istanti di
+                        simulazione. Il trigger non viene mai disattivato se
+                        non a mano.
+  
+  22.  Cliccare per cambiare ABSOLUTE in DELTA, VALUE e SLOPE
+       o per cambiare TIME in FREQ e SIGNAL; spostarsi con il 
+       bottone sinistro premuto per misurare i valori desiderati.
+
+  23.  Cliccare su DELETE nel menu EDITING poi trascinare e racchiudere con il
+       rettangolo le aree da cancellare.
+
+  24.  Usare DELETE + PASTE per muovere le aree, COPY + PASTE per copiarle 
+       (o in editing trascinare e racchiudere con il rettangolo le aree e 
+       poi spostarle e copiarle).
+
+  25.  NON USARE i comandi OPEN e CLOSE: si possono danneggiare le strutture 
+       dati di log.
+
+  26.  Usare SAVE e LOAD per salvare e caricare i circuiti 
+       (l' estensione "lgf" puï essere omessa).
+
+  27.  SAVE salva la precedente versione con estensione "lfo".
+
+  28.  Nell' ultima schermata della modalitÖ di stampa appaiono affiancati
+       i due comandi PLOT e FILE. PLOT non ha alcun effetto. FILE produce 
+       la stampa su un file in formato Postscript di cui si puï specificare 
+       il nome (omettendone l' estensione "ps") nella schermata di CONFIG 
+       altrimenti il file di default ä \LOG\LIB\LOGPLOT.PS 
+       N.B. Se il nome non viene modificato ad ogni stampa il file viene 
+            sovrascritto.

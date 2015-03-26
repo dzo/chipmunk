@@ -1,0 +1,7 @@
+for i in *.c *.h
+do
+echo $i
+echo ------------------------------------------
+fromall < $i > /tmp/t
+diff /tmp/t /root/Prog/chipmunk/log/src/$i
+done
