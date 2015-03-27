@@ -220,9 +220,9 @@ p2clib.o: p2clib.c
 	$(CC) -c $(CFLAGS) $(P2CFLAGS) p2clib.c
 
 clean:
-	del *.o
-	del libp2c.a
-	del ..\libp2c.a
+	-del *.o
+	-del libp2c.a
+	-del ..\libp2c.a
  
 ## The following part of the Makefile is for making a tar file of the
 ## original parts of the psys distribution. Most users have no need for it.

@@ -241,10 +241,10 @@ TOOLOBJ = $(SIMOBJ) lplot.o logspc.o logntk.o winmain.o
 install: all
 
 clean:	
-	del *.o 
-	del ana\*.o 
-	del log.exe
-	del loged.exe
+	-del *.o 
+	-del ana\*.o 
+	-del log.exe
+	-del loged.exe
 
 all:  main
 
