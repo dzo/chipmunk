@@ -47,6 +47,7 @@ the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 
 extern char *my_strdup(char *s);
+#undef strdup
 #define strdup my_strdup
 
 
@@ -398,7 +399,7 @@ struct LOC_Log_logntk_proc *LINK;
     getword(buf, buf1, LINK);
     getword(buf, buf2, LINK);
     if (strlen(buf2) != 1 ||
-	buf2[0] != 'D' && buf2[0] != 'P' && buf2[0] != 'N') {
+	(buf2[0] != 'D' && buf2[0] != 'P' && buf2[0] != 'N')) {
       message("Syntax error in TRANS command", LINK);
       return;
     }
@@ -537,7 +538,7 @@ struct LOC_Log_logntk_proc *LINK;
       }
       portlist = (log_nrec **)Malloc(g->kind->numpins * sizeof(log_nrec *));
       pnumlist = NULL;
-      examinetemplate(g, portlist, (long)g->kind->numpins, isinstgate(g),
+      examinetemplate(g, portlist, (long)g->kind->numpins, isgenericinstgate(g),
 		      &pnumlist, &lastn, &laste, &lasts, &lastw);
       for (i = 0; i < lastw; i++)
 	namenode(portlist[i], LINK);
@@ -906,7 +907,7 @@ struct LOC_readcells *LINK;
   while (!P_eof(LINK->f2) && !done) {
     do {
       fgets(LINK->s, 256, LINK->f2);
-      TEMP = strchr(LINK->s, '\n');
+      TEMP = (char *) strchr(LINK->s, '\n');
       if (TEMP != NULL)
 	*TEMP = 0;
       if (*LINK->s == '|')
@@ -927,7 +928,7 @@ struct LOC_readcells *LINK;
       copying = false;
     do {
       fgets(LINK->s, 256, LINK->f2);
-      TEMP = strchr(LINK->s, '\n');
+      TEMP = (char *) strchr(LINK->s, '\n');
       if (TEMP != NULL)
 	*TEMP = 0;
       if (copying) {
@@ -1005,7 +1006,7 @@ struct LOC_dologntk *LINK;
 	found = false;
 	while (!found && !P_eof(V.f2)) {
 	  fgets(V.s, 256, V.f2);
-	  TEMP = strchr(V.s, '\n');
+	  TEMP = (char *) strchr(V.s, '\n');
 	  if (TEMP != NULL)
 	    *TEMP = 0;
 	  if (*V.s != 'c')
@@ -1021,7 +1022,7 @@ struct LOC_dologntk *LINK;
 	    if (*V.name == '\0') {
 	      do {
 		fgets(V.s2, 256, V.f2);
-		TEMP = strchr(V.s2, '\n');
+		TEMP = (char *) strchr(V.s2, '\n');
 		if (TEMP != NULL)
 		  *TEMP = 0;
 	      } while (*V.s == '\0' || V.s[0] == '|');
@@ -1212,7 +1213,7 @@ struct LOC_dologntk *LINK;
 	writeword((Char *)g->temp, &V);
 	portlist = (log_nrec **)Malloc(g->kind->numpins * sizeof(log_nrec *));
 	pnumlist = NULL;
-	examinetemplate(g, portlist, (long)g->kind->numpins, isinstgate(g),
+	examinetemplate(g, portlist, (long)g->kind->numpins, isgenericinstgate(g),
 			&pnumlist, &lastn, &laste, &lasts, &lastw);
 	l1 = c->port;
 	i = 0;
@@ -1305,7 +1306,7 @@ struct LOC_dologntk *LINK;
     }
     g = g->next;
   }
-  if (!(topness == top_yes || topness == top_maybe && autotop) || maincell)
+  if (!(topness == top_yes || (topness == top_maybe && autotop)) || maincell)
     return;
   fprintf(LINK->outf, ".\n");
   i = 0;
@@ -1457,7 +1458,6 @@ struct LOC_Log_logntk_proc *LINK;
   log_brec *curbox;
   long i, xpos, ypos, FORLIM;
   
-  m_tracking(2L);
   (*LINK->act->hook.clearfunc)();
   defndir = mydefndirectory((int)LINK->act->curpage, LINK);
   curdef = NULL;
@@ -1593,7 +1593,6 @@ struct LOC_Log_logntk_proc *LINK;
       epilog(LINK);
   }
   strlist_empty(&defndir);
-  m_tracking(0L);
 }
 
 
@@ -1748,6 +1747,9 @@ log_action *act_;
       docommand("", WITH->funcarg, true, &V);
       (*WITH->hook.clearfunc)();
     }
+    break;
+
+  default:
     break;
   }
 

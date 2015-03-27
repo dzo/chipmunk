@@ -85,7 +85,7 @@ Version		Date	Description
 long	m_ctr, x_ctr;			/* spice counters */
 long	r_ctr, c_ctr;
 long	npn_ctr, pnp_ctr, d_ctr;
-long	v_ctr, s_ctr[26];
+long	i_ctr, v_ctr, s_ctr[26];
 
 #define	DEFAULT_NBULK	"Vdd"		/* bulk nodes for 3-terminal devices */
 char    nBulk[82];
@@ -126,6 +126,9 @@ char	pre_file[256] = "", post_file[256] = ""; /* for #include-esque stuff */
 #define N_sPhase        16
 #define N_sDelay        17
 
+#define N_pIinit	5
+#define N_pIpulse	6
+
 /* End Of Spice Globals */
 
 
@@ -134,7 +137,10 @@ char	pre_file[256] = "", post_file[256] = ""; /* for #include-esque stuff */
 #define LOGSPC_G
 #include "logspc.h"
 
+extern double AnaVdd;
+
 char *my_strdup();
+#undef strdup
 #define strdup my_strdup
 
 #define main_name       "-Main-"
@@ -564,7 +570,7 @@ struct LOC_Log_logspc_proc *LINK;
     getword(buf, buf1, LINK);
     getword(buf, buf2, LINK);
     getword(buf, buf3, LINK); /* new in 0.7 */
-    if (strlen(buf2) != 1 ||
+    if (strlen(buf2) != 1 || (
 	buf2[0] != 'D' && buf2[0] != 'P' && buf2[0] != 'N' &&
 	buf2[0] != 'X' && buf2[0] != 'Y' && buf2[0] != 'Z' &&
 	buf2[0] != 'R' && buf2[0] != 'C' &&
@@ -572,7 +578,7 @@ struct LOC_Log_logspc_proc *LINK;
 	buf2[0] != 'K' && buf2[0] != 'L' &&
 	buf2[0] != 'A' && buf2[0] != 'B' && buf2[0] != 'E' &&
         buf2[0] != 'V' && buf2[0] != 'F' && buf2[0] != 'G' &&
-        buf2[0] != 'S') {
+        buf2[0] != 'S' && buf2[0] != 'H')) {
       message("Syntax error in TRANS command", LINK);
       return;
     }
@@ -714,7 +720,7 @@ struct LOC_Log_logspc_proc *LINK;
       }
       portlist = (log_nrec **)Malloc(g->kind->numpins * sizeof(log_nrec *));
       pnumlist = NULL;
-      examinetemplate(g, portlist, (long)g->kind->numpins, isinstgate(g),
+      examinetemplate(g, portlist, (long)g->kind->numpins, isgenericinstgate(g),
 		      &pnumlist, &lastn, &laste, &lasts, &lastw);
       for (i = 0; i < lastw; i++)
 	namenode(portlist[i], LINK);
@@ -1086,7 +1092,7 @@ struct LOC_readcells *LINK;
   while (!P_eof(LINK->f2) && !done) {
     do {
       fgets(LINK->s, 256, LINK->f2);
-      TEMP = strchr(LINK->s, '\n');
+      TEMP = (char *)strchr(LINK->s, '\n');
       if (TEMP != NULL)
 	*TEMP = 0;
       if ((!prewarp) && (*LINK->s == '*')) {
@@ -1127,7 +1133,7 @@ struct LOC_readcells *LINK;
 
     do {
       fgets(LINK->s, 256, LINK->f2);
-      TEMP = strchr(LINK->s, '\n');
+      TEMP = (char *) strchr(LINK->s, '\n');
       if (TEMP != NULL)
 	*TEMP = 0;
       if (copying) {
@@ -1207,7 +1213,7 @@ struct LOC_dologspc *LINK;
 	found = false;
 	while (!found && !P_eof(V.f2)) {
 	  fgets(V.s, 256, V.f2);
-	  TEMP = strchr(V.s, '\n');
+	  TEMP = (char *)strchr(V.s, '\n');
 	  if (TEMP != NULL)
 	    *TEMP = 0;
 	  if (strncmp(V.s, ".SUBCKT", 7))	/* if not a header line, skip */
@@ -1230,7 +1236,7 @@ struct LOC_dologspc *LINK;
 		the spc file, so we need to modify this code */
 	      do {
 		fgets(V.s2, 256, V.f2); /* V.s2 will be terminated by \n\0 */
-		TEMP = strchr(V.s2, '\n');
+		TEMP = (char *) strchr(V.s2, '\n');
 		if (TEMP != NULL)
 		  *TEMP = 0;
 	      } while (strncmp(V.s2, "* LOGSPC end", 12));/* used to be .END */
@@ -1407,6 +1413,11 @@ struct LOC_dologspc *LINK;
     }
     g = g->next;
   }
+
+  /* Write Voltage source for Vdd */
+  fprintf(LINK->outf, "V%d Vdd Gnd %g;\n", v_ctr, AnaVdd);
+  v_ctr++;
+
   g = LINK->LINK->act->gbase[LINK->LINK->act->curpage - 1];
   while (g != NULL) {
     if (gateinbox(mybox, g)) {
@@ -1654,6 +1665,44 @@ struct LOC_dologspc *LINK;
               g->attr[N_Cap - 1].UU.r);
 	    c_ctr ++;
             break;
+	  case 'h':	/* 2-pin differential current source */
+	    switch (g->attr[N_Type - 1].UU.nv)
+            {
+              case 0:   /* dc mode */
+                fprintf (LINK->outf, "I%ld %s %s %g\n", i_ctr,
+                  (Char *)g->pin[0]->temp,
+                  (Char *)g->pin[1]->temp,
+                  g->attr[N_Dc - 1].UU.r);
+                i_ctr ++;
+                break;
+              case 1:
+                fprintf(LINK->outf,
+                  "I%ld %s %s PULSE (%g %g %g %g %g %g %g)\n", i_ctr,
+                  (Char *)g->pin[0]->temp,
+                  (Char *)g->pin[1]->temp,
+                  g->attr[N_pIinit - 1].UU.r,
+                  g->attr[N_pIpulse - 1].UU.r,
+                  g->attr[N_pDelay - 1].UU.r,
+                  g->attr[N_pRise - 1].UU.r,
+                  g->attr[N_pFall - 1].UU.r,
+                  g->attr[N_pWidth - 1].UU.r,
+                  g->attr[N_pPeriod - 1].UU.r);
+                i_ctr ++;
+                break;
+              case 2:
+                fprintf (LINK->outf,
+                  "I%ld %s %s SIN (%g %g %g %g 0.0 %g)\n", i_ctr,
+                  (Char *)g->pin[0]->temp,
+                  (Char *)g->pin[1]->temp,
+                  g->attr[N_sOffset - 1].UU.r,
+                  g->attr[N_sAmp - 1].UU.r,
+                  g->attr[N_sFreq - 1].UU.r,
+                  g->attr[N_sDelay - 1].UU.r,
+                  g->attr[N_sPhase - 1].UU.r);
+                i_ctr ++;
+                break;
+            }
+	    break;
 	  case 'v':	/* 2-pin differential voltage source */
 	    switch (g->attr[N_Type - 1].UU.nv)
             {
@@ -1729,7 +1778,7 @@ struct LOC_dologspc *LINK;
 	V.linelen = strlen(STR1);
 	portlist = (log_nrec **)Malloc(g->kind->numpins * sizeof(log_nrec *));
 	pnumlist = NULL;
-	examinetemplate(g, portlist, (long)g->kind->numpins, isinstgate(g),
+	examinetemplate(g, portlist, (long)g->kind->numpins, isgenericinstgate(g),
 			&pnumlist, &lastn, &laste, &lasts, &lastw);
 	l1 = c->port;
 	i = 0;
@@ -1848,7 +1897,7 @@ struct LOC_dologspc *LINK;
     }
     g = g->next;
   }
-  if (!(topness == top_yes || topness == top_maybe && autotop) || maincell)
+  if (!(topness == top_yes || (topness == top_maybe && autotop)) || maincell)
     return;
 
   fprintf(LINK->outf, ".ENDS %s\n\n", cellname);
@@ -1905,7 +1954,7 @@ struct LOC_Log_logspc_proc *LINK;
 
   m_ctr = x_ctr = 1;	/* initialize spice counters */
   r_ctr = c_ctr = 1;
-  npn_ctr = pnp_ctr = d_ctr = 1;
+  npn_ctr = pnp_ctr = d_ctr = i_ctr = 1;
   v_ctr = 1;
   for (s_ctr_index = 0; s_ctr_index < 26; s_ctr_index ++)
     s_ctr[s_ctr_index] = 1;
@@ -2096,7 +2145,6 @@ struct LOC_Log_logspc_proc *LINK;
   log_brec *curbox;
   long i, xpos, ypos, FORLIM;
 
-  m_tracking(2L);
   (*LINK->act->hook.clearfunc)();
   defndir = mydefndirectory((int)LINK->act->curpage, LINK);
   curdef = NULL;
@@ -2228,7 +2276,6 @@ struct LOC_Log_logspc_proc *LINK;
       epilog(LINK);
   }
   strlist_empty(&defndir);
-  m_tracking(0L);
 }
 
 
@@ -2383,6 +2430,9 @@ log_action *act_;
       docommand("", WITH->funcarg, true, &V);
       (*WITH->hook.clearfunc)();
     }
+    break;
+
+  default:
     break;
   }
 

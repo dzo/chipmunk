@@ -162,6 +162,7 @@ log_grec *Inst;
   Inst->attr[N_Vt - 1].changed = true;
   Inst->attr[N_Kappa - 1].blnk = true;
   Inst->attr[N_Kappa - 1].changed = true;
+  return 0;  /* never examined */
 }
 
 
@@ -771,7 +772,7 @@ long Attrnum;
 	Inst->attr[N_Wdrawn - 1].UU.r > 1e6)
       Result = false;
     else 
-	Nfetconsts(Inst, Attrnum);
+	Nfetconsts(Inst);
     break;
 
   case N_Ldrawn:
@@ -789,7 +790,7 @@ long Attrnum;
 	Inst->attr[N_SArea - 1].UU.r > 1e6)
       Result = false;
     else 
-      Nfetconsts(Inst, Attrnum);
+      Nfetconsts(Inst);
     break;
 
   case N_DArea:
@@ -798,7 +799,7 @@ long Attrnum;
 	Inst->attr[N_DArea - 1].UU.r > 1e6)
       Result = false;
     else 
-      Nfetconsts(Inst, Attrnum);
+      Nfetconsts(Inst);
     break;
 
   case N_WArea:
@@ -807,7 +808,7 @@ long Attrnum;
 	Inst->attr[N_WArea - 1].UU.r > 1e6)
       Result = false;
     else 
-      Nfetconsts(Inst, Attrnum);
+      Nfetconsts(Inst);
     break;
 
   case N_NaOffset:
@@ -816,7 +817,7 @@ long Attrnum;
 	Inst->attr[N_NaOffset - 1].UU.r > 1e6)
       Result = false;
     else 
-      Nfetconsts(Inst, Attrnum);
+      Nfetconsts(Inst);
     break;
 
   case N_MuOffset:
@@ -825,7 +826,7 @@ long Attrnum;
 	Inst->attr[N_MuOffset - 1].UU.r > 1e6)
       Result = false;
     else 
-      Nfetconsts(Inst, Attrnum);
+      Nfetconsts(Inst);
     break;
 
   case N_QssOffset:
@@ -834,7 +835,7 @@ long Attrnum;
 	Inst->attr[N_QssOffset - 1].UU.r > 1000)
       Result = false;
     else 
-      Nfetconsts(Inst, Attrnum);
+      Nfetconsts(Inst);
     break;
 
   case N_Vt:
@@ -1178,6 +1179,9 @@ Analog_32_action *act;
 
   case Analog_act_probe:
     Probe_Nfet7F(act);
+    break;
+
+  default:
     break;
   }
 }

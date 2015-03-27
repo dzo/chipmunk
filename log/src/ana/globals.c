@@ -143,6 +143,9 @@ Analog_32_action *act;
   case Analog_act_attrchange:
     act->ok = false;
     break;
+
+  default:
+    break;
   }
 }
 

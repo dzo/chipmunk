@@ -769,7 +769,7 @@ double x;
     else
       return ((long)logval);
   }
-
+  return (0L);
 }
 
 
@@ -1361,8 +1361,8 @@ long axis_type;
     WITH->dpower = mag(ma_max2(fabs(WITH->datamax), fabs(WITH->datamin)));
     if (WITH->engineering)
       WITH->dpower = (long)floor((WITH->dpower - 1.0) / 3 + 0.5) * 3;
-    else if (WITH->floating && WITH->dpower > -2 && WITH->dpower < 3 ||
-	     WITH->fixed) {
+    else if ((WITH->floating && WITH->dpower > -2 && WITH->dpower < 3) ||
+	     WITH->fixed) { /* a fixed '&&' warning expression */
       WITH->dpower = 0;
       if (WITH->intpower > 0)
 	WITH->intpower = 0;

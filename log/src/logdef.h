@@ -34,7 +34,7 @@
 
 #define log_million     1000000L   /* Very large array size */
 
-#define log_version     "5.61"   /* LOG version number */
+#define log_version     "5.66"   /* LOG version number */
 
 #define Debugging       false   /* Compile with DEBUG option */
 #define Checking        true   /* Compile with range checking, etc. */
@@ -151,7 +151,8 @@ typedef struct log_vectorrec {
 typedef log_vectorrec log_vectorrecs[log_million];
 
 typedef struct log_pinrec {
-  schar x, y, s, c;
+  schar x, y, s;
+  uchar c;
 } log_pinrec;
 
 typedef log_pinrec log_pinrecs[log_million];
@@ -598,7 +599,9 @@ typedef struct log_action {
   boolean markers;   /* printing markers are defined */
   boolean invisible;   /* gates and wires are invisible */
   boolean textinvisible;   /* labels and boxes are invisible */
+  boolean pnuminvisible;   /* pin numbers are invisible */
   boolean dotsvisible;   /* are "red dots" on or off normally? */
+  boolean showconflicts;   /* show only conflicts */
   boolean resetflag;   /* "Reset" command has been given */
   boolean pwrflag;   /* simulator is turned on */
   boolean initdone;   /* done with program initialization */

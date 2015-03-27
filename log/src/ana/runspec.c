@@ -297,7 +297,8 @@ Analog_32_action *act;
     Newgate_Runspec(act);
     break;
 
-
+  default:
+    break;
   }
 }
 

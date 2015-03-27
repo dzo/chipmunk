@@ -454,6 +454,8 @@ Analog_32_action *act;
     Refresh_Thermal(act);
     break;
 
+  default:
+    break;
   }
 }
 

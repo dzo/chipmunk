@@ -42,7 +42,7 @@ extern Void edit_16 PP((uchar **proc, long *proclen, Char *name));
 extern Void dump_16 PP((uchar **proc, na_strlist **sl, int indenting));
 
 extern Void read_16 PP((uchar **proc, long *proclen, na_strlist *sl));
-extern Void dasm_16 PP((Char *buf, uchar *proc, long *pc));
+extern Char *dasm_16 PP((uchar *proc, long *pc));
 extern long indent_16 PP((uchar *proc, long pc));
 extern long length_16 PP((uchar *proc, long pc));
 

@@ -1017,6 +1017,9 @@ log_action *act;
   case act_glowcol:
     log_glowcol_32();
     break;
+
+  default:
+    break;
   }
 }
 
@@ -1085,6 +1088,9 @@ log_action *act;
 
   case act_confighist:
     log_confighist_32(AnaLogIglobals, false);
+    break;
+
+  default:
     break;
   }
 }

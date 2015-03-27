@@ -218,7 +218,7 @@ struct LOC_Log_mygates_sram8k *LINK;
 	index_ = strtol(STR3, NULL, 16);
 	while (strlen(buf) > 6) {
 	  LINK->ram[index_] = strtol(strpart(STR3, buf, 6, 7), NULL, 16);
-	  strcpy(buf, buf + 2);
+	  strcpy_overlap(buf, buf + 2);
 	  index_ = (index_ + 1) % (ramsize + 1);
 /* p2c: diggates.text, line 160:
  * Note: Using % for possibly-negative arguments [317] */
@@ -363,6 +363,9 @@ log_16_action *act_;
 	V.ram[addr] = TEMP;
       }
     }
+    break;
+
+  default:
     break;
   }
 }
@@ -691,6 +694,9 @@ log_16_action *act_;
     V.dip = (dispinfo *)WITH2->info;
     erasedisp(&V);
     break;
+
+  default:
+    break;
   }
 }
 
@@ -740,7 +746,7 @@ log_16_action *act;
     if (P_ibetween(-11L, WITH->actx, 12L) && P_ibetween(-5L, WITH->acty, 4L)) {
       keyx = (WITH->actx + 11) / 2;
       keyy = (WITH->acty + 5) / 2;
-      if (keyy != 4 || (unsigned long)keyx < 32 && ((1L << keyx) & 0x1f9) != 0) {
+      if (keyy != 4 || ((unsigned long)keyx < 32 && ((1L << keyx) & 0x1f9) != 0)) {
 	asciimode = (WITH1->attr[0].UU.nv == 0);
 	if (asciimode && keyy == 3 && keyx == 10) {
 	  TEMP = ((((unsigned long)WITH1->vars) & (1L << 6)) == 0);
@@ -773,6 +779,9 @@ log_16_action *act;
 	WITH->actflag = true;
       }
     }
+    break;
+
+  default:
     break;
   }
 }

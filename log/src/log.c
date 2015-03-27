@@ -2050,7 +2050,7 @@ short xx, yy;
   x = (xx + gg.hscale + gg.xoff) / gg.scale;
   y = (yy + gg.hscale + gg.yoff) / gg.scale;
   unprobe();
-  if (gg.showpage > 0 && !gg.invisible) {
+  if (gg.showpage > 0 && !gg.invisible && !gg.showconflicts) {
     if (gg.incircuit) {
       g = gg.gbase[gg.curpage - 1];
       while (g != NULL && gg.probegate == NULL) {
@@ -2272,8 +2272,8 @@ log_kattrrec **attr;
 	WITH->UU.U73.i1 = 0;
 	j1 = 0;
 	WITH->blnk = true;
-	while (l1->s[0] >= 'a' && l1->s[0] <= 'f' ||
-	       l1->s[0] >= 'A' && l1->s[0] <= 'F' || isdigit(l1->s[0])) {
+	while ((l1->s[0] >= 'a' && l1->s[0] <= 'f') ||
+	       (l1->s[0] >= 'A' && l1->s[0] <= 'F') || isdigit(l1->s[0])) {
 	  WITH->UU.U73.i1 = WITH->UU.U73.i1 * 10 + l1->s[0] - 48;
 	  if (l1->s[0] >= 'A')
 	    WITH->UU.U73.i1 -= 7;
@@ -3982,13 +3982,7 @@ short c;
 	      g->g, g->sig, c);
 }
 
-
-#define fromtab         "0123-456789"
-/* p2c: log.text, line 3593: Note: Characters >= 128 encountered [281] */
-#define totab           "\224\230\231\232\233\234\235\236\240\241\242"
-
-
-
+typedef enum {inside,north,east,south,west} placement;
 
 Static Void drawpnums(g, c)
 log_grec *g;
@@ -3998,9 +3992,14 @@ short c;
   Char s[7];
   log_krec *WITH;
   short FORLIM, FORLIM1;
+  int tx,ty,ex,ey;
+  int minx,miny,maxx,maxy;
+  placement p = inside;
+  long hw;
+ 
 
 //	return;// don't draw pins
-  if (zoom <= 0 || gg.textinvisible)
+  if (zoom <= 0 || gg.textinvisible || gg.pnuminvisible)
     return;
   m_color((long)c);
   rxx = log_rotxx[g->rot];
@@ -4008,20 +4007,52 @@ short c;
   ryx = log_rotyx[g->rot];
   ryy = log_rotyy[g->rot];
   WITH = g->kind;
+  minx = ( WITH->x1 * rxx + WITH->y1 * ryx);
+  miny = ( WITH->x1 * rxy + WITH->y1 * ryy);
+  maxx = ( WITH->x2 * rxx + WITH->y2 * ryx);
+  maxy = ( WITH->x2 * rxy + WITH->y2 * ryy);
+
   FORLIM = WITH->numpnums;
   for (i = 0; i < FORLIM; i++) {
     sprintf(s, "%d", WITH->pnum[i].num);
- //   FORLIM1 = strlen(s);
- //   for (j = 0; j < FORLIM1; j++) {
- //     k = strposc(fromtab, s[j], 1L);
- //     if (k != 0)
-//	s[j] = totab[k - 1];
- //   }
-    m_move(g->x * gg.scale + (WITH->pnum[i].x * rxx + WITH->pnum[i].y * ryx) *
-			     gg.scale / log_scale0 - gg.xoff,
-	   g->y * gg.scale + (WITH->pnum[i].x * rxy + WITH->pnum[i].y * ryy) *
-			     gg.scale / log_scale0 - gg.yoff);
-    m_displaytext(s);
+     hw = strlen(s) * 5 / 2;
+     ex = (WITH->pnum[i].x * rxx + WITH->pnum[i].y * ryx);
+     ey = (WITH->pnum[i].x * rxy + WITH->pnum[i].y * ryy);
+     if (ex < minx) {
+       p = west;
+     } else if (ex > maxx) {
+       p = east;
+     } else if (ey < miny) {
+       p = north;
+     } else if (ey > maxy) {
+       p = south;
+    }
+     tx = g->x * gg.scale + ex * gg.scale / log_scale0 - gg.xoff;
+     ty = g->y * gg.scale + ey * gg.scale / log_scale0 - gg.yoff;
+     switch (p) {
+     case west:
+      tx -= 5;
+       break;
+     case east:
+       tx +=5;
+       break;
+     case north:
+       tx -= hw;
+       ty -= 9;
+       break;
+     case south:
+       tx -= hw;
+       ty += 5;
+       break;
+ 
+     default:
+       break;
+     }
+     if (p == west)
+       m_rightstr(tx,ty,NULL,s);
+     else
+       m_drawstr(tx,ty,NULL,s);
+
   }
 }
 
@@ -4313,6 +4344,9 @@ short c;
   log_vwrec *vw;
   log_srec *s;
 
+  if (gg.invisible || (gg.showconflicts == true && n->conflict == false))
+    return;
+
   hidecursor();
   if ((unsigned)c > 15) {
     if (gg.glowmode && gg.showpage > 0)
@@ -4355,8 +4389,8 @@ short c;
   if (showsolder) {
     s = gg.sbase[gg.curpage - 1];
     while (s != NULL) {
-      if (s->hwire != NULL && s->hwire->node == n ||
-	  s->vwire != NULL && s->vwire->node == n)
+      if ((s->hwire != NULL && s->hwire->node == n) ||
+	  (s->vwire != NULL && s->vwire->node == n))
 	drawsolderc(s->x, s->y, c);
       s = s->next;
     }
@@ -4511,7 +4545,7 @@ Static Void refresh()
   remcursor();
   clipon();
   refrpagedisp();
-  if (!gg.invisible) {
+  if (!gg.invisible && !gg.showconflicts) {
     working();
     suppressdots = gg.dotsvisible;
     g = gg.gbase[gg.curpage - 1];
@@ -5490,7 +5524,7 @@ Static Void pass()
 	gg.simstate = simst_notready;
     } else
       gg.simstate = simst_notactive;
-    if (gg.glowmode && gg.showpage > 0 && !gg.invisible) {
+    if (gg.glowmode && gg.showpage > 0 && !gg.invisible && !gg.showconflicts) {
       flag = false;
       hw = gg.hwbase[gg.curpage - 1];
       while (hw != NULL) {
@@ -6265,6 +6299,9 @@ log_action *act;
     act->acttool->simulator = true;
     act->acttool->ready = true;
     break;
+  default:
+    break;
+
   }
 }
 
@@ -6554,7 +6591,75 @@ log_nrec **n, *n2;
 }
 
 
+Static Void purgesignaltab()
+{
+  short i, pg;
+  log_nrec *n1;
+  log_hnrec *hn;
+  log_grec *g;
+  short FORLIM;
+  log_sigrec *WITH;
 
+  FORLIM = gg.maxsignal;
+  for (i = 0; i < FORLIM; i++)
+    gg.signaltab[i].f = gg.signaltab[i].keep;
+
+  FORLIM = gg.numpages;
+  for (pg = 0; pg < FORLIM; pg++) {
+    g = gg.gbase[pg];
+    while (g != NULL) {
+      if (g->sig != 0)
+        gg.signaltab[g->sig - 1].f = true;
+      g = g->next;
+    }
+  }
+
+  if (copybuf.valid) {
+    g = copybuf.gcopy;
+    while (g != NULL) {
+      if (g->sig != 0)
+        gg.signaltab[g->sig - 1].f = true;
+      g = g->next;
+    }
+  } 
+
+  if (histtrig != 0)
+    gg.signaltab[histtrig - 1].f = true;
+
+  hn = gg.hnbase;
+  while (hn != NULL) {
+    gg.signaltab[hn->sig - 1].f = true;
+    hn = hn->next;
+  }
+
+  FORLIM = kindgroupsize;
+  for (i = 0; i < FORLIM; i++) {
+    if (kindsig[i] != 0)
+      gg.signaltab[kindsig[i] - 1].f = true;
+  }
+
+  g = gg.neargate;
+  if (g != NULL && g->sig != 0)
+    gg.signaltab[g->sig - 1].f = true;
+
+  gg.lastsignal = 0;
+  FORLIM = gg.maxsignal;
+  for (i = 1; i <= FORLIM; i++) {
+    if (!gg.signaltab[i - 1].f) {
+      if (gg.signaltab[i -1].name && gg.signaltab[i - 1].np) {
+        WITH = &gg.signaltab[i - 1];
+        if (WITH->name != NULL)
+          strdispose(&WITH->name);
+        n1 = gg.signaltab[i - 1].np;
+        if (n1 && nodeexists(n1))
+          unrefnode(&gg.signaltab[i - 1].np);
+        gg.signaltab[i - 1].np = NULL;
+      }
+    } else {
+      gg.lastsignal = i;
+    }
+  }
+}
 
 
 /*=================  GARBAGECOLL  ================*/
@@ -6575,7 +6680,8 @@ Static Void garbagecoll()
   working();
   n = gg.nbase;
   while (n != NULL) {
-    n->ref = 0;
+    if (!n->keep)
+      n->ref = 0;
     n = n->next;
   }
   FORLIM = gg.numpages;
@@ -6605,6 +6711,7 @@ Static Void garbagecoll()
   }
   callsimtools(act_refnodes);
   working();
+  purgesignaltab();
   n = gg.nbase;
   while (n != NULL) {
     n1 = n->next;
@@ -6614,18 +6721,12 @@ Static Void garbagecoll()
   }
 }
 
-
-#define rtn             "GETSIGNAL"
-
-
-
-
 /*=================  GETTOFROM  ==================*/
 /*=                                              =*/
 /*=  Find the number associated with a signal    =*/
 /*=     name.  If it doesn't exist, create it.   =*/
-/*=     If not enough room, try to get rid of a  =*/
-/*=     signal name that is no longer used.      =*/
+/*=     If not enough room, issue an error and   =*/
+/*=     return zero.                             =*/
 /*=                                              =*/
 /*================================================*/
 
@@ -6634,10 +6735,7 @@ short d;
 Char *n_;
 {
   Char n[256];
-  short i, j, pg;
-  log_nrec *n1;
-  log_hnrec *hn;
-  log_grec *g;
+  short i;
   Char STR1[256], STR2[256];
   short FORLIM;
   log_sigrec *WITH;
@@ -6650,73 +6748,26 @@ Char *n_;
   else {
     i = 1;
     while (i <= gg.lastsignal &&
-	   (gg.signaltab[i - 1].name == NULL ||
-	    strcmp(gg.signaltab[i - 1].name, n)))
+           (gg.signaltab[i - 1].name == NULL ||
+            strcmp(gg.signaltab[i - 1].name, n)))
       i++;
     if (i > gg.lastsignal) {
       stamp(&gg.sigstamp);
       i = 1;
       while (i <= gg.maxsignal && gg.signaltab[i - 1].name != NULL)
-	i++;
+        i++;
       if (i > gg.maxsignal) {
-	FORLIM = gg.maxsignal;
-	for (i = 0; i < FORLIM; i++)
-	  gg.signaltab[i].f = gg.signaltab[i].keep;
-	FORLIM = gg.numpages;
-	for (pg = 0; pg < FORLIM; pg++) {
-	  g = gg.gbase[pg];
-	  while (g != NULL) {
-	    if (g->sig != 0)
-	      gg.signaltab[g->sig - 1].f = true;
-	    g = g->next;
-	  }
-	}
-	if (histtrig != 0)
-	  gg.signaltab[histtrig - 1].f = true;
-	hn = gg.hnbase;
-	while (hn != NULL) {
-	  gg.signaltab[hn->sig - 1].f = true;
-	  hn = hn->next;
-	}
-	FORLIM = kindgroupsize;
-	for (i = 0; i < FORLIM; i++) {
-	  if (kindsig[i] != 0)
-	    gg.signaltab[kindsig[i] - 1].f = true;
-	}
-	j = -1;
-	gg.lastsignal = 0;
-	FORLIM = gg.maxsignal;
-	for (i = 1; i <= FORLIM; i++) {
-	  if (!gg.signaltab[i - 1].f) {
-	    if (j == -1)
-	      j = i;
-	    WITH = &gg.signaltab[i - 1];
-	    if (WITH->name != NULL)
-	      strdispose(&WITH->name);
-	    n1 = gg.signaltab[i - 1].np;
-	    if (!nodeexists(n1))
-	      report(10, rtn);
-	    unrefnode(&gg.signaltab[i - 1].np);
-	    if (nodeexists(n1))
-	      report(11, rtn);
-	    gg.signaltab[i - 1].np = NULL;
-	  } else
-	    gg.lastsignal = i;
-	}
-	if (j < 0) {
-	  beginerror();
-	  printf("Only %d distinct signal names are allowed!\n", gg.maxsignal);
-	  enderror();
-	  j = 0;
-	}
-	i = j;
+        beginerror();
+        printf("Only %d distinct signal names are allowed!\n", gg.maxsignal);
+        enderror();
+        i = 0;
       }
       if (i != 0) {
-	WITH = &gg.signaltab[i - 1];
-	WITH->name = strdup(n);
-	WITH->keep = false;
-	newnoderef(&WITH->np, 0, 1L);
-	WITH->temp = (na_long)0;
+        WITH = &gg.signaltab[i - 1];
+        WITH->name = strdup(n);
+        WITH->keep = false;
+        newnoderef(&WITH->np, 0, 1L);
+        WITH->temp = (na_long)0;
       }
     }
   }
@@ -6724,8 +6775,6 @@ Char *n_;
     gg.lastsignal = i;
   return i;
 }
-
-#undef rtn
 
 
 
@@ -7336,6 +7385,21 @@ Static Void doimmedcnffunction()
     vmessageflag("Invisible-labels mode is ", gg.textinvisible);
     return;
   }
+  if (!strcmp(gg.func, "INVPINNUM")) {
+    getbool(gg.funcarg, &gg.pnuminvisible);
+    refrfunc();
+    vmessageflag("Invisible-pin-number mode is ", gg.pnuminvisible);
+    return;
+  }
+  if (!strcmp(gg.func, "SHOWCONFLICTS")) {
+    getbool(gg.funcarg, &gg.showconflicts);
+    refrfunc();
+    if (gg.showconflicts)
+      vmessage("Conflicts are highlighted");
+    else
+      vmessage("Conflicts are not highlighted");
+    return;
+  }
   if (!strcmp(gg.func, "QUIET")) {
     getbool(gg.funcarg, &gg.quiet);
     vmessageflag("Quiet mode is ", gg.quiet);
@@ -7472,6 +7536,8 @@ Static Void doimmedfunction()
     return;
   }
   if (!strcmp(gg.func, "HOME")) {
+    zoomto(0);
+    refrfunc();
     xoff0 = origin - gg.xoff;
     yoff0 = origin - gg.yoff;
     setscale(0);
@@ -7764,7 +7830,7 @@ short x, y;
 Static Void closerwire(x, y)
 short x, y;
 {
-  if (gg.invisible) {
+  if (gg.invisible || gg.showconflicts) {
     gg.nearhw = NULL;
     gg.nearvw = NULL;
     return;
@@ -17484,16 +17550,29 @@ Char *filename_;
       putc('\n', f);
       n1 = (log_nrec *)n1->temp;
     }
-    count = 0;
+
+    /* ensure that each signal has a named gate on this page. */ 
     FORLIM = gg.lastsignal;
+    for (i = 0; i < FORLIM; i++)
+      gg.signaltab[i].f = false;
+
+    g = gg.gbase[pgnum - 1];
+    while (g != NULL) {
+      if (g->sig > 0 && g->sig <= gg.lastsignal && 
+               gg.signaltab[g->sig -1].np != NULL &&
+               gg.signaltab[g->sig -1].np->flag)
+        gg.signaltab[g->sig -1].f = true;
+      g = g->next;
+    }
+
+    count = 0;
     for (i = 0; i < FORLIM; i++) {
-      if (gg.signaltab[i].np != NULL && gg.signaltab[i].np->flag)
+      if (gg.signaltab[i].f)
 	count++;
     }
     fprintf(f, "s %d\n", count);
-    FORLIM = gg.lastsignal;
     for (i = 0; i < FORLIM; i++) {
-      if (gg.signaltab[i].np != NULL && gg.signaltab[i].np->flag)
+      if (gg.signaltab[i].f)
 	fprintf(f, "%d %s\n",
 		countnode(gg.signaltab[i].np, &V), gg.signaltab[i].name);
     }
@@ -17603,7 +17682,7 @@ Char *filename_;
       if (g->sig != 0) {
 	FORLIM = g->sig;
 	for (j = 0; j < FORLIM; j++) {
-	  if (gg.signaltab[j].np != NULL && gg.signaltab[j].np->flag)
+	  if (gg.signaltab[j].f)
 	    i++;
 	}
       }
@@ -19288,7 +19367,6 @@ Static Void toolcommand()
 #define whichmin        (-2)
 
 
-#define months          "JanFebMarAprMayJunJulAugSepOctNovDec"
 
 
 Local log_tool *counttool(i)
@@ -19324,10 +19402,12 @@ Local Void status_log()
   Char STR2[9];
   Char STR3[81];
 
+  char * months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
   if (gg.actflag) {
     sysdate(&date);
-    printf("   Date %2d-%.3s-%01d   Time\n",
-	   date.day, months + date.month * 3L - 3, date.year);
+    printf("   Date %2d-%s-%02d   Time\n",
+          date.day, months[date.month - 1], date.year);
     printf("   Available memory:   \n\n");
     printf("   Simulation time:    \n");
     printf("   Simulation timestep:\n");
@@ -19394,7 +19474,6 @@ Local Void status_log()
   }
 }
 
-#undef months
 
 Local Void status_mem()
 {
@@ -19512,48 +19591,83 @@ Local Void status_mem()
   printf("Total signal names:  %12ld\n", j);
 }
 
-Local Void status_macro()
+Local Void status_macro(int v)
 {
   macrorec *mp;
   Char ch;
   long i, j;
+  int half;
+  int k;
+  static int n;
+  int n_displayed;
+  int n_macros;
+  int n_to_print;
 
   if (!gg.actflag)
     return;
+  for (k=0,mp = macrobase; mp != NULL; mp = mp->next, k++)
+    ;
+  n_macros = k;
+  n_displayed = ((txacross / 40)+1) * (txdown -4);
+
+  half = k / 2;
+  if (k & 1)
+    half++;
+  if (v > 0)
+    n += (txdown -4);
+  else if (v < 0)
+    n -= (txdown -4);
+  if (n > half)
+    n -= (txdown -4);
+  if (n < 0)
+    n = 0;
   mp = macrobase;
   i = 2;
+  n_to_print = P_min(half-n,txdown-4);
   do {
     j = 4;
+    for (k=0; k < n && mp != NULL; k++)
+      mp = mp->next;
     do {
       if (mp != NULL) {
-	nk_gotoxy((int)i, (int)j);
-	ch = mp->key;
-	if (ch == '\007')
-	  printf("bs ");
-	else if (ch == '\t')
-	  printf("tab");
-	else if (ch == '\015')
-	  printf("cr ");
-	else if (ch == ' ')
-	  printf("sp ");
-	else if ((ch & 255) >= 168 && (ch & 255) <= 193)
-	  printf("^%c ", (Char)((uchar)ch - 'g'));
-	else if (ch <= '\037' || (ch & (~127)) != 0)
-	  printf("%3d", ch);
-	else
-	  printf("%c  ", ch);
-	printf("  %s", mp->name);
+        nk_gotoxy((int)i, (int)j);
+        ch = mp->key;
+        if (ch == '\007')
+          printf("bs ");
+        else if (ch == '\t')
+          printf("tab");
+        else if (ch == '\015')
+          printf("cr ");
+        else if (ch == ' ')
+          printf("sp ");
+        else if ((ch & 255) >= 168 && (ch & 255) <= 193)
+          printf("^%c ", (Char)((uchar)ch - 'g'));
+        else if (ch <= '\037' || (ch & (~127)) != 0)
+          printf("%3d", ch);
+        else
+          printf("%c  ", ch);
+        printf("  %s", mp->name);
+        mp = mp->next;
       }
-      mp = mp->next;
       j++;
-    } while (j < txdown && mp != NULL);
+    } while (j < txdown && j < n_to_print+4 && mp != NULL);
+    if (i < 40) {
+      for (k = 0, mp = macrobase; mp != NULL && k < half ; k++) 
+        mp = mp->next;
+    }
     i += 40;
   } while (i <= txacross && mp != NULL);
+
+  for (k=0; mp != NULL; k++, mp = mp->next)
+   ;   
+  nk_gotoxy((int)2, (int)txdown);
+  printf("[%d of %d]",((n+1)/(n_displayed/2))+1,(n_macros/n_displayed)+1);
 
 /* p2c: log.text, line 18560: Note: Character >= 128 encountered [281] */
 /* p2c: log.text, line 18560: Note: Character >= 128 encountered [281] */
 /* p2c: log.text, line 18562: Note: Character >= 128 encountered [281] */
 }
+
 
 
 
@@ -19571,6 +19685,7 @@ Char *name_;
   boolean refrflag, exitflag;
   log_tool *tp;
   Char STR2[256], STR3[256];
+  int n = 0;
 
   strcpy(name, name_);
   clearshowalpha();
@@ -19645,7 +19760,7 @@ Char *name_;
 	break;
 
       case 0:
-	status_macro();
+	status_macro(n);
 	break;
 
       default:
@@ -19669,6 +19784,15 @@ Char *name_;
       if (pollkbd2())
 	ch = inkey2();
       switch (ch) {
+      case 31:
+              n = -1;
+              refrflag = true;
+              break;
+
+      case 10:
+              n = 1;
+              refrflag = true;
+              break;
 
       case '+':
       case '\034':
@@ -20615,11 +20739,13 @@ Static Void initmacros()
   definemacro('G', "GRID");
   definemacro('h', "HOME");
   definemacro('i', "INVISIBLE");
+  definemacro('k', "SHOWCONFLICTS");
   definemacro('I', "INVLABEL");
   definemacro('l', "LABEL");
   definemacro('L', "LOAD");
   definemacro('m', "MOVE");
   definemacro('M', "TAPMODE");
+  definemacro('n', "INVPINNUM");
   definemacro('o', "ONOFF");
   definemacro('p', "PLOT");
   definemacro('r', "ROT");
@@ -21243,6 +21369,7 @@ Static Void initialize()
   gg.glowmode = false;
   gg.probemode = false;
   gg.textinvisible = false;
+  gg.pnuminvisible = true;
   gg.invisible = false;
   gg.pwrflag = true;
   gg.busyflag = true;
@@ -21250,6 +21377,7 @@ Static Void initialize()
   glowsolder = true;
   gg.quiet = false;
   gg.dotsvisible = true;
+  gg.showconflicts = false;
   avoidrabbits = true;
   pushedbackkey = '\0';
   conflictenbl = true;
@@ -21907,7 +22035,7 @@ Char *argv[];
 	    gg.posx = gg.gridx;
 	    gg.posy = gg.gridy;
 	    gg.startpoint = true;
-	    if (!ospointflag && !justtap() && !gg.invisible) {
+	    if (!ospointflag && !justtap() && !gg.invisible && !gg.showconflicts) {
 	      if (gg.probemode)
 		yardstick();
 	      else {
@@ -21959,7 +22087,7 @@ Char *argv[];
 		    addvwire(gg.posx, gg.oldy, gg.posy, curwcolor);
 		}
 	      }
-	      if (gg.invisible || gg.probemode)
+	      if (gg.invisible || gg.probemode || gg.showconflicts)
 		gg.startpoint = false;
 	    }
 	  } else if (inbox((int)(menux1 - 4), line1 - 5, 34, 20))
@@ -21984,7 +22112,7 @@ Char *argv[];
 		configkind((int)temp1);
 	      else if (justtap())
 		flipkind();
-	      else if (!gg.invisible && !gg.probemode) {
+	      else if (!gg.invisible && !gg.probemode && !gg.showconflicts) {
 		if (addgate(kindgroup[temp1 - 1], kindsig[temp1 - 1],
 			    kindattr[temp1 - 1]))
 		  nextkindsig((int)temp1);

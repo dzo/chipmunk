@@ -39,6 +39,7 @@ extern boolean labelinbox PP((log_brec *bp, log_lrec *l));
 extern boolean boxinbox PP((log_brec *bp, log_brec *bp2));
 extern boolean boxtouchbox PP((log_brec *bp, log_brec *bp2));
 extern boolean isinstgate PP((log_grec *g));
+extern boolean isgenericinstgate PP((log_grec *g));
 extern Char *gateinstof PP((Char *Result, log_grec *g));
 extern Char *gateinstname PP((Char *Result, log_grec *g));
 extern na_strlist *defndirectory PP((int pg));
@@ -49,7 +50,7 @@ extern Void examinetemplate PP((log_grec *g, log_nrec **pp, long ppsize,
 
 
 
-extern Void log_7_ginst PP((log_action *act));
+extern Void Log_7_ginst PP((log_action *act));
 
 
 #undef vextern

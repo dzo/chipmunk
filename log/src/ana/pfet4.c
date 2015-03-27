@@ -1004,6 +1004,9 @@ Analog_32_action *act;
   case Analog_act_probe:
     Probe_Pfet4(act);
     break;
+
+  default:
+    break;
   }
 }
 

@@ -99,7 +99,7 @@ boolean *stable;
       nip = (nodeinfo *)n->info;
       if ((nip->truev = newv = nip->v0) == log_none)
 	newv = nip->defv;
-      if (TRACE_COPY) printf("Setting node %x to %d\n", nip, newv);
+      if (TRACE_COPY) printf("Setting node %x to %d\n", (unsigned int)nip, newv);
       if (newv != (nip->v00 = nip->v)) {
 	nip->v = newv;
 	st = false;
@@ -191,43 +191,55 @@ log_nrec *np;
                    case n+8: case n+9: case n+10: case n+11:  \
                    case n+12: case n+13: case n+14: case n+15
 
-static  and_table[3][3] = { { log_none, log_zero, log_one  },
+static int  and_table[3][3] = { { log_none, log_zero, log_one  },
 			    { log_zero, log_zero, log_zero },
 			    { log_one,  log_zero, log_one  } };
 
-static nand_table[3][3] = { { log_none, log_one,  log_zero },
+static int nand_table[3][3] = { { log_none, log_one,  log_zero },
 			    { log_one,  log_one,  log_one  },
 			    { log_zero, log_one,  log_zero } };
 
-static   or_table[3][3] = { { log_none, log_zero, log_one  },
+static int  or_table[3][3] = { { log_none, log_zero, log_one  },
 			    { log_zero, log_zero, log_one  },
 			    { log_one,  log_one,  log_one  } };
 
-static  nor_table[3][3] = { { log_none, log_one,  log_zero },
+static int  nor_table[3][3] = { { log_none, log_one,  log_zero },
 			    { log_one,  log_one,  log_zero },
 			    { log_zero, log_zero, log_zero } };
 
-static  xor_table[3][3] = { { log_none, log_zero, log_one  },
+static int  xor_table[3][3] = { { log_none, log_zero, log_one  },
 			    { log_zero, log_zero, log_one  },
 			    { log_one,  log_one,  log_zero } };
 
-static not_table[3] = { log_none, log_one,  log_zero };
-static fix_table[3] = { log_zero, log_zero, log_one  };
+static int not_table[3] = { log_none, log_one,  log_zero };
+static int fix_table[3] = { log_zero, log_zero, log_one  };
 
 
 Static char *debug_dasm()
 {
+#define SAFETY_MARGIN 256
   long pc = 1;
-  static char buf[256];
+  static char *buf;
+  char *tmp = NULL;
   int pc2 = 0;
 
-  *buf = '\"';
+  if (buf) {
+    Free(buf);
+    buf = NULL;
+  }
   if (*g_proc) {
-    dasm_16(buf+1, g_proc, &pc);
+    tmp = (Char*)dasm_16(g_proc, &pc);
+    buf = (Char*)Malloc(strlen(tmp) + SAFETY_MARGIN); 
+    strcpy(buf, "\"");
+    strcat(buf, tmp);
     strcat(buf, "\"  <");
+    Free(tmp);
     pc--;
-  } else
-    strcpy(buf, "<");
+  } else {
+    buf = (Char*)Malloc(SAFETY_MARGIN);
+    strcpy(buf, "\"<");
+  }
+
   while (pc2 < pc && pc2 < 8) {
     sprintf(buf + strlen(buf), "%s%.2x", (pc2 > 0) ? " " : "", g_proc[pc2]);
     pc2++;
@@ -329,7 +341,7 @@ static log_16_value g_expr()
     if (ch < 128)
       return g_info->pvars[ch - 64] ? log_one : log_zero;
     else
-      return g_info->ppins[ch + ((*g_proc++) << 7) - (32*128+64)]
+      return g_info->pvars[ch + ((*g_proc++) << 7) - (32*128+64)]
 	? log_one : log_zero;
 
   case 0xad:  /* FIX */
@@ -337,7 +349,7 @@ static log_16_value g_expr()
     
   case 0xb0:  /* high pin */
     nip = g_pins[*g_proc++]->info;
-    if (TRACE_VAL) printf(" Value of %x is %d\n", nip, (int)nip->v - 1);
+    if (TRACE_VAL) printf(" Value of %x is %d\n", (unsigned int)nip, (int)nip->v - 1);
     return nip->v;
 
   case 0xb1:  /* STRONG */
@@ -347,7 +359,7 @@ static log_16_value g_expr()
   case16(0xc0):  /* pin */
   case16(0xd0):
     nip = g_pins[ch & 0x1f]->info;
-    if (TRACE_VAL) printf(" Value of %x is %d\n", nip, (int)nip->v - 1);
+    if (TRACE_VAL) printf(" Value of %x is %d\n", (unsigned int)nip, (int)nip->v - 1);
     return nip->v;
 
   case16(0xe0):  /* var */
@@ -479,7 +491,7 @@ Static Void g_stmts()
 	g_info->pvars[ch - 64] = (g_expr() != log_zero);
       else {
 	ch2 = *g_proc++;
-	g_info->pvars[ch + ((*g_proc++) << 7) - (32*128+64)] =
+	g_info->pvars[ch + (ch2 << 7) - (32*128+64)] =
 	  (g_expr() != log_zero);
       }
       break;
@@ -488,30 +500,24 @@ Static Void g_stmts()
       ch = *g_proc++;
       if (ch < 128)
 	g_info->pvars[ch - 64] ^= 1;
-      else {
-	ch2 = *g_proc++;
+      else
 	g_info->pvars[ch + ((*g_proc++) << 7) - (32*128+64)] ^= 1;
-      }
       break;
 
     case 0x1a:  /* pvar = ZERO */
       ch = *g_proc++;
       if (ch < 128)
 	g_info->pvars[ch - 64] = 0;
-      else {
-	ch2 = *g_proc++;
+      else
 	g_info->pvars[ch + ((*g_proc++) << 7) - (32*128+64)] = 0;
-      }
       break;
 
     case 0x1b:  /* pvar = ONE */
       ch = *g_proc++;
       if (ch < 128)
 	g_info->pvars[ch - 64] = 1;
-      else {
-	ch2 = *g_proc++;
+      else
 	g_info->pvars[ch + ((*g_proc++) << 7) - (32*128+64)] = 1;
-      }
       break;
 
     case 0x1c:  /* PULLDN */
@@ -549,7 +555,7 @@ Static Void g_stmts()
 
       case log_zero:
 	nip = np->info;
-	if (TRACE_VAL) printf(" Output 0 to %x (was %d)\n", nip, nip->v0);
+	if (TRACE_VAL) printf(" Output 0 to %x (was %d)\n", (unsigned int)nip, nip->v0);
 	if (nip->v0 == log_one)
 	  record_conflict(np);
 	else
@@ -558,13 +564,15 @@ Static Void g_stmts()
 
       case log_one:
 	nip = np->info;
-	if (TRACE_VAL) printf(" Output 1 to %x (was %d)\n", nip, nip->v0);
+	if (TRACE_VAL) printf(" Output 1 to %x (was %d)\n", (unsigned int)nip, nip->v0);
 	if (nip->v0 == log_zero)
 	  record_conflict(np);
 	else
 	  nip->v0 = log_one;
 	break;
 
+      default:
+	break;
       }
       break;
 
@@ -575,7 +583,7 @@ Static Void g_stmts()
     oc_out_node:
       if (g_expr() == log_zero) {
 	nip = np->info;
-	if (TRACE_VAL) printf(" Output 0 to %x (was %d)\n", nip, nip->v0);
+	if (TRACE_VAL) printf(" Output 0 to %x (was %d)\n", (unsigned int)nip, nip->v0);
 	if (nip->v0 == log_one)
 	  record_conflict(np);
 	else
@@ -627,8 +635,8 @@ na_long *vars;
 {
 
   uchar *s_proc = g_proc;
-  long s_vars = s_vars;
-  log_nrec **s_pins = s_pins;
+  long s_vars = g_vars;
+  log_nrec **s_pins = g_pins;
   gateinfo *s_info = g_info;
 
   g_proc = pr;

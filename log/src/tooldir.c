@@ -21,6 +21,7 @@ extern Void Log_1_proc();
 extern Void Log_2_proc();
 extern Void Log_32_proc();
 extern Void Log_33_proc();
+extern Void Log_7_ginst();
 extern Void Log_7_proc();
 extern Void Log_7_time();
 extern Void Log_DEVTECHN_initlib_32();
@@ -30,6 +31,7 @@ extern Void Log_NFET5_INITLIB_32();
 extern Void Log_NFET7F_INITLIB_32();
 extern Void Log_NFET7T_INITLIB_32();
 extern Void Log_NPN1_INITLIB_32();
+extern Void Log_NPN2_INITLIB_32();
 extern Void Log_NSPC1_INITLIB_32();
 extern Void Log_PFET5_INITLIB_32();
 extern Void Log_PFET6_INITLIB_32();
@@ -37,6 +39,7 @@ extern Void Log_PFET7F_INITLIB_32();
 extern Void Log_PFET7T_INITLIB_32();
 extern Void Log_PHYSICAL_initlib_32();
 extern Void Log_PNP1_INITLIB_32();
+extern Void Log_PNP2_INITLIB_32();
 extern Void Log_PSPC1_INITLIB_32();
 extern Void Log_PWL_INITLIB_32();
 extern Void Log_RUNSPEC_initlib_32();
@@ -89,6 +92,7 @@ struct ext_proc ext_proc_table[] = {
   "Log_2_proc", Log_2_proc,
   "Log_32_proc", Log_32_proc,
   "Log_33_proc", Log_33_proc,
+  "Log_7_ginst", Log_7_ginst,
   "Log_7_proc", Log_7_proc,
   "Log_7_time", Log_7_time,
   "Log_DEVTECHN_initlib_32", Log_DEVTECHN_initlib_32,
@@ -98,6 +102,7 @@ struct ext_proc ext_proc_table[] = {
   "Log_NFET7F_INITLIB_32", Log_NFET7F_INITLIB_32,
   "Log_NFET7T_INITLIB_32", Log_NFET7T_INITLIB_32,
   "Log_NPN1_INITLIB_32", Log_NPN1_INITLIB_32,
+  "Log_NPN2_INITLIB_32", Log_NPN2_INITLIB_32,
   "Log_NSPC1_INITLIB_32", Log_NSPC1_INITLIB_32,
   "Log_PFET5_INITLIB_32", Log_PFET5_INITLIB_32,
   "Log_PFET6_INITLIB_32", Log_PFET6_INITLIB_32,
@@ -105,6 +110,7 @@ struct ext_proc ext_proc_table[] = {
   "Log_PFET7T_INITLIB_32", Log_PFET7T_INITLIB_32,
   "Log_PHYSICAL_initlib_32", Log_PHYSICAL_initlib_32,
   "Log_PNP1_INITLIB_32", Log_PNP1_INITLIB_32,
+  "Log_PNP2_INITLIB_32", Log_PNP2_INITLIB_32,
   "Log_PSPC1_INITLIB_32", Log_PSPC1_INITLIB_32,
   "Log_PWL_INITLIB_32", Log_PWL_INITLIB_32,
   "Log_RUNSPEC_initlib_32", Log_RUNSPEC_initlib_32,

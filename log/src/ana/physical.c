@@ -298,7 +298,8 @@ Analog_32_action *act;
     Newgate_Physical(act);
     break;
 
-
+  default:
+    break;
   }
 }
 

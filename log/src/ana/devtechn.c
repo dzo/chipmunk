@@ -478,7 +478,8 @@ Analog_32_action *act;
     Newgate_Devtechn(act);
     break;
 
-
+  default:
+    break;
   }
 }
 
