@@ -78,6 +78,14 @@ the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 #define sdotsize        1
 #define shownums        2
+#define label_font_size 3
+#define signal_font_size 4
+#define gate_font_size  5
+#define node_font_size  6
+#define border_style    7
+#define box_style       8
+#define ps_line_width   9
+#define gate_text_limit 10
 
 #define y_func          1
 #define y_label         2
@@ -127,11 +135,16 @@ typedef struct snapplotrec {
 #define optionspos      (configpos + 50)
 #define nextpos         (optionspos + 50)
 
-#define quit2pos        484
+#define quit2pos        (m_across - 27)
 
 #define filepos         (quit2pos - 40)
 #define plotpos         (filepos - 40)
 #define zoomoutpos      (plotpos - 70)
+
+
+#define sig_ofs        18        /* signal name horizontal offset */
+#define com_den        (12L*21L) /* denominator common to all fontsizes */
+#define dft_siz        (50L)     /* default gate text size */
 
 
 Static log_action *lp_gg;
@@ -294,7 +307,7 @@ Static Void changexfunc()
   log_gattrrec *WITH;
 
   WITH = &datagattr[x_label - 1];
-  if (!strcmp(WITH->UU.c, xfun) && strcmp(datagattr[x_func - 1].UU.c, xfun) ||
+  if ((!strcmp(WITH->UU.c, xfun) && strcmp(datagattr[x_func - 1].UU.c, xfun)) ||
       *WITH->UU.c == '\0') {
     strcpy(WITH->UU.c, datagattr[x_func - 1].UU.c);
     WITH->blnk = (*WITH->UU.c == '\0');
@@ -309,7 +322,7 @@ Static Void changeyfunc()
   log_gattrrec *WITH;
 
   WITH = &datagattr[y_label - 1];
-  if (!strcmp(WITH->UU.c, yfun) && strcmp(datagattr[y_func - 1].UU.c, yfun) ||
+  if ((!strcmp(WITH->UU.c, yfun) && strcmp(datagattr[y_func - 1].UU.c, yfun)) ||
       *WITH->UU.c == '\0') {
     strcpy(WITH->UU.c, datagattr[y_func - 1].UU.c);
     WITH->blnk = (*WITH->UU.c == '\0');
@@ -600,7 +613,7 @@ struct LOC_Log_lplot_proc *LINK;
     }
     i = strposc(fn, '*', 1L);
     if (i != 0 && strpos2(fn, "*:", 1) != i) {
-      strcpy(fn + i - 1, fn + i);
+      strcpy_overlap(fn + i - 1, fn + i);
 /* p2c: lplot.text, line 494:
  * Note: Using % for possibly-negative arguments [317] */
       sprintf(STR2, "%s%ld%s",
@@ -610,7 +623,7 @@ struct LOC_Log_lplot_proc *LINK;
     strcpy(LINK->psfilenm, fn);
     i = strposc(LINK->pspipe, '*', 1L);
     if (i != 0) {
-      strcpy(LINK->pspipe + i - 1, LINK->pspipe + i);
+      strcpy_overlap(LINK->pspipe + i - 1, LINK->pspipe + i);
       sprintf(STR2, "%s%s", fn, LINK->pspipe + i - 1);
       strcpy(LINK->pspipe + i - 1, STR2);
     }
@@ -651,6 +664,9 @@ struct LOC_Log_lplot_proc *LINK;
       }
       _Escape((int)i);
     ENDTRY(try2);
+    break;
+
+  default:
     break;
   }
   LINK->plotdev = device;
@@ -702,15 +718,17 @@ struct LOC_Log_lplot_proc *LINK;
     plot_lwindow(x1, y1, x2, y2);
     break;
   }
+
+  i = lplotgattr[showborder - 1].UU.nv;
+  if (i == 2 || (i == 1 && LINK->plotdev == lplot_screen)) {
+    plot_color(getcolor("BORDER", defcolor, LINK));
+    plot_linestyle(filegattr[border_style -1].UU.U73.i1);
+    plot_box(x1, y1, x2, y2, 0L);
+    plot_linestyle(0L);
+  }
+
   if (lplotgattr[clipwindow - 1].UU.b)
     plot_clip();
-  i = lplotgattr[showborder - 1].UU.nv;
-  if (i != 2 && (i != 1 || LINK->plotdev != lplot_screen))
-    return;
-  plot_color(getcolor("BORDER", defcolor, LINK));
-  plot_linestyle(1L);
-  plot_box(x1, y1, x2, y2, 0L);
-  plot_linestyle(0L);
 }
 
 
@@ -747,6 +765,9 @@ struct LOC_Log_lplot_proc *LINK;
 	;
       ENDTRY(try5);
     }
+    break;
+
+  default:
     break;
   }
   LINK->plotdev = lplot_nodev;
@@ -828,7 +849,7 @@ struct LOC_Log_lplot_proc *LINK;
     if (ch >= 128) {
 /* p2c: lplot.text, line 649: Note: Character >= 128 encountered [281] */
       if (*LINK->prefstr == '\0') {
-	strcpy(V.s + V.i - 1, V.s + V.i);
+	strcpy_overlap(V.s + V.i - 1, V.s + V.i);
 	V.i--;
       } else {
 	switch (ch) {
@@ -845,8 +866,8 @@ struct LOC_Log_lplot_proc *LINK;
 	case 206:
 	case 207:
 	case 208:
-	  V.s[V.i - 1] = first[ch - 194];
-	  sprintf(STR3, "%cB%cB", LINK->prefstr, LINK->prefstr);
+	  V.s[V.i - 1] = first[ch - 194]; /* below, [0] are guesses */
+	  sprintf(STR3, "%cB%cB", LINK->prefstr[0], LINK->prefstr[0]); 
 	  modestr(STR3, &V);
 	  break;
 
@@ -865,23 +886,23 @@ struct LOC_Log_lplot_proc *LINK;
 	default:
 	  if (ch >= 128 && ch <= 147) {
 	    V.s[V.i - 1] = first[ch - 128];
-	    sprintf(STR1, "%cB", LINK->prefstr);
+	    sprintf(STR1, "%cB", LINK->prefstr[0]);
 	    modestr(STR1, &V);
 	  } else if (ch >= 148 && ch <= 167) {
 	    V.s[V.i - 1] = first[ch - 148];
-	    sprintf(STR1, "%cP", LINK->prefstr);
+	    sprintf(STR1, "%cP", LINK->prefstr[0]);
 	    modestr(STR1, &V);
 	  } else if (ch >= 168 && ch <= 193) {
 	    V.s[V.i - 1] = ch - 103;
-	    sprintf(STR1, "%cB", LINK->prefstr);
+	    sprintf(STR1, "%cB", LINK->prefstr[0]);
 	    modestr(STR1, &V);
 	  } else if (ch >= 214 && ch <= 239) {
 	    V.s[V.i - 1] = ch - 149;
-	    sprintf(STR1, "%cO", LINK->prefstr);
+	    sprintf(STR1, "%cO", LINK->prefstr[0]);
 	    modestr(STR1, &V);
 	  } else if (ch >= 240 && ch <= 250) {
 	    V.s[V.i - 1] = ch - 192;
-	    sprintf(STR1, "%cO", LINK->prefstr);
+	    sprintf(STR1, "%cO", LINK->prefstr[0]);
 	    modestr(STR1, &V);
 	  }
 	  break;
@@ -918,7 +939,7 @@ struct LOC_Log_lplot_proc *LINK;
   else
     m_color((long)lp_gg->color.menuword);
   drawstr2(filepos, (long)LINK->menuy1, "File", LINK);
- // XFlush(m_display);
+//  XFlush(m_display);
 }
 
 /* Local variables for doplotfile: */
@@ -1072,10 +1093,13 @@ struct LOC_plotfile *LINK;
   long xx, yy, tx, ty;
   Char STR3[256];
 
-  if (LINK->LINK->LINK->plotdev == lplot_screen && v->UU.U116.tsize < 60)
+  if (LINK->LINK->LINK->plotdev == lplot_screen
+	&& v->UU.U116.tsize < filegattr[gate_text_limit -1].UU.U73.i1)
     return;
+
   plot_selfont(lplotgattr[sigfontnum - 1].UU.U73.i1);
-  plot_charsize((long)v->UU.U116.tsize, 210L, 2L);
+  plot_charsize(sc_ * filegattr[gate_font_size -1].UU.U73.i1
+                  * v->UU.U116.tsize / dft_siz, com_den, 2L);
   plot_charorient(0.0, false);
   xx = LINK->g1->x * sc_ + v->x1 * log_rotxx[LINK->g1->rot] +
        v->y1 * log_rotyx[LINK->g1->rot];
@@ -1085,7 +1109,13 @@ struct LOC_plotfile *LINK;
        (v->UU.U116.torg / 3 - 1) * log_rotyx[LINK->g1->rot];
   ty = (v->UU.U116.torg % 3 - 1) * log_rotxy[LINK->g1->rot] +
        (v->UU.U116.torg / 3 - 1) * log_rotyy[LINK->g1->rot];
-  sprintf(STR3, "%.1s%.1s", "UCL" + ty + 1, "LCR" + tx + 1);
+
+  /* sprintf(STR3, "%.1s%.1s", "UCL" + ty + 1, "LCR" + tx + 1); */
+
+  STR3[0] = (tx == -1) ? 'U' : ((tx == 0) ? 'C' : 'L');
+  STR3[1] = (ty == -1) ? 'L' : ((ty == 0) ? 'C' : 'R');
+  STR3[2] = '\0';
+
   plot_genstring(xx, yy, STR3, v->UU.U116.sp);
 }
 
@@ -1096,13 +1126,13 @@ struct LOC_plotfile *LINK;
 {
   Char STR1[256], STR2[256];
 
-  if (LINK->i < 26) {
-    sprintf(Result, "%c", (Char)(LINK->i + 'A'));
+  if (num < 26) {
+    sprintf(Result, "%c", (Char)(num + 'A'));
     return Result;
   } else {
     sprintf(Result, "%s%s",
-	    nodename(STR1, LINK->i / 26 - 1, LINK),
-	    nodename(STR2, LINK->i % 26, LINK));
+	    nodename(STR1, num / 26 - 1, LINK),
+	    nodename(STR2, num % 26, LINK));
     return Result;
 /* p2c: lplot.text, line 923:
  * Note: Using % for possibly-negative arguments [317] */
@@ -1161,17 +1191,17 @@ struct LOC_doplotfile *LINK;
       n->temp = (na_long)V.i;
       V.i++;
       /*$if false$
-			      i := strlen(name) + 1;
-			      repeat
-				 i := i - 1;
-			      until (i < 1) or (name[i] < 'Z');
-			      if i < 1 then
-				 strappendc(name, 'A')
-			      else
-				 name[i] := succ(name[i]);
-			      for j := i+1 to strlen(name) do
-				 name[j] := 'A';
-			      n^.temp.str := name;
+                              i := strlen(name) + 1;
+                              repeat
+                                 i := i - 1;
+                              until (i < 1) or (name[i] < 'Z');
+                              if i < 1 then
+                                 strappendc(name, 'A')
+                              else
+                                 name[i] := succ(name[i]);
+                              for j := i+1 to strlen(name) do
+                                 name[j] := 'A';
+                              n^.temp.str := name;
 $end$*/
       n = n->next;
     }
@@ -1404,7 +1434,7 @@ $end$*/
 	      }
 	    }
 	  } else {
-	    plot_charsize(sc_ * 5L, 50L, 1L);
+	    plot_charsize(sc_ * filegattr[node_font_size -1].UU.U73.i1, com_den, 1L);
 	    switch (V.g1->rot) {
 
 	    case 0:
@@ -1503,7 +1533,8 @@ $end$*/
 		y1 = (long)floor(atof(name) + 0.5);
 		strword(sl1->s, name);
 		plot_selfont(lplotgattr[sigfontnum - 1].UU.U73.i1);
-		plot_charsize(strtol(name, NULL, 0), 210L, 2L);
+		plot_charsize(sc_ * filegattr[gate_font_size -1].UU.U73.i1
+                            * strtol(name, NULL, 0) / dft_siz, com_den, 2L);
 		switch (x2) {
 
 		case 0:
@@ -1559,7 +1590,7 @@ $end$*/
     if (filegattr[shownums - 1].UU.b) {
       plot_color(getcolor("NODE", "GATE", LINK->LINK));
       plot_selfont(1L);
-      plot_charsize(sc_ * 2L, 63L, 1L);
+      plot_charsize(sc_ * filegattr[node_font_size -1].UU.U73.i1, com_den, 1L);
       plot_charorient(0.0, false);
       do {
 	d = LONG_MAX;
@@ -1591,7 +1622,7 @@ $end$*/
     if (!WITH->textinvisible) {
       plot_color(getcolor("SIGNAL", "GATE", LINK->LINK));
       plot_selfont(lplotgattr[sigfontnum - 1].UU.U73.i1);
-      plot_charsize(sc_ * 3L, 42L, 2L);
+      plot_charsize(sc_ * filegattr[signal_font_size -1].UU.U73.i1, com_den, 2L);
       plot_charorient(0.0, false);
       do {
 	d = LONG_MAX;
@@ -1611,9 +1642,9 @@ $end$*/
 	  strcpy(name, WITH->signaltab[V.g1->sig - 1].name);
 	  munchlabel(name, LINK->LINK);
 	  if (V.g1->kind->flag.U3.nright == (V.g1->rot == 0))
-	    plot_string((V.g1->x - 3L) * sc_, -V.g1->y * sc_ - 4L, name);
+	    plot_genstring(V.g1->x * sc_ - sig_ofs, -V.g1->y * sc_, "cl", name);
 	  else
-	    plot_rightstring((V.g1->x + 3L) * sc_, -V.g1->y * sc_ - 4L, name);
+	    plot_genstring(V.g1->x * sc_ + sig_ofs, -V.g1->y * sc_, "cr", name);
 	  x1 = V.g1->x;
 	  y1 = V.g1->y;
 	  V.g1->temp = (na_long)(((unsigned long)V.g1->temp) | (1L << 1));
@@ -1725,7 +1756,7 @@ $end$*/
     }
     if (!WITH->textinvisible) {
       plot_color(getcolor("DASHBOX", "LABELTEXT", LINK->LINK));
-      plot_linestyle(2L);
+      plot_linestyle(filegattr[box_style -1].UU.U73.i1);
       b = WITH->bbase[WITH->curpage - 1];
       while (b != NULL) {
 	plot_move(b->x1 * sc_, -b->y1 * sc_);
@@ -1741,7 +1772,7 @@ $end$*/
       plot_linestyle(0L);
       plot_color(getcolor("LABELTEXT", "DASHBOX", LINK->LINK));
       plot_selfont(lplotgattr[fontnum - 1].UU.U73.i1);
-      plot_charsize(sc_ * 4L, 63L, 3L);
+      plot_charsize(sc_ * filegattr[label_font_size -1].UU.U73.i1, com_den, 3L);
       plot_charorient(0.0, false);
       l = WITH->lbase[WITH->curpage - 1];
       while (l != NULL) {
@@ -1753,22 +1784,21 @@ $end$*/
 	      (st[1] == 'r' || st[1] == 'c' || st[1] == 'l' || st[1] == 'R' ||
 	       st[1] == 'C' || st[1] == 'L')) {
 	    ch = toupper(st[1]);
-	    strcpy(st, st + 2);
+	    strcpy_overlap(st, st + 2);
 	  }
 	  munchlabel(st, LINK->LINK);
 	  switch (ch) {
 
 	  case 'L':
-	    plot_string(l->x * sc_, -l->y * sc_ - 8L, st);
+	    plot_genstring(l->x * sc_, -l->y * sc_, "cl", st);
 	    break;
 
 	  case 'C':
-	    plot_centerstring(l->x * sc_ + l->w * sc_ / 2L, -l->y * sc_ - 8L,
-			      st);
+	    plot_genstring(l->x * sc_, -l->y * sc_, "cc", st);
 	    break;
 
 	  case 'R':
-	    plot_rightstring((l->x + l->w) * sc_, -l->y * sc_ - 8L, st);
+	    plot_genstring(l->x * sc_, -l->y * sc_, "cr", st);
 	    break;
 	  }
 	}
@@ -1923,7 +1953,6 @@ struct LOC_Log_lplot_proc *LINK;
   Char ch;
   log_action *WITH;
 
-  m_tracking(2L);
   V.LINK = LINK;
   WITH = lp_gg;
   V.lrefrflag = true;
@@ -2008,7 +2037,6 @@ struct LOC_Log_lplot_proc *LINK;
       break;
     }
   } while (!exitflag);
-  m_tracking(0L);
 }  /*doplotfile*/
 
 #undef sc0
@@ -2361,7 +2389,7 @@ struct LOC_doplotdata *LINK;
     plot_getwindow(&x1, &y1, &x2, &y2);
     setwindow(x1, y1, x2, y2, LINK->LINK);
     i = datagattr[biglabels - 1].UU.nv;
-    if (i == 2 || i == 1 && LINK->LINK->plotdev == lplot_screen) {
+    if (i == 2 || (i == 1 && LINK->LINK->plotdev == lplot_screen)) {
       stupid = mam_defcharsize;
       stupid *= 3;
       stupid /= 2;
@@ -2706,6 +2734,7 @@ struct LOC_Log_lplot_proc *LINK;
   log_action *WITH;
   log_gattrrec *WITH1;
   Char STR3[256];
+  double lw;
 
   V.LINK = LINK;
   strcpy(cmd, cmd_);
@@ -2798,6 +2827,23 @@ struct LOC_Log_lplot_proc *LINK;
       if (*buf != '\0')
 	strlist_remove(&noplotgates, buf);
     } while (*buf != '\0');
+  } else if (!strcmp(cmd, "LABELFONTSIZE")) {
+    getintattr(&filegattr[label_font_size - 1], &V);
+  } else if (!strcmp(cmd, "SIGNALFONTSIZE")) {
+    getintattr(&filegattr[signal_font_size - 1], &V);
+  } else if (!strcmp(cmd, "GATEFONTSIZE")) {
+    getintattr(&filegattr[gate_font_size - 1], &V);
+  } else if (!strcmp(cmd, "NODEFONTSIZE")) {
+    getintattr(&filegattr[node_font_size - 1], &V);
+  } else if (!strcmp(cmd, "BORDERSTYLE")) {
+    getintattr(&filegattr[border_style - 1], &V);
+  } else if (!strcmp(cmd, "BOXSTYLE")) {
+    getintattr(&filegattr[box_style - 1], &V);
+  } else if (!strcmp(cmd, "LINEWIDTH")) {
+    lw = filegattr[ps_line_width - 1].UU.r;
+    plot_linewidth(lw);
+  } else if (!strcmp(cmd, "GATETEXTLIMIT")) {
+    getintattr(&filegattr[gate_text_limit - 1], &V);
   } else {
     sprintf(STR3, "LPLOT:  Can't understand command %s", cmd);
     (*WITH->hook.message)(STR3);
@@ -2873,7 +2919,7 @@ struct LOC_Log_lplot_proc *LINK;
 #ifdef OS2
 /* In the string below, : is not allowed. So, cannot set the drive letter. */
     l1 = strlist_append(&lplotlbl,
-		    "PostScript;C/tcpip/tmp/*.ps | lpr  *:Output file name:");
+ 		    "PostScript;drawing.ps:Output file name:");
 #else
   l1 = strlist_append(&lplotlbl,
 		    "PostScript;Cdrawing.ps  :Output file name:");
@@ -2888,6 +2934,16 @@ struct LOC_Log_lplot_proc *LINK;
   l1 = strlist_append(&filelbl, "1OR1:Solder dot size:");
   l1 = strlist_append(&filelbl, "");
   l1 = strlist_append(&filelbl, "BN:Show node names?");
+  l1 = strlist_append(&filelbl, "");
+  l1 = strlist_append(&filelbl, "I16:Label font size");
+  l1 = strlist_append(&filelbl, "I18:Signal font size");
+  l1 = strlist_append(&filelbl, "I12:Gate font size");
+  l1 = strlist_append(&filelbl, "I8:Node font size");
+  l1 = strlist_append(&filelbl, "I1:Border line style");
+  l1 = strlist_append(&filelbl, "I2:Box line style");
+  l1 = strlist_append(&filelbl, "R7.0:Line width");
+  l1 = strlist_append(&filelbl, "I60:Gate text limit");
+
   (*WITH->hook.parselabel)(&filelbl, &filenumattrs, &filekattr);
   (*WITH->hook.newattrs)(&filegattr, filenumattrs, filekattr);
   strlist_init(&datalbl);
@@ -3013,6 +3069,9 @@ log_action *lact;
     (*WITH->hook.getcolor)("PEN4", &screenpen[3], log_orange);   /*log_pink*/
     (*WITH->hook.getcolor)("PEN5", &screenpen[4], log_cyan);   /*log_lgray*/
     (*WITH->hook.getcolor)("PEN6", &screenpen[5], log_yellow);
+    break;
+
+  default:
     break;
   }
   if (V.outf != NULL)

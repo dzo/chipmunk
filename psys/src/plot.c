@@ -26,12 +26,12 @@
 #endif
 
 #ifndef PSLIB
-# define PSLIB CHIPLIB
+# define PSLIB ""
 #endif
 
-
+#ifndef FONTLIB
 # define FONTLIB ""
-
+#endif
 
 
 
@@ -117,13 +117,13 @@ typedef struct chardesc {
 typedef chardesc *indexarr[1000000L];
 
 typedef union swap2 {
-	short ival;
-	unsigned char c[2];
+        short ival;
+        unsigned char c[2];
 } swap2;
 
 typedef union swap4 {
-	long ival;
-	unsigned char c[4];
+        long ival;
+        unsigned char c[4];
 } swap4;
 
 
@@ -134,13 +134,13 @@ Local short getshortsw(c)
 
     if (bigendian)
       {
-	s.c[1] = c[1];
-	s.c[0] = c[0];
+        s.c[1] = c[1];
+        s.c[0] = c[0];
       }
     else
       {
-	s.c[0] = c[1];
-	s.c[1] = c[0];
+        s.c[0] = c[1];
+        s.c[1] = c[0];
       }
 
      return s.ival;
@@ -153,17 +153,17 @@ char *c;
 
     if (bigendian)
       {
-	s.c[0] = c[0];
-	s.c[1] = c[1];
-	s.c[2] = c[2];
-	s.c[3] = c[3];
+        s.c[0] = c[0];
+        s.c[1] = c[1];
+        s.c[2] = c[2];
+        s.c[3] = c[3];
       }
     else
       {
 	s.c[0] = c[3];
-	s.c[1] = c[2];
-	s.c[2] = c[1];
-	s.c[3] = c[0];
+        s.c[1] = c[2];
+        s.c[2] = c[1];
+        s.c[3] = c[0];
       }
 
      return s.ival;
@@ -174,7 +174,7 @@ Static short w1x, w1y, w2x, w2y, pp1x, pp1y, pp2x, pp2y, p1x, p1y, p2x, p2y,
 	     pltc, pltcolr, pltpat, plotter;
 Static long csnum, csden, csn, csnxx, csnxy, csnyx, csnyy, sbo, spo, sod,
 	    csns, csnc, csah, csav, csad, csd, csdsc, cssc, cscsc, orgx,
-	    orgy, pltx, plty, xpos, ypos, sc;
+            orgy, pltx, plty, xpos, ypos, sc;
 Static long b1x, b1y, b2x, b2y;
 Static double csth;
 Static boolean quality, fast, rotate, fancy, pendn, spendn, hasellipse;
@@ -195,8 +195,7 @@ Static Char fontfn[256], headerfn[256]="texstuff.ps";
 Static boolean headerincflag;
 Static FILE **outf, **foutf;
 Static boolean foutfopen;
-
-
+Static double ps_linewidth = 7.0;
 
 
 /*$if false$
@@ -231,7 +230,7 @@ Char *fn;
   ENDTRY(try1);
   if (okay) {
     while (fgets(buf, 256, f) != NULL) {
-      TEMP = strchr(buf, '\n');
+      TEMP = (char *) strchr(buf, '\n');
       if (TEMP != NULL)
 	*TEMP = 0;
       plot_out(buf);
@@ -418,6 +417,8 @@ plot_devrec *rec;
       }
     }
     break;
+  default:
+    break;
   }
 }
 
@@ -470,7 +471,8 @@ struct LOC_ps_proc *LINK;
     "/TFP {1.3333 dup scale 0 -.5 rmoveto} def /TFB {1.3333 dup scale 0 .2 rmoveto} def");
   plot_out(
     "/BOX { 2 copy M 3 index exch D 3 -1 roll 2 index D exch D closepath } def");
-  plot_out("7.0 setlinewidth 1 setlinejoin");
+  sprintf(STR1, "%g setlinewidth 1 setlinejoin", ps_linewidth);
+  plot_out(STR1);
   sprintf(STR1, "1 %ld div dup scale newpath", (long)ps_scale);
   plot_out(STR1);
   if (rotate) {
@@ -882,6 +884,9 @@ plot_devrec *rec;
       ps_curstyle = rec->x1;
     }
     break;
+
+  default:
+    break;
   }
 }
 
@@ -1071,6 +1076,8 @@ plot_devrec *rec;
     plot_out(V.s);
     rec->q1.U1.i1 = 0;
     break;
+  default:
+    break;
   }
 }
 
@@ -1082,57 +1089,57 @@ procedure graphics_proc(var rec : plot_devrec);
       i : integer;
    begin
       with rec do
-	 case rec.act of
-	    plot_act_clip:
-	       begin
-		  crt_zdlim(x1, x2, y1, y2);
-	       end;
-	    plot_act_move:
-	       begin
-		  crt_zdmov(x1, y1);
-		  if x1 < plot_bx1 then plot_bx1 := x1;
-		  if x1 > plot_bx2 then plot_bx2 := x1;
-		  if y1 < plot_by1 then plot_by1 := y1;
-		  if y1 > plot_by2 then plot_by2 := y1;
-	       end;
-	    plot_act_draw:
-	       begin
-		  crt_zddrw(x1, y1);
-		  if x1 < plot_bx1 then plot_bx1 := x1;
-		  if x1 > plot_bx2 then plot_bx2 := x1;
-		  if y1 < plot_by1 then plot_by1 := y1;
-		  if y1 > plot_by2 then plot_by2 := y1;
-	       end;
-	    plot_act_color:
-	       begin
-		  if (x1 >= 1) and (x1 <= plot_numscreenpens) then
-		     i := plot_screenpen[x1]
-		  else
-		     i := x1;
-		  crt_zcolr(i);
-	       end;
-	    plot_act_style:
-	       begin
-		  case x1 of
-		     1: i := hex('8000');       {#               }
-		     2: i := hex('FF00');       {########        }
-		     3: i := hex('FFF0');       {############    }
-		     4: i := hex('FFFA');       {############# # }
-		     5: i := hex('FFF6');       {############ ## }
-		     6: i := hex('FFD6');       {######### ## ## }
-		     otherwise
-			i := 0;
-		  end;
-		  if i = 0 then
-		     crt_zlstl(0)
-		  else
-		     begin
-			graphics_crt_zlptn(chr(i div 256), chr(i mod 256), 15);
-			crt_zlstl(15);
-		     end;
-	       end;
-	    otherwise ;
-	 end;
+         case rec.act of
+            plot_act_clip:
+               begin
+                  crt_zdlim(x1, x2, y1, y2);
+               end;
+            plot_act_move:
+               begin
+                  crt_zdmov(x1, y1);
+                  if x1 < plot_bx1 then plot_bx1 := x1;
+                  if x1 > plot_bx2 then plot_bx2 := x1;
+                  if y1 < plot_by1 then plot_by1 := y1;
+                  if y1 > plot_by2 then plot_by2 := y1;
+               end;
+            plot_act_draw:
+               begin
+                  crt_zddrw(x1, y1);
+                  if x1 < plot_bx1 then plot_bx1 := x1;
+                  if x1 > plot_bx2 then plot_bx2 := x1;
+                  if y1 < plot_by1 then plot_by1 := y1;
+                  if y1 > plot_by2 then plot_by2 := y1;
+               end;
+            plot_act_color:
+               begin
+                  if (x1 >= 1) and (x1 <= plot_numscreenpens) then
+                     i := plot_screenpen[x1]
+                  else
+                     i := x1;
+                  crt_zcolr(i);
+               end;
+            plot_act_style:
+               begin
+                  case x1 of
+                     1: i := hex('8000');       {#               }
+                     2: i := hex('FF00');       {########        }
+                     3: i := hex('FFF0');       {############    }
+                     4: i := hex('FFFA');       {############# # }
+                     5: i := hex('FFF6');       {############ ## }
+                     6: i := hex('FFD6');       {######### ## ## }
+                     otherwise
+                        i := 0;
+                  end;
+                  if i = 0 then
+                     crt_zlstl(0)
+                  else
+                     begin
+                        graphics_crt_zlptn(chr(i div 256), chr(i mod 256), 15);
+                        crt_zlstl(15);
+                     end;
+               end;
+            otherwise ;
+         end;
    end;
 $end$*/
 
@@ -1176,9 +1183,9 @@ plot_devrec *rec;
 
   case plot_act_polygon:
     if (rec->x2 == 0)
-      m_drawpoly(rec->x1, (long *)rec->q1.U25.lap1, (long *)rec->q1.U25.lap2);
+      m_drawpoly(rec->x1, (int *)rec->q1.U25.lap1, (int *)rec->q1.U25.lap2);
     else
-      m_fillpoly(rec->x1, (long *)rec->q1.U25.lap1, (long *)rec->q1.U25.lap2);
+      m_fillpoly(rec->x1, (int *)rec->q1.U25.lap1, (int *)rec->q1.U25.lap2);
     rec->x1 = 0;
     break;
 
@@ -1227,6 +1234,8 @@ plot_devrec *rec;
       m_setlinestyle(15L, i);
       m_linestyle(15L);
     }
+    break;
+  default:
     break;
   }
 }
@@ -1375,7 +1384,7 @@ Char *title_;
   while (i > 0 && title[i - 1] != '/' && title[i - 1] != ':')
     i--;
   if (i > 0)
-    strcpy(title, title + i);
+    strcpy_overlap(title, title + i);
   i = strlen(title);
   while (i > 0 && title[i - 1] != '.')
     i--;
@@ -1433,7 +1442,7 @@ Char sizecode;
   plot_out("PU;SP0;");
   init__();
   /*   if (strlen(s) >= 9) and (s[9] = '1') then
-	fancy := true;    */
+        fancy := true;    */
 }
 
 
@@ -1669,6 +1678,7 @@ long x1, y1, x2, y2;
 boolean rot;
 {
   long sc1, i;
+  short tx;
 
   w1x = x1;
   w1y = y1;
@@ -1701,9 +1711,11 @@ boolean rot;
   sc = labs((p2x - p1x) * scale_ / (x2 - x1));
   sc1 = labs((p2y - p1y) * scale_ / (y2 - y1));
   if (sc1 < sc) {
-    if (rotate)
-      p2x = (p1x + p2x + (x2 - x1) * (p2y - p1y) / (y2 - y1)) / 2;
-    else
+    if (rotate) {
+      tx = ((p2x - p1x) - (x2 - x1) * (p2y - p1y) / (y2 - y1)) / 2;
+      p1x += tx; 
+      p2x -= tx;
+    } else
       p1x = (p1x + p2x - (x2 - x1) * (p2y - p1y) / (y2 - y1)) / 2;
     sc = sc1;
     return;
@@ -2049,7 +2061,7 @@ Void plot_clip()
     rec.x1 = p1y + y1;
     rec.x2 = p1y + y2;
     rec.y1 = p1x - x1;
-    rec.y2 = p1x - x2;
+    rec.y2 = p1x + x2;
   } else {
     rec.x1 = p1x + x1;
     rec.x2 = p1x + x2;
@@ -2202,6 +2214,14 @@ long num;
     (*(Void(*) PP((plot_devrec *rec, Anyptr _link)))proc.proc)(&rec, proc.link);
   else
     (*(Void(*) PP((plot_devrec *rec)))proc.proc)(&rec);
+}
+
+
+
+Void plot_linewidth(n)
+double n;
+{
+  ps_linewidth = n;
 }
 
 
@@ -2382,8 +2402,8 @@ struct LOC_plot_rbezier *LINK;
   double y43, x43, y42, x42;
 
   /*   if (abs(x1 - x2) < epsilon) and (abs(y1 - y2) < epsilon) and
-	(abs(x1 - x3) < epsilon) and (abs(y1 - y3) < epsilon) and
-	(abs(x1 - x4) < epsilon) and (abs(y1 - y4) < epsilon) then  */
+        (abs(x1 - x3) < epsilon) and (abs(y1 - y3) < epsilon) and
+        (abs(x1 - x4) < epsilon) and (abs(y1 - y4) < epsilon) then  */
   y43 = y4 - y3;
   x43 = x4 - x3;   /*avoid overflows*/
   y42 = y4 - y2;
@@ -2451,7 +2471,7 @@ long epsilon_;
   iy4 = (long)floor((y4 - orgy) * 16 * sc / scale_ + 0.5) - 8;
   pmove((ix1 + 8) / 16, (iy1 + 8) / 16);
   /*    smalle := imax(20, (imax4(x1,x2,x3,x4) - imin4(x1,x2,x3,x4) +
-			  imax4(y1,y2,y3,y4) - imin4(y1,y2,y3,y4)) div 3200);   */
+                          imax4(y1,y2,y3,y4) - imin4(y1,y2,y3,y4)) div 3200);   */
   smalle = abs(pp1x - pp2x) + abs(pp1y - pp2y);
   if (V.epsilon == 0)
     V.epsilon = smalle * 3;
@@ -2533,9 +2553,7 @@ Char *fn;
 }
 
 
-Void plot_headerfile(fn, incflag)
-Char *fn;
-boolean incflag;
+Void plot_headerfile(Char * fn, boolean incflag)
 {
   strcpy(headerfn, fn);
   headerincflag = incflag;
@@ -2590,17 +2608,17 @@ typedef fname fnamearr[1000000L];
      int i;
      uchar x[2];
      if (read(f, fd, 6)<=0)
-	     fprintf(stderr,"file read error (readchardesc)\n");
+             fprintf(stderr,"file read error (readchardesc)\n");
      pp1 = fd->v;
      siz -= 6;
      for (i=0;i<(siz/2);i++) {
-	 if (read(f, x, 2) <= 0)
-	     fprintf(stderr,"file read error (readchardesc)\n");
-	 pp1->drw = (x[1] >>7) & 1;
-	 pp1->py = (Signed int)(x[1] & 0x7f);
+         if (read(f, x, 2) <= 0)
+             fprintf(stderr,"file read error (readchardesc)\n");
+         pp1->drw = (x[1] >>7) & 1;
+         pp1->py = (Signed int)(x[1] & 0x7f);
    pp1->circ = (x[0] >>7) & 1;
-	 pp1->px = (Signed int)(x[0]  & 0x7f);
-	 pp1 += 1;
+         pp1->px = (Signed int)(x[0]  & 0x7f);
+         pp1 += 1;
    }
  }
 
@@ -2646,15 +2664,15 @@ long *which_;
     TRY(try3);
       if (f != NULL)
 #ifdef OS2
-	f = freopen(fn2, "rb", f);
+        f = freopen(fn2, "rb", f);
 #else
-	f = freopen(fn2, "rb", f);
+        f = freopen(fn2, "r", f);
 #endif  
       else
 #ifdef OS2
-	f = fopen(fn2, "rb");
+        f = fopen(fn2, "rb");
 #else
-	f = fopen(fn2, "rb");
+        f = fopen(fn2, "r");
 #endif
       if (f == NULL) {
 	P_escapecode = -10;
@@ -2736,14 +2754,23 @@ long *which_;
  * Note: Can't interpret size in FREADBYTES [174] */
     if (bigendian)
       {
-	fread(fft, nf * 8, 1, f);
+	for (i=0;i<nf;i++) {
+	  fread(&(fft[i].ptr), 4, 1, f);
+	  fread(&(fft[i].num),1,1,f);
+	  fread(&(fft[i].height),1,1,f);
+	  fread(&(fft[i].attr),1,1,f);
+	  fread(&(fft[i].numchrs),1,1,f);
+	}
       }
     else
       {
 	for (i=0;i<nf;i++) {
 	  fread(STR1, 4, 1, f);
 	  fft[i].ptr = getintsw(STR1);
-	  fread(&(fft[i].num),4,1,f);
+	  fread(&(fft[i].num),1,1,f);
+	  fread(&(fft[i].height),1,1,f);
+	  fread(&(fft[i].attr),1,1,f);
+	  fread(&(fft[i].numchrs),1,1,f);
 	}
       }
     for (i = 0; i < nf; i++) {
@@ -2764,10 +2791,10 @@ long *which_;
 	fseek(f, fft[i].ptr - 1, 0);
 	FORLIM1 = fft[i].numchrs;
 	for (j = 1; j <= FORLIM1; j++) {
-	  fread(&(cd.ch),1,1,f);
-	  fread(&(cd.reserved),1,1,f);
-	  fread(STR1,2,1,f);
-	  cd.num = getshortsw(STR1);
+          fread(&(cd.ch),1,1,f);
+          fread(&(cd.reserved),1,1,f);
+          fread(STR1,2,1,f);
+          cd.num = getshortsw(STR1);
 	  ft->arr[cd.ch] = cd.num + offset;
 	  ix[cd.num + offset - 1] = loadme;
 	}
@@ -2797,10 +2824,10 @@ long *which_;
 /* p2c: plot.text, line 2421:
  * Note: Can't interpret size in FREADBYTES [174] */
       for (i=0;i<nn;i++) {
-	     fread(fnm[i].nam,8,1,f); /* read chars */
-	     fread(STR1, 2, 1, f);
-	     fnm[i].num = getshortsw(STR1);
-	  }
+             fread(fnm[i].nam,8,1,f); /* read chars */
+             fread(STR1, 2, 1, f);
+             fnm[i].num = getshortsw(STR1);
+          }
       for (i = 0; i < nn; i++) {
 	nm = (plot_namerec *)Malloc(sizeof(plot_namerec));
 	nm->next = plot_namebase;
@@ -2836,24 +2863,23 @@ long *which_;
 	ix[i + offset] = (chardesc *)Malloc(sizeof(point)*fix[i].siz+1);
 /* p2c: plot.text, line 2456:
  * Note: Can't interpret size in FREADBYTES [174] */
-	if (bigendian)
-	  {
-	    readchardesc(fileno(f),(chardesc *)ix[i + offset],fix[i].siz);
-	  }
-	else
-	  {
-	    cd1 = (chardesc *)ix[i + offset];
-	    fread(cd1,6,1,f); /* read chars */
-	    pp1 = cd1->v;
-	    for (j=0;j<((fix[i].siz-6)/2);j++) {
-	      fread(STR1,2,1,f); /* reading fields */
-	      pp1[j].drw = (STR1[1] >>7) & 1;
-	      pp1[j].py = (Signed int)(STR1[1] & 0x7f);
-	      pp1[j].circ = (STR1[0] >>7) & 1;
-	      pp1[j].px = (Signed int)(STR1[0]  & 0x7f);
-	    }
-	    
-	  }
+
+	/* readchardesc(fileno(f),(chardesc *)ix[i+offset],fix[i].siz); */
+	/* code below replaces above commented-out line */
+
+	cd1 = (chardesc *)ix[i + offset];
+	fread(cd1,6,1,f); /* read chars */
+	pp1 = cd1->v;
+	for (j=0;j<((fix[i].siz-6)/2);j++) {
+	  fread(STR1,2,1,f); /* reading fields */
+	  pp1[j].drw = (STR1[1] >>7) & 1;
+	  pp1[j].py = (Signed int)(STR1[1] & 0x7f);
+	  pp1[j].circ = (STR1[0] >>7) & 1;
+	  pp1[j].px = (Signed int)(STR1[0]  & 0x7f);
+	}
+
+	/* end of replaced code */    
+
 	p += fix[i].siz;
       }
     }

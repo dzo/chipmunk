@@ -805,7 +805,7 @@ long iores;
   Char s[81];
 
   misc_getioerrmsg(s, iores);   /* MISC */
-  return strcpy(Result, s);
+  return strcpy_overlap(Result, s);
 }
 
 
@@ -1124,7 +1124,7 @@ short x, y, n;
   Char s[2];
 
   m_move((long)x, (long)y);
-  strcpy(s, " ");
+  strcpy_overlap(s, " ");
   s[0] = n + '0';
   m_displaytext(s);
 }
@@ -1144,7 +1144,7 @@ short x, y, n;
   Char s[3];
 
   m_move((long)x, (long)y);
-  strcpy(s, "  ");
+  strcpy_overlap(s, "  ");
   if (n >= 10)
     s[0] = n / 10 + '0';
   s[1] = n % 10 + '0';
@@ -1676,12 +1676,12 @@ Const Char *s;
     drawstr2(across + menux3, line2, modename);
   refreditmode();   /*may have been trashed by previous mode name*/
   if (*s != '\0') {
-    strcpy(modename, s);
+    strcpy_overlap(modename, s);
     modeflag = true;
     m_color((long)gg.color.selword);
   } else {
     if (gg.probekind != NULL) {
-      strcpy(modename, gg.probekind->name);
+      strcpy_overlap(modename, gg.probekind->name);
       m_color((long)gg.color.selword);
     } else {
       time(&h);
@@ -1689,7 +1689,7 @@ Const Char *s;
       sprintf(modename, "%.5s", cp + 11);
       modetime = timers_sysclock() / 6000;
       if (!strcmp(modename, "00:00"))
-	strcpy(modename, "__@/ ");
+	strcpy_overlap(modename, "__@/ ");
       m_color((long)gg.color.menuword);
     }
     modeflag = false;
@@ -1764,15 +1764,15 @@ double *r;
   Char *STR1;
   Char STR2[256];
 
-  strcpy(s, s_);
+  strcpy_overlap(s, s_);
   if (!(*s != '\0' &&
 	(s[0] == '.' || s[0] == '+' || s[0] == '-' || isdigit(s[0]))))
     return;
   *r = strtod(s, &STR1);
   i = STR1 - s + 1;
-  strcpy(s, s + i - 1);
-  strcpy(STR2, strltrim(s));
-  strcpy(s, STR2);
+  strcpy_overlap(s, s + i - 1);
+  strcpy_overlap(STR2, strltrim(s));
+  strcpy_overlap(s, STR2);
   dounits(s, r);
 }
 
@@ -1787,8 +1787,8 @@ Char *buf, *wrd;
   Char STR1[256];
   Char STR2[256];
 
-  strcpy(STR1, strltrim(strrtrim(strcpy(STR2, buf))));
-  strcpy(buf, STR1);
+  strcpy_overlap(STR1, strltrim(strrtrim(strcpy_overlap(STR2, buf))));
+  strcpy_overlap(buf, STR1);
   if (*buf != '"') {
     strword(buf, wrd);
     return;
@@ -1797,7 +1797,7 @@ Char *buf, *wrd;
   if (i == 0)
     i = strlen(buf) + 1;
   strpart(wrd, buf, 2, i - 1);
-  strcpy(buf, buf + i);
+  strcpy_overlap(buf, buf + i);
 }
 
 
@@ -1808,8 +1808,8 @@ Char *buf, *wrd;
   Char STR1[256];
   Char STR2[256];
 
-  strcpy(STR1, strltrim(strrtrim(strcpy(STR2, buf))));
-  strcpy(buf, STR1);
+  strcpy_overlap(STR1, strltrim(strrtrim(strcpy_overlap(STR2, buf))));
+  strcpy_overlap(buf, STR1);
   if (*buf == '"')
     strwordx(buf, wrd);
   else {
@@ -1831,7 +1831,7 @@ long def;
 
   getword(s, w);
   if (*w == '-') {
-    strcpy(w, w + 1);
+    strcpy_overlap(w, w + 1);
     sign = -1;
   } else
     sign = 1;
@@ -1966,7 +1966,7 @@ short x, y;
 
   if (WITH->flag.U3.named && g->sig > 0) {
      Char STR1[256];
-     short xwid = m_strwidth(NULL, strrtrim(strcpy(STR1,
+     short xwid = m_strwidth(NULL, strrtrim(strcpy_overlap(STR1,
 	    gg.signaltab[g->sig - 1].name))) - 17;
 
      if (WITH->flag.U3.nright) {
@@ -2175,17 +2175,17 @@ log_kattrrec **attr;
       WITH = &(*attr)[j - 1];
       WITH->vr = 0;
       WITH->vra = 0;
-      strcpy(STR1, strltrim(l1->s));
-      strcpy(l1->s, STR1);
+      strcpy_overlap(STR1, strltrim(l1->s));
+      strcpy_overlap(l1->s, STR1);
       while (*l1->s == '[') {
 	j2 = strposc(l1->s, ']', 1L);
 	if (j2 < 3)
 	  continue;
 	l2 = strlist_append(&attrnames, strpart(STR1, l1->s, 2, j2 - 1));
 	l2->value = (na_long)((long)j);
-	strcpy(l1->s, l1->s + j2);
-	strcpy(STR1, strltrim(l1->s));
-	strcpy(l1->s, STR1);
+	strcpy_overlap(l1->s, l1->s + j2);
+	strcpy_overlap(STR1, strltrim(l1->s));
+	strcpy_overlap(l1->s, STR1);
       }
       j2 = strposc(l1->s, ';', 1L);
       if (j2 != 0 && j2 < j1) {
@@ -2204,29 +2204,29 @@ log_kattrrec **attr;
 	  }
 	  j3++;
 	}
-	strcpy(l1->s, l1->s + j2);
+	strcpy_overlap(l1->s, l1->s + j2);
       }
       if (l1->s[0] == ' ') {
-	strcpy(STR1, strltrim(l1->s));
-	strcpy(l1->s, STR1);
+	strcpy_overlap(STR1, strltrim(l1->s));
+	strcpy_overlap(l1->s, STR1);
       }
       WITH->prec = 0;
       haveprec = false;
       while (isdigit(l1->s[0])) {
 	WITH->prec = WITH->prec * 10 + l1->s[0] - 48;
 	haveprec = true;
-	strcpy(l1->s, l1->s + 1);
+	strcpy_overlap(l1->s, l1->s + 1);
       }
       if (l1->s[0] == ' ') {
-	strcpy(STR1, strltrim(l1->s));
-	strcpy(l1->s, STR1);
+	strcpy_overlap(STR1, strltrim(l1->s));
+	strcpy_overlap(l1->s, STR1);
       }
       WITH->opt = false;
       do {
 	WITH->dtype = toupper(l1->s[0]);
 	if (l1->s[0] != ':') {
 	  do {
-	    strcpy(l1->s, l1->s + 1);
+	    strcpy_overlap(l1->s, l1->s + 1);
 	  } while (l1->s[0] == ' ');
 	}
 	if (WITH->dtype == 'O')
@@ -2238,17 +2238,17 @@ log_kattrrec **attr;
 	  while (l1->s[0] != ',' && l1->s[0] != ':') {
 	    if (l1->s[0] != ' ' && strlen(WITH->UU.U82.u) < 3)
 	      sprintf(WITH->UU.U82.u + strlen(WITH->UU.U82.u), "%c", l1->s[0]);
-	    strcpy(l1->s, l1->s + 1);
+	    strcpy_overlap(l1->s, l1->s + 1);
 	  }
 	  if (l1->s[0] == ',')
-	    strcpy(l1->s, l1->s + 1);
-	  strcpy(STR1, strltrim(l1->s));
-	  strcpy(l1->s, STR1);
+	    strcpy_overlap(l1->s, l1->s + 1);
+	  strcpy_overlap(STR1, strltrim(l1->s));
+	  strcpy_overlap(l1->s, STR1);
 	}
 	*buf = '\0';
 	while (l1->s[0] != ':') {
 	  sprintf(buf + strlen(buf), "%c", l1->s[0]);
-	  strcpy(l1->s, l1->s + 1);
+	  strcpy_overlap(l1->s, l1->s + 1);
 	}
 	WITH->UU.U82.r = 0.0;
 	WITH->blnk = true;
@@ -2263,7 +2263,7 @@ log_kattrrec **attr;
 	WITH->blnk = true;
 	while (isdigit(l1->s[0])) {
 	  WITH->UU.U73.i1 = WITH->UU.U73.i1 * 10 + l1->s[0] - 48;
-	  strcpy(l1->s, l1->s + 1);
+	  strcpy_overlap(l1->s, l1->s + 1);
 	  WITH->blnk = false;
 	}
 	if (!haveprec)
@@ -2279,7 +2279,7 @@ log_kattrrec **attr;
 	    WITH->UU.U73.i1 -= 7;
 	  if (l1->s[0] >= 'a')
 	    WITH->UU.U73.i1 -= 32;
-	  strcpy(l1->s, l1->s + 1);
+	  strcpy_overlap(l1->s, l1->s + 1);
 	  j1++;
 	  WITH->blnk = false;
 	}
@@ -2293,7 +2293,7 @@ log_kattrrec **attr;
 	j1 = strposc(l1->s, ':', 1L);
 	sprintf(buf, "%.*s", j1 - 1, l1->s);
 	strrtrim(buf);
-	strcpy(l1->s, l1->s + j1 - 1);
+	strcpy_overlap(l1->s, l1->s + j1 - 1);
 	if (!haveprec)
 	  WITH->prec = 255;
 	if (strlen(buf) > WITH->prec) {
@@ -2302,13 +2302,13 @@ log_kattrrec **attr;
  * Note: Modification of string length may translate incorrectly [146] */
 	}
 	WITH->UU.c = (Char *)Malloc(WITH->prec + 1L);
-	strcpy(WITH->UU.c, buf);
+	strcpy_overlap(WITH->UU.c, buf);
 	WITH->blnk = (*buf == '\0');
       } else if (WITH->dtype == 'A') {
 	j1 = strposc(l1->s, ':', 1L);
 	sprintf(buf, "%.*s", j1 - 1, l1->s);
 	strrtrim(buf);
-	strcpy(l1->s, l1->s + j1 - 1);
+	strcpy_overlap(l1->s, l1->s + j1 - 1);
 	WITH->prec = 255;
 	WITH->UU.sp = strdup(buf);
 	WITH->blnk = (*buf == '\0');
@@ -2334,16 +2334,16 @@ log_kattrrec **attr;
 	  *buf = '\0';
 	  while (l1->s[0] != ',' && l1->s[0] != ':') {
 	    sprintf(buf + strlen(buf), "%c", l1->s[0]);
-	    strcpy(l1->s, l1->s + 1);
+	    strcpy_overlap(l1->s, l1->s + 1);
 	  }
 	  if (l1->s[0] == ',')
-	    strcpy(l1->s, l1->s + 1);
+	    strcpy_overlap(l1->s, l1->s + 1);
 	  l3 = strlist_append(&l2,
-	      strcpy(STR1, strltrim(strrtrim(strcpy(STR2, buf)))));
+	      strcpy_overlap(STR1, strltrim(strrtrim(strcpy_overlap(STR2, buf)))));
 	  l3->value = (na_long)((long)WITH->UU.U86.nv);
 	  WITH->UU.U86.nv++;
-	  strcpy(STR1, strltrim(l1->s));
-	  strcpy(l1->s, STR1);
+	  strcpy_overlap(STR1, strltrim(l1->s));
+	  strcpy_overlap(l1->s, STR1);
 	} while (l1->s[0] != ':');
 	WITH->UU.U86.v = l2;
 	WITH->blnk = false;
@@ -2362,7 +2362,7 @@ log_kattrrec **attr;
       if (WITH->blnk)
 	WITH->opt = true;
       j1 = strposc(l1->s, ':', 1L);
-      strcpy(l1->s, l1->s + j1);
+      strcpy_overlap(l1->s, l1->s + j1);
       j++;
       WITH->y = yy;
       if (strlen(l1->s) > maxx)
@@ -2371,7 +2371,7 @@ log_kattrrec **attr;
     j1 = 1;
     while (j1 < strlen(l1->s)) {
       if (l1->s[j1 - 1] == ':' && l1->s[j1] == ':')
-	strcpy(l1->s + j1 - 1, l1->s + j1);
+	strcpy_overlap(l1->s + j1 - 1, l1->s + j1);
       j1++;
     }
     yy++;
@@ -2409,7 +2409,7 @@ Char *name;
   log_tool *t2;
 
   *t = (log_tool *)Malloc(sizeof(log_tool));
-  strcpy((*t)->name, name);
+  strcpy_overlap((*t)->name, name);
   (*t)->ready = false;
   (*t)->simulator = false;
   (*t)->keep = false;
@@ -2421,7 +2421,7 @@ Char *name;
   (*t)->nlbl = NULL;
   (*t)->hlbl = NULL;
   (*t)->shortname = (Char *)Malloc(33);
-  strcpy((*t)->shortname, name);
+  strcpy_overlap((*t)->shortname, name);
   stamp(&(*t)->netstamp);
   (*t)->deltatime = 0.0;
   t2 = gg.toolbase;
@@ -2450,9 +2450,9 @@ Char *name_;
   boolean ready;
   cnfrec *cnfp;
 
-  strcpy(name, name_);
-  strcpy(savefunc, gg.func);
-  strcpy(saveargs, gg.funcarg);
+  strcpy_overlap(name, name_);
+  strcpy_overlap(savefunc, gg.func);
+  strcpy_overlap(saveargs, gg.funcarg);
   lp = gg.toolbase;
   while (lp != NULL && strcmp(lp->name, name))
     lp = lp->next;
@@ -2488,7 +2488,7 @@ Char *name_;
 	  if (!strcmp(cnfp->tool, name)) {
 	    doingcnffunction = true;
 	    gg.action = act_cnf;
-	    strcpy(gg.funcarg, cnfp->s);
+	    strcpy_overlap(gg.funcarg, cnfp->s);
 	    getword(gg.funcarg, gg.func);
 	    (*proc)(&gg);
 	    doingcnffunction = false;
@@ -2512,8 +2512,8 @@ Char *name_;
     }
   }
   Result = lp;
-  strcpy(gg.func, savefunc);
-  strcpy(gg.funcarg, saveargs);
+  strcpy_overlap(gg.func, savefunc);
+  strcpy_overlap(gg.funcarg, saveargs);
   return Result;
 }
 
@@ -2600,10 +2600,10 @@ Char *act;
 {
   Char savefunc[17];
 
-  strcpy(savefunc, gg.genfunc);
-  strcpy(gg.genfunc, act);
+  strcpy_overlap(savefunc, gg.genfunc);
+  strcpy_overlap(gg.genfunc, act);
   calltool(sim, act_general);
-  strcpy(gg.genfunc, savefunc);
+  strcpy_overlap(gg.genfunc, savefunc);
 }
 
 
@@ -2614,10 +2614,10 @@ Char *act;
 {
   Char savefunc[17];
 
-  strcpy(savefunc, gg.genfunc);
-  strcpy(gg.genfunc, act);
+  strcpy_overlap(savefunc, gg.genfunc);
+  strcpy_overlap(gg.genfunc, act);
   calltoolnode(n, act_gennode);
-  strcpy(gg.genfunc, savefunc);
+  strcpy_overlap(gg.genfunc, savefunc);
 }
 
 
@@ -2627,10 +2627,10 @@ Char *act;
 {
   Char savefunc[17];
 
-  strcpy(savefunc, gg.genfunc);
-  strcpy(gg.genfunc, act);
+  strcpy_overlap(savefunc, gg.genfunc);
+  strcpy_overlap(gg.genfunc, act);
   calltoolkind(k, act_genkind);
-  strcpy(gg.genfunc, savefunc);
+  strcpy_overlap(gg.genfunc, savefunc);
 }
 
 
@@ -2640,10 +2640,10 @@ Char *act;
 {
   Char savefunc[17];
 
-  strcpy(savefunc, gg.genfunc);
-  strcpy(gg.genfunc, act);
+  strcpy_overlap(savefunc, gg.genfunc);
+  strcpy_overlap(gg.genfunc, act);
   calltoolgate(g, act_gengate);
-  strcpy(gg.genfunc, savefunc);
+  strcpy_overlap(gg.genfunc, savefunc);
 }
 
 
@@ -2654,16 +2654,16 @@ Char *act;
   log_tool *tp;
   Char savefunc[17];
 
-  strcpy(savefunc, gg.genfunc);
+  strcpy_overlap(savefunc, gg.genfunc);
   tp = gg.toolbase;
   while (tp != NULL) {
     if (tp->ready && tp->simulator) {
-      strcpy(gg.genfunc, act);
+      strcpy_overlap(gg.genfunc, act);
       calltool(tp, act_general);
     }
     tp = tp->next;
   }
-  strcpy(gg.genfunc, savefunc);
+  strcpy_overlap(gg.genfunc, savefunc);
 }
 
 
@@ -2673,17 +2673,17 @@ Char *act;
   log_tool *tp;
   Char savefunc[17];
 
-  strcpy(savefunc, gg.genfunc);
+  strcpy_overlap(savefunc, gg.genfunc);
   tp = gg.toolbase;
   while (tp != NULL) {
     if (tp->ready && tp->simulator) {
-      strcpy(gg.genfunc, act);
+      strcpy_overlap(gg.genfunc, act);
       gg.actnode = NULL;
       calltool(tp, act_gennode);
     }
     tp = tp->next;
   }
-  strcpy(gg.genfunc, savefunc);
+  strcpy_overlap(gg.genfunc, savefunc);
 }
 
 
@@ -2693,17 +2693,17 @@ Char *act;
   log_tool *tp;
   Char savefunc[17];
 
-  strcpy(savefunc, gg.genfunc);
+  strcpy_overlap(savefunc, gg.genfunc);
   tp = gg.toolbase;
   while (tp != NULL) {
     if (tp->ready && tp->simulator) {
-      strcpy(gg.genfunc, act);
+      strcpy_overlap(gg.genfunc, act);
       gg.actkind = NULL;
       calltool(tp, act_genkind);
     }
     tp = tp->next;
   }
-  strcpy(gg.genfunc, savefunc);
+  strcpy_overlap(gg.genfunc, savefunc);
 }
 
 
@@ -2713,17 +2713,17 @@ Char *act;
   log_tool *tp;
   Char savefunc[17];
 
-  strcpy(savefunc, gg.genfunc);
+  strcpy_overlap(savefunc, gg.genfunc);
   tp = gg.toolbase;
   while (tp != NULL) {
     if (tp->ready && tp->simulator) {
-      strcpy(gg.genfunc, act);
+      strcpy_overlap(gg.genfunc, act);
       gg.actgate = NULL;
       calltool(tp, act_gengate);
     }
     tp = tp->next;
   }
-  strcpy(gg.genfunc, savefunc);
+  strcpy_overlap(gg.genfunc, savefunc);
 }
 
 
@@ -3312,14 +3312,14 @@ long scale, rot, xx, yy;
 	 (v->UU.U116.torg / 3 - 1) * log_rotyy[rot];
     i = strposc(v->UU.U116.sp, '$', 1L);
     if (i > 0 && i < strlen(v->UU.U116.sp)) {
-      strcpy(buf, v->UU.U116.sp);
+      strcpy_overlap(buf, v->UU.U116.sp);
       mode = 'X';
       while (i <= strlen(buf)) {
 	if (buf[i - 1] == '$' && i < strlen(buf)) {
 	  switch (toupper(buf[i])) {
 
 	  case '$':
-	    strcpy(buf + i - 1, buf + i);
+	    strcpy_overlap(buf + i - 1, buf + i);
 	    i++;
 	    break;
 
@@ -3328,7 +3328,7 @@ long scale, rot, xx, yy;
 	  case 'O':
 	  case 'X':
 	    mode = toupper(buf[i]);   /*close enough*/
-	    strcpy(buf + i - 1, buf + i + 1);
+	    strcpy_overlap(buf + i - 1, buf + i + 1);
 	    break;
 
 	  default:
@@ -3965,7 +3965,7 @@ short x, y, gtype, sig, c;
   m_color((long)c);
   if (k->flag.U3.nright != (gtype / log_kindoffset == 0))
     drawstr2((int)(x - m_strwidth(NULL,
-		     strrtrim(strcpy(STR1, gg.signaltab[sig - 1].name))) + 17),
+		     strrtrim(strcpy_overlap(STR1, gg.signaltab[sig - 1].name))) + 17),
 	     y - 3, gg.signaltab[sig - 1].name);
   else
     drawstr2(x - 17, y - 3, gg.signaltab[sig - 1].name);
@@ -4848,10 +4848,10 @@ Char *name_;
 {
   Char name[256];
 
-  strcpy(name, name_);
+  strcpy_overlap(name, name_);
   newci_fixfname(name, "text", "");
   closedump();
-  strcpy(dumpfname, name);
+  strcpy_overlap(dumpfname, name);
 }
 
 
@@ -4861,10 +4861,10 @@ Char *name_;
 {
   Char name[256];
 
-  strcpy(name, name_);
+  strcpy_overlap(name, name_);
   newci_fixfname(name, "text", "");
   closetrace();
-  strcpy(tracefname, name);
+  strcpy_overlap(tracefname, name);
   if (gg.traceflag)
     tracemessage("Trace mode ON");
 }
@@ -5238,7 +5238,7 @@ double *val;
 Char *opts;
 {
   gg.actval = 0.0;
-  strcpy(gg.actstr, opts);
+  strcpy_overlap(gg.actstr, opts);
   calltoolnode(n, act_nodeval);
   *val = gg.actval;
 }
@@ -5913,7 +5913,7 @@ log_kattrrec *kattr;
 
     case 'C':
       (*gattr)[i].UU.c = (Char *)Malloc(kattr[i].prec + 1L);
-      strcpy((*gattr)[i].UU.c, kattr[i].UU.c);
+      strcpy_overlap((*gattr)[i].UU.c, kattr[i].UU.c);
       break;
 
     case 'A':
@@ -5974,7 +5974,7 @@ log_kattrrec *kattr;
 
     case 'C':
       (*gattr)[i].UU.c = (Char *)Malloc(kattr[i].prec + 1L);
-      strcpy((*gattr)[i].UU.c, oldattr[i].UU.c);
+      strcpy_overlap((*gattr)[i].UU.c, oldattr[i].UU.c);
       break;
 
     case 'A':
@@ -6740,9 +6740,9 @@ Char *n_;
   short FORLIM;
   log_sigrec *WITH;
 
-  strcpy(n, n_);
-  strcpy(STR1, strltrim(strrtrim(strcpy(STR2, n))));
-  strcpy(n, STR1);
+  strcpy_overlap(n, n_);
+  strcpy_overlap(STR1, strltrim(strrtrim(strcpy_overlap(STR2, n))));
+  strcpy_overlap(n, STR1);
   if (*n == '\0')
     i = d;
   else {
@@ -6910,15 +6910,15 @@ Char *Result;
 short c;
 {
   if (c == log_wcol_normal)
-    return strcpy(Result, "U");
+    return strcpy_overlap(Result, "U");
   else if (c == log_wcol_green)
-    return strcpy(Result, "G");
+    return strcpy_overlap(Result, "G");
   else if (c == log_wcol_red)
-    return strcpy(Result, "R");
+    return strcpy_overlap(Result, "R");
   else if (c == log_wcol_blue)
-    return strcpy(Result, "B");
+    return strcpy_overlap(Result, "B");
   else if (c == log_wcol_yellow)
-    return strcpy(Result, "Y");
+    return strcpy_overlap(Result, "Y");
   else {
     sprintf(Result, "%02d", c);
     return Result;
@@ -7192,7 +7192,7 @@ short mode;
       i++;
     else if (ch == '\007' && i > 1) {
       i--;
-      strcpy(s + i - 1, s + i);
+      strcpy_overlap(s + i - 1, s + i);
       redraw = true;
     } else if (ch == '\177') {
       *s = '\0';
@@ -7205,7 +7205,7 @@ short mode;
       if (starting)
 	*s = '\0';
       sprintf(STR1, "%c%s", ch, s + i - 1);
-      strcpy(s + i - 1, STR1);
+      strcpy_overlap(s + i - 1, STR1);
       i++;
       redraw = true;
     }
@@ -7485,7 +7485,7 @@ Static Void doimmedfunction()
       }
     }
     doingcnffunction = false;
-    strcpy(cmd, gg.func);
+    strcpy_overlap(cmd, gg.func);
     tp = gg.toolbase;
     while (tp != NULL && !strcmp(gg.func, cmd)) {
       if (tp->ready)
@@ -7621,19 +7621,19 @@ Char *name_;
   Char name[256];
   Char cmd[17];
 
-  strcpy(name, name_);
+  strcpy_overlap(name, name_);
   remcursor();
   commandfound = true;
   while (*name == ':')
-    strcpy(name, name + 1);
+    strcpy_overlap(name, name + 1);
   getword(name, cmd);
   doingcnffunction = false;
   if (!strcmp(gg.func, cmd)) {
     *gg.func = '\0';
     return;
   }
-  strcpy(gg.func, cmd);
-  strcpy(gg.funcarg, name);
+  strcpy_overlap(gg.func, cmd);
+  strcpy_overlap(gg.funcarg, name);
   if (briefprobe) {
     remcursor();
     gg.probemode = false;
@@ -9733,7 +9733,7 @@ boolean cut, tap;
       bases->lcopy = l2;
       l2->x = l->x - anchorx;
       l2->y = l->y - anchory;
-      strcpy(l2->name, l->name);
+      strcpy_overlap(l2->name, l->name);
       if (cut) {
 	eralabel(l);
 	displabel(&l);
@@ -10289,7 +10289,7 @@ short i;
 
   if (kindsig[i - 1] == 0)
     return;
-  strcpy(buf, gg.signaltab[kindsig[i - 1] - 1].name);
+  strcpy_overlap(buf, gg.signaltab[kindsig[i - 1] - 1].name);
   j = strlen(buf);
   if (!(j > 0 && isdigit(buf[j - 1])))
     return;
@@ -10301,7 +10301,7 @@ short i;
     buf[j - 1]++;
   else {
     sprintf(STR1, "1%s", buf + j);
-    strcpy(buf + j, STR1);
+    strcpy_overlap(buf + j, STR1);
   }
   kdrawgatec(i, gg.color.backgr);
   kindsig[i - 1] = getsignal(0, buf);
@@ -10469,7 +10469,7 @@ short x, y;
     gg.lbase[gg.curpage - 1] = l1;
     l1->x = l->x + x;
     l1->y = l->y + y;
-    strcpy(l1->name, l->name);
+    strcpy_overlap(l1->name, l->name);
     l1->w = m_strwidth(logfont_lfont, l1->name) / log_scale0;
 /* p2c: log.text, line 9972:
  * Warning: Symbol 'LOGFONT_LFONT' is not defined [221] */
@@ -12162,18 +12162,18 @@ Char *t_;
   boolean match;
   short FORLIM;
 
-  strcpy(s, s_);
-  strcpy(t, t_);
+  strcpy_overlap(s, s_);
+  strcpy_overlap(t, t_);
   if (*t == '\0' || !strcmp(s, t))
     return (strcmp(s, t) == 0);
   else {
     ch = t[0];
     if (ch == '*' || ch == '?' || ch == '=') {
-      strcpy(t, t + 1);
+      strcpy_overlap(t, t + 1);
       do {
 	match = comparestr(s, g, t);
 	if (!match && *s != '\0')
-	  strcpy(s, s + 1);
+	  strcpy_overlap(s, s + 1);
       } while (!(match || *s == '\0'));
       return (match || comparestr(s, g, t));
     } else if (ch == ';') {
@@ -12187,8 +12187,8 @@ Char *t_;
       }
       return Result;
     } else if (*s != '\0' && (ch == '%' || ch == s[0])) {
-      strcpy(s, s + 1);
-      strcpy(t, t + 1);
+      strcpy_overlap(s, s + 1);
+      strcpy_overlap(t, t + 1);
       return (comparestr(s, g, t));
     } else
       return false;
@@ -12344,9 +12344,9 @@ boolean loadit;
   log_vectorrec *WITH2;
   long FORLIM2;
 
-  strcpy(n, n_);
+  strcpy_overlap(n, n_);
   working();
-  strcpy(n, strrtrim(strcpy(STR1, strltrim(n))));
+  strcpy_overlap(n, strrtrim(strcpy_overlap(STR1, strltrim(n))));
   found = false;
   count = 0;
   FORLIM = idxsize;
@@ -12463,7 +12463,7 @@ boolean loadit;
 	GET(libf1[V.f - 1]->f, filerec);
 	WITH = kind[i - 1];
 	WITH->code = i0;
-	strcpy(WITH->name, index_[i0 - 1]);
+	strcpy_overlap(WITH->name, index_[i0 - 1]);
 	WITH->proc = NULL;
 	WITH->lbl = NULL;
 	WITH->attr = NULL;
@@ -12676,7 +12676,7 @@ boolean loadit;
 		    while (*buf != '\0') {
 		      if (buf[0] == '\002')
 			j0++;
-		      strcpy(buf, buf + 1);
+		      strcpy_overlap(buf, buf + 1);
 		      j00 = strposc(buf, '\002', 1L);
 		      if (j00 == 0)
 			j00 = strlen(buf) + 1;
@@ -12691,7 +12691,7 @@ boolean loadit;
 			  l2->value = (na_long)((long)j0);
 			}
 		      }
-		      strcpy(buf, buf + j00 - 1);
+		      strcpy_overlap(buf, buf + j00 - 1);
 		    }
 		  } else
 		    l2 = strlist_append(&WITH->lbl, buf);
@@ -12879,7 +12879,7 @@ Char *name;
     y0 = -3;
     y1 = -4;
     y2 = 4;
-    strcpy(buf, name);
+    strcpy_overlap(buf, name);
   }
   x = g->pinpos[i - 1].x * gg.scale - gg.xoff;
   y = g->pinpos[i - 1].y * gg.scale - gg.yoff;
@@ -13111,7 +13111,7 @@ Char *Result, *s;
   *s2 = '\0';
   for (i = strlen(s) - 1; i >= 0; i--)
     sprintf(s2 + strlen(s2), "%c", s[i]);
-  return strcpy(Result, s2);
+  return strcpy_overlap(Result, s2);
 }
 
 
@@ -13122,9 +13122,9 @@ Char *name_;
   librstrrec *lsp;
   Char STR1[256];
 
-  strcpy(name, name_);
+  strcpy_overlap(name, name_);
   lsp = librstrs;
-  strcpy(name, strreverse(STR1, name));
+  strcpy_overlap(name, strreverse(STR1, name));
   while (lsp != NULL && strcmp(lsp->name, name)) {
     if (strcmp(name, lsp->name) < 0)
       lsp = lsp->left;
@@ -13413,7 +13413,7 @@ boolean librmode;
 	  flag = true;
 	  nm[8] = '\0';
 	  k = kind[y0 * catwidth + x0];
-	  strrtrim(strcpy(nm, k->name));
+	  strrtrim(strcpy_overlap(nm, k->name));
 	  w = m_strwidth(logfont_lfont, nm);
 /* p2c: log.text, line 12903:
  * Warning: Symbol 'LOGFONT_LFONT' is not defined [221] */
@@ -13436,17 +13436,17 @@ boolean librmode;
 	    lp = lp->next;
 	  while (lp != NULL && *bot3 == '\0') {
 	    if (*bot1 == '\0')
-	      strcpy(bot1, lp->s);
+	      strcpy_overlap(bot1, lp->s);
 	    else if (*bot2 == '\0')
-	      strcpy(bot2, lp->s);
+	      strcpy_overlap(bot2, lp->s);
 	    else if (*bot3 == '\0')
-	      strcpy(bot3, lp->s);
+	      strcpy_overlap(bot3, lp->s);
 	    lp = lp->next;
 	  }
 	  if (*bot1 == '\0') {
 	    lsp = findlibrstr(k->name);
 	    if (lsp != NULL)
-	      strcpy(bot1, lsp->str);
+	      strcpy_overlap(bot1, lsp->str);
 	  }
 	  bottime = timers_sysclock();
 	} else
@@ -13612,18 +13612,18 @@ short p;
     i = strposc(s, 'E', 1L) - 1;
     j = strposc(s, '.', 1L);
     while (s[i - 1] == '0' || p != 0 && i > j + p) {
-      strcpy(s + i - 1, s + i);
+      strcpy_overlap(s + i - 1, s + i);
       i--;
     }
     if (s[i - 1] == '.') {
-      strcpy(s + i - 1, s + i);
+      strcpy_overlap(s + i - 1, s + i);
       i--;
     }
     while (strlen(s) > i + 3 && s[i + 2] == '0')
-      strcpy(s + i + 2, s + i + 3);
+      strcpy_overlap(s + i + 2, s + i + 3);
     if (s[i + 1] == '+')
-      strcpy(s + i + 1, s + i + 2);
-    return strcpy(Result, strltrim(s));
+      strcpy_overlap(s + i + 1, s + i + 2);
+    return strcpy_overlap(Result, strltrim(s));
   }
   if (p == 0) {
     sprintf(s, "%30.9f", r);
@@ -13636,7 +13636,7 @@ short p;
     s[i] = '\0';
 /* p2c: log.text, line 13120:
  * Note: Modification of string length may translate incorrectly [146] */
-    return strcpy(Result, strltrim(s));
+    return strcpy_overlap(Result, strltrim(s));
   }
   sprintf(s, "%25.*f", p, r);
   i = strlen(s) + 1;
@@ -13644,7 +13644,7 @@ short p;
 /* zfprintf(stdout, "realstr:%lf p: %d s:  %s\n", r, p, s); **MDG** */
 /* p2c: log.text, line 13125:
  * Note: Modification of string length may translate incorrectly [146] */
-  return strcpy(Result, strltrim(s));
+  return strcpy_overlap(Result, strltrim(s));
 }
 
 
@@ -13670,36 +13670,36 @@ boolean mu;
   if (r == 0 || fabs(r) >= 1.0e15 || fabs(r) < 1.0e-16)
     *s = '\0';
   else if (fabs(r) >= 1e12) {
-    strcpy(s, "T");
+    strcpy_overlap(s, "T");
     r /= 1e12;
   } else if (fabs(r) >= 1e9) {
-    strcpy(s, "G");
+    strcpy_overlap(s, "G");
     r /= 1e9;
   } else if (fabs(r) >= 1e6) {
-    strcpy(s, "Meg");  
+    strcpy_overlap(s, "Meg");  
     r /= 1e6;
   } else if (fabs(r) >= 1e3) {
-    strcpy(s, "K");
+    strcpy_overlap(s, "K");
     r /= 1e3;
   } else if (fabs(r) >= 0.1) {
     *s = '\0';
   } else if (fabs(r) >= 1e-3) {
-    strcpy(s, "m");
+    strcpy_overlap(s, "m");
     r *= 1e3;
   } else if (fabs(r) >= 1e-6) {
-    strcpy(s, "u");
+    strcpy_overlap(s, "u");
     r *= 1e6;
   } else if (fabs(r) >= 1e-9) {
-    strcpy(s, "n");
+    strcpy_overlap(s, "n");
     r *= 1e9;
   } else if (fabs(r) >= 1e-12) {
-    strcpy(s, "p");
+    strcpy_overlap(s, "p");
     r *= 1e12;
   } else {
-    strcpy(s, "f");
+    strcpy_overlap(s, "f");
     r *= 1e15;
   }
-  sprintf(s, "%s%s", realstr(STR1, r, p), strcpy(STR2, s));
+  sprintf(s, "%s%s", realstr(STR1, r, p), strcpy_overlap(STR2, s));
   sprintf(Result, "%s%s", s, u);
 /* zfprintf(stdout, "realunit Result: %s\n", Result); ***MDG** */ 
   return Result;
@@ -14013,7 +14013,7 @@ long *attrstamp;
   V.numattrs = numattrs_;
   V.kattr = kattr_;
   V.lbl = lbl_;
-  strcpy(V.name, name_);
+  strcpy_overlap(V.name, name_);
   V.chproc = chproc_;
   if (V.lbl == NULL)
     return;
@@ -14303,8 +14303,8 @@ long *attrstamp;
 	case 'U':
 	case 'F':
 	  readlnpass(buf, 2);
-	  strcpy(STR1, strltrim(buf));
-	  strcpy(buf, STR1);
+	  strcpy_overlap(STR1, strltrim(buf));
+	  strcpy_overlap(buf, STR1);
 	  saveb2 = touched;
 	  saveb = WITH->blnk;
 	  saver = WITH->UU.r;
@@ -14339,8 +14339,8 @@ long *attrstamp;
 
 	case 'I':
 	  readlnpass(buf, 2);
-	  strcpy(STR1, strltrim(buf));
-	  strcpy(buf, STR1);
+	  strcpy_overlap(STR1, strltrim(buf));
+	  strcpy_overlap(buf, STR1);
 	  saveb2 = touched;
 	  saveb = WITH->blnk;
 	  savei = WITH->UU.U73.i1;
@@ -14375,8 +14375,8 @@ long *attrstamp;
 
 	case 'H':
 	  readlnpass(buf, 2);
-	  strcpy(STR1, strltrim(buf));
-	  strcpy(buf, STR1);
+	  strcpy_overlap(STR1, strltrim(buf));
+	  strcpy_overlap(buf, STR1);
 	  saveb2 = touched;
 	  saveb = WITH->blnk;
 	  savei = WITH->UU.U73.i1;
@@ -14409,34 +14409,34 @@ long *attrstamp;
 	  break;
 
 	case 'C':
-	  strcpy(buf, WITH->UU.c);
+	  strcpy_overlap(buf, WITH->UU.c);
 	  readlnpass(buf, 3);
-	  strcpy(savebuf, WITH->UU.c);
-	  strcpy(STR1, strltrim(strrtrim(strcpy(STR3, buf))));
-	  strcpy(buf, STR1);
+	  strcpy_overlap(savebuf, WITH->UU.c);
+	  strcpy_overlap(STR1, strltrim(strrtrim(strcpy_overlap(STR3, buf))));
+	  strcpy_overlap(buf, STR1);
 	  if (*buf == '\0' && !V.kattr[V.p - 1].opt)
-	    strcpy(buf, V.kattr[V.p - 1].UU.c);
+	    strcpy_overlap(buf, V.kattr[V.p - 1].UU.c);
 	  else if (strlen(buf) > V.kattr[V.p - 1].prec) {
 	    buf[V.kattr[V.p - 1].prec] = '\0';
 /* p2c: log.text, line 13845:
  * Note: Modification of string length may translate incorrectly [146] */
 	  }
-	  strcpy(WITH->UU.c, buf);
+	  strcpy_overlap(WITH->UU.c, buf);
 	  if (tryconfig(&V))
 	    touched = true;
 	  else
-	    strcpy(WITH->UU.c, savebuf);
+	    strcpy_overlap(WITH->UU.c, savebuf);
 	  WITH->blnk = (*WITH->UU.c == '\0');
 	  break;
 
 	case 'A':
-	  strcpy(buf, WITH->UU.c);
+	  strcpy_overlap(buf, WITH->UU.c);
 	  readlnpass(buf, 3);
-	  strcpy(savebuf, WITH->UU.sp);
-	  strcpy(STR1, strltrim(strrtrim(strcpy(STR3, buf))));
-	  strcpy(buf, STR1);
+	  strcpy_overlap(savebuf, WITH->UU.sp);
+	  strcpy_overlap(STR1, strltrim(strrtrim(strcpy_overlap(STR3, buf))));
+	  strcpy_overlap(buf, STR1);
 	  if (*buf == '\0' && !V.kattr[V.p - 1].opt)
-	    strcpy(buf, V.kattr[V.p - 1].UU.sp);
+	    strcpy_overlap(buf, V.kattr[V.p - 1].UU.sp);
 	  strchange(&WITH->UU.sp, buf);
 	  if (tryconfig(&V))
 	    touched = true;
@@ -14474,8 +14474,8 @@ long *attrstamp;
 	case 'V':
 	  readlnpass(buf, 2);
 	  savei = WITH->UU.nv;
-	  strcpy(STR1, strltrim(strrtrim(strcpy(STR3, buf))));
-	  strcpy(buf, STR1);
+	  strcpy_overlap(STR1, strltrim(strrtrim(strcpy_overlap(STR3, buf))));
+	  strcpy_overlap(buf, STR1);
 	  l1 = V.kattr[V.p - 1].UU.U86.v;
 	  while (l1 != NULL && strcicmp(l1->s, buf) != 0)
 	    l1 = l1->next;
@@ -14668,8 +14668,8 @@ Char *buf;
   case 'R':
   case 'U':
   case 'F':
-    strcpy(STR1, strltrim(buf));
-    strcpy(buf, STR1);
+    strcpy_overlap(STR1, strltrim(buf));
+    strcpy_overlap(buf, STR1);
     saveb2 = touched;
     saveb = WITH->blnk;
     saver = WITH->UU.r;
@@ -14701,8 +14701,8 @@ Char *buf;
     break;
 
   case 'I':
-    strcpy(STR1, strltrim(buf));
-    strcpy(buf, STR1);
+    strcpy_overlap(STR1, strltrim(buf));
+    strcpy_overlap(buf, STR1);
     saveb2 = touched;
     saveb = WITH->blnk;
     savei = WITH->UU.U73.i1;
@@ -14734,8 +14734,8 @@ Char *buf;
     break;
 
   case 'H':
-    strcpy(STR1, strltrim(buf));
-    strcpy(buf, STR1);
+    strcpy_overlap(STR1, strltrim(buf));
+    strcpy_overlap(buf, STR1);
     saveb2 = touched;
     saveb = WITH->blnk;
     savei = WITH->UU.U73.i1;
@@ -14767,30 +14767,30 @@ Char *buf;
     break;
 
   case 'C':
-    strcpy(savebuf, WITH->UU.c);
-    strcpy(STR1, strltrim(strrtrim(strcpy(STR3, buf))));
-    strcpy(buf, STR1);
+    strcpy_overlap(savebuf, WITH->UU.c);
+    strcpy_overlap(STR1, strltrim(strrtrim(strcpy_overlap(STR3, buf))));
+    strcpy_overlap(buf, STR1);
     if (*buf == '\0' && !V.kattr[V.p - 1].opt)
-      strcpy(buf, V.kattr[V.p - 1].UU.c);
+      strcpy_overlap(buf, V.kattr[V.p - 1].UU.c);
     else if (strlen(buf) > V.kattr[V.p - 1].prec) {
       buf[V.kattr[V.p - 1].prec] = '\0';
 /* p2c: log.text, line 14167:
  * Note: Modification of string length may translate incorrectly [146] */
     }
-    strcpy(WITH->UU.c, buf);
+    strcpy_overlap(WITH->UU.c, buf);
     if (tryconfig_(&V))
       touched = true;
     else
-      strcpy(WITH->UU.c, savebuf);
+      strcpy_overlap(WITH->UU.c, savebuf);
     WITH->blnk = (*WITH->UU.c == '\0');
     break;
 
   case 'A':
-    strcpy(savebuf, WITH->UU.sp);
-    strcpy(STR1, strltrim(strrtrim(strcpy(STR3, buf))));
-    strcpy(buf, STR1);
+    strcpy_overlap(savebuf, WITH->UU.sp);
+    strcpy_overlap(STR1, strltrim(strrtrim(strcpy_overlap(STR3, buf))));
+    strcpy_overlap(buf, STR1);
     if (*buf == '\0' && !V.kattr[V.p - 1].opt)
-      strcpy(buf, V.kattr[V.p - 1].UU.sp);
+      strcpy_overlap(buf, V.kattr[V.p - 1].UU.sp);
     strchange(&WITH->UU.sp, buf);
     if (tryconfig_(&V))
       touched = true;
@@ -14803,7 +14803,7 @@ Char *buf;
     saveb = WITH->blnk;
     saveb2 = WITH->UU.b;
     if (*buf == '\0')
-      strcpy(buf, " ");
+      strcpy_overlap(buf, " ");
     if (buf[0] == '1' || buf[0] == 'y' || buf[0] == 'Y' || buf[0] == 't' ||
 	buf[0] == 'T') {
       WITH->UU.b = true;
@@ -14829,8 +14829,8 @@ Char *buf;
 
   case 'V':
     savei = WITH->UU.nv;
-    strcpy(STR1, strltrim(strrtrim(strcpy(STR3, buf))));
-    strcpy(buf, STR1);
+    strcpy_overlap(STR1, strltrim(strrtrim(strcpy_overlap(STR3, buf))));
+    strcpy_overlap(buf, STR1);
     l1 = V.kattr[V.p - 1].UU.U86.v;
     while (l1 != NULL && strcicmp(l1->s, buf) != 0)
       l1 = l1->next;
@@ -14857,7 +14857,7 @@ Char *value_;
   short pg;
   log_tool *saveacttool;
 
-  strcpy(value, value_);
+  strcpy_overlap(value, value_);
   if (num < 1 || num > g->kind->numattrs)
     return;
   saveacttool = gg.acttool;
@@ -14891,7 +14891,7 @@ Char *value_;
   Char value[256];
   log_tool *saveacttool;
 
-  strcpy(value, value_);
+  strcpy_overlap(value, value_);
   if (num < 1 || num > n->simtype->nnumattrs)
     return;
   saveacttool = gg.acttool;
@@ -15079,13 +15079,13 @@ log_grec *g;
 /* p2c: log.text, line 14457:
  * Warning: Symbol 'LOGFONT_LFONT' is not defined [221] */
       drawstr2((int)(g->x * gg.scale - gg.xoff - m_strwidth(logfont_lfont,
-		       strrtrim(strcpy(STR1, n))) + 17),
+		       strrtrim(strcpy_overlap(STR1, n))) + 17),
 	       (int)(g->y * gg.scale - gg.yoff - 3),
-	       strrtrim(strcpy(STR2, n)));
+	       strrtrim(strcpy_overlap(STR2, n)));
     } else
       drawstr2((int)(g->x * gg.scale - gg.xoff - 17),
 	       (int)(g->y * gg.scale - gg.yoff - 3),
-	       strrtrim(strcpy(STR1, n)));
+	       strrtrim(strcpy_overlap(STR1, n)));
     m_colormode((long)m_normal);
     if (!pollkbd2()) {
       do {
@@ -15100,13 +15100,13 @@ log_grec *g;
 /* p2c: log.text, line 14471:
  * Warning: Symbol 'LOGFONT_LFONT' is not defined [221] */
       drawstr2((int)(g->x * gg.scale - gg.xoff - m_strwidth(logfont_lfont,
-		       strrtrim(strcpy(STR1, n))) + 17),
+		       strrtrim(strcpy_overlap(STR1, n))) + 17),
 	       (int)(g->y * gg.scale - gg.yoff - 3),
-	       strrtrim(strcpy(STR2, n)));
+	       strrtrim(strcpy_overlap(STR2, n)));
     } else
       drawstr2((int)(g->x * gg.scale - gg.xoff - 17),
 	       (int)(g->y * gg.scale - gg.yoff - 3),
-	       strrtrim(strcpy(STR1, n)));
+	       strrtrim(strcpy_overlap(STR1, n)));
     m_colormode((long)m_normal);
     n[strlen(n) - 1] = '\0';
     if (pollkbd2()) {
@@ -15125,11 +15125,11 @@ log_grec *g;
 /* p2c: log.text, line 14490:
  * Warning: Symbol 'LOGFONT_LFONT' is not defined [221] */
     drawstr2((int)(g->x * gg.scale - gg.xoff - m_strwidth(logfont_lfont,
-		     strrtrim(strcpy(STR1, n))) + 17),
-	     (int)(g->y * gg.scale - gg.yoff - 3), strrtrim(strcpy(STR2, n)));
+		     strrtrim(strcpy_overlap(STR1, n))) + 17),
+	     (int)(g->y * gg.scale - gg.yoff - 3), strrtrim(strcpy_overlap(STR2, n)));
   } else
     drawstr2((int)(g->x * gg.scale - gg.xoff - 17),
-	     (int)(g->y * gg.scale - gg.yoff - 3), strrtrim(strcpy(STR1, n)));
+	     (int)(g->y * gg.scale - gg.yoff - 3), strrtrim(strcpy_overlap(STR1, n)));
   settofrom(&g, n);
   signalcaps = nk_setcapslock(savecaps);
 }
@@ -15292,7 +15292,7 @@ Char *name;
       l1 = l1->next;
   }
   if (l1 != NULL)
-    strcpy(name, l1->s);
+    strcpy_overlap(name, l1->s);
   else
     sprintf(name, "%d", num);
 }
@@ -15316,9 +15316,9 @@ short *num;
 {
   Char name[256];
 
-  strcpy(name, name_);
+  strcpy_overlap(name, name_);
   if (*name == '#')
-    strcpy(name, name + 1);
+    strcpy_overlap(name, name + 1);
   if (strsubset(name, "0123456789")) {
     if (*name == '\0') {
       *num = 0;
@@ -15345,7 +15345,7 @@ short num;
 Char *name;
 {
   if (num >= 1 && num <= k->numpins && k->pinnames[num - 1] != NULL) {
-    strcpy(name, k->pinnames[num - 1]->s);
+    strcpy_overlap(name, k->pinnames[num - 1]->s);
     return;
   }
   if (num == 0)
@@ -15408,7 +15408,7 @@ Char *s;
   log_lrec *l;
 
   newlabel(&l);
-  strcpy(l->name, s);
+  strcpy_overlap(l->name, s);
   l->x = x;
   l->y = y;
   l->w = m_strwidth(logfont_lfont, s) / log_scale0;
@@ -15498,7 +15498,7 @@ log_lrec *l;
   x1 = l->x * gg.scale - gg.xoff;
   y1 = l->y * gg.scale - gg.yoff + 2;
   i = 1;
-  strcpy(name, l->name);
+  strcpy_overlap(name, l->name);
   if (touching) {
     while (i <= strlen(name) &&
 	   gg.t.x - x1 > m_strwidth(logfont_lfont,
@@ -15577,16 +15577,16 @@ log_lrec *l;
 /* p2c: log.text, line 14903: Note: Character >= 128 encountered [281] */
 	if (i <= strlen(name)) {
 	  sprintf(STR1, " %s", name + i - 1);
-	  strcpy(name + i - 1, STR1);
+	  strcpy_overlap(name + i - 1, STR1);
 	} else
 	  strcat(name, " ");
 	name[i - 1] = ch;
 	i++;
       } else if (ch == '\007' && i > 1) {
 	i--;
-	strcpy(name + i - 1, name + i);
+	strcpy_overlap(name + i - 1, name + i);
       } else if (ch == '\030' && i <= strlen(name))
-	strcpy(name + i - 1, name + i);
+	strcpy_overlap(name + i - 1, name + i);
       else if (ch == '\b' && i > 1)
 	i--;
       else if (ch == '\034' && i <= strlen(name))
@@ -15597,9 +15597,9 @@ log_lrec *l;
 	i = strlen(name) + 1;
       else if (ch == '\n' && strlen(name) < log_lablen) {
 	sprintf(STR1, " %s", name + i - 1);
-	strcpy(name + i - 1, STR1);
+	strcpy_overlap(name + i - 1, STR1);
       } else if (ch == '\037' && i <= strlen(name) && strlen(name) > 1)
-	strcpy(name + i - 1, name + i);
+	strcpy_overlap(name + i - 1, name + i);
       if (redraw) {
 	remcursor();
 	m_color((long)gg.color.labeltext);
@@ -15612,7 +15612,7 @@ log_lrec *l;
   if (*name == '\0')
     displabel(&l);
   else if (strcmp(name, l->name)) {
-    strcpy(l->name, name);
+    strcpy_overlap(l->name, name);
     l->w = m_strwidth(logfont_lfont, l->name) / log_scale0;
 /* p2c: log.text, line 14961:
  * Warning: Symbol 'LOGFONT_LFONT' is not defined [221] */
@@ -16577,7 +16577,7 @@ struct LOC_historycommand *LINK;
 {
   if (LINK->xactive) {
     LINK->xactive = false;
-    strcpy(LINK->xexpr, expr);
+    strcpy_overlap(LINK->xexpr, expr);
     if (*LINK->yexpr == '\0')
       LINK->yactive = true;
     refraxes(LINK);
@@ -16586,7 +16586,7 @@ struct LOC_historycommand *LINK;
   if (!LINK->yactive)
     return;
   LINK->yactive = false;
-  strcpy(LINK->yexpr, expr);
+  strcpy_overlap(LINK->yexpr, expr);
   if (*LINK->xexpr == '\0')
     LINK->xactive = true;
   refraxes(LINK);
@@ -16692,7 +16692,7 @@ struct LOC_historycommand *LINK;
       if (*gg.actstr == '\0')
 	realunit(LINK->gridstr, gg.actval, 4, "", true);
       else
-	strcpy(LINK->gridstr, gg.actstr);
+	strcpy_overlap(LINK->gridstr, gg.actstr);
       break;
 
     case 201:
@@ -16703,7 +16703,7 @@ struct LOC_historycommand *LINK;
       if (*gg.actstr == '\0')
 	realunit(LINK->gridstr, gg.actval, 4, "", true);
       else
-	strcpy(LINK->gridstr, gg.actstr);
+	strcpy_overlap(LINK->gridstr, gg.actstr);
       break;
 
     case 202:
@@ -16724,7 +16724,7 @@ struct LOC_historycommand *LINK;
       gg.actgattr = histgridhn->attr;
       calltoolnode(gg.signaltab[gg.actx - 1].np, act_histstr);
       if (*gg.actstr == '\0')
-	strcpy(gg.actstr, realunit(STR1, gg.actval, 4, "", true));
+	strcpy_overlap(gg.actstr, realunit(STR1, gg.actval, 4, "", true));
       sprintf(LINK->gridstr, "%s  ->  %s",
 	      realunit(STR1, LINK->gridtime, 4, "s", true), gg.actstr);
       break;
@@ -16741,7 +16741,7 @@ struct LOC_historycommand *LINK;
 	if (*gg.actstr == '\0')
 	  realunit(LINK->gridstr, gg.actval, 4, "", true);
 	else
-	  strcpy(LINK->gridstr, gg.actstr);
+	  strcpy_overlap(LINK->gridstr, gg.actstr);
 	strcat(LINK->gridstr, "/s");
       }
       break;
@@ -17196,7 +17196,7 @@ Static Void historycommand()
 	if (!strcmp(STR2, EXEC))
 	  *name = '\0';
 	else
-	  strcpy(name, strrtrim(strcpy(STR3, name)));
+	  strcpy_overlap(name, strrtrim(strcpy_overlap(STR3, name)));
 	remcursor();
         clipoff();
 	i = getsignal(0, name);
@@ -17467,7 +17467,7 @@ Char *filename_;
   Char STR2[256];
   short FORLIM;
 
-  strcpy(filename, filename_);
+  strcpy_overlap(filename, filename_);
   f = NULL;
   newci_fixfname(filename, "lgf", "");
   if (*filename != '\0' && pageempty(pgnum) && access(filename, F_OK) == 0) {
@@ -17477,7 +17477,7 @@ Char *filename_;
   }
   if (*filename != '\0') {
     TRY(try24);
-      strcpy(buf, filename);
+      strcpy_overlap(buf, filename);
       newci_forcefname(buf, "lfo", "");
       fp_change(filename, buf);
     RECOVER(try24);
@@ -17723,7 +17723,7 @@ Char *filename_;
     gg.pagechanged[pgnum - 1] = false;
     if (curfilename[pgnum - 1] == NULL)
       curfilename[pgnum - 1] = (Char *)Malloc(256);
-    strcpy(curfilename[pgnum - 1], filename);
+    strcpy_overlap(curfilename[pgnum - 1], filename);
   }
   if (f != NULL)
     fclose(f);
@@ -17810,7 +17810,7 @@ Static Void savecommand()
     beginbottom();
     printf("File name to save: ");
     if (curfilename[gg.curpage - 1] != NULL)
-      strcpy(filename, curfilename[gg.curpage - 1]);
+      strcpy_overlap(filename, curfilename[gg.curpage - 1]);
     else
       *filename = '\0';
     readlnpass(filename, 3);
@@ -17841,15 +17841,15 @@ Static Void namecommand()
   } else if (!strcmp(gg.funcarg, "?"))
     *filename = '\0';
   else
-    strcpy(filename, gg.funcarg);
+    strcpy_overlap(filename, gg.funcarg);
   if (*filename != '\0') {
-    if (!strcmp(filename, "\"\"") || *strcpy(STR3, strltrim(filename)) == '\0')
+    if (!strcmp(filename, "\"\"") || *strcpy_overlap(STR3, strltrim(filename)) == '\0')
       Free(curfilename[gg.curpage - 1]);
     else {
       newci_fixfname(filename, "lgf", "");
       if (curfilename[gg.curpage - 1] == NULL)
 	curfilename[gg.curpage - 1] = (Char *)Malloc(256);
-      strcpy(curfilename[gg.curpage - 1], filename);
+      strcpy_overlap(curfilename[gg.curpage - 1], filename);
     }
   }
   if (curfilename[gg.curpage - 1] == NULL) {
@@ -17974,7 +17974,7 @@ short ver;
     newlabel(&l);
     l->x = x;
     l->y = y;
-    strcpy(l->name, nam);
+    strcpy_overlap(l->name, nam);
     l->w = m_strwidth(logfont_lfont, l->name) / log_scale0;
 /* p2c: log.text, line 17118:
  * Warning: Symbol 'LOGFONT_LFONT' is not defined [221] */
@@ -18132,7 +18132,7 @@ short count;
 	    *buf = '\0';
 	    fscanf(*f, "%[^\n]", buf);
 	    if (strlen(buf) <= kattr[jj - 1].prec)
-	      strcpy((*gattr)[jj - 1].UU.c, buf);
+	      strcpy_overlap((*gattr)[jj - 1].UU.c, buf);
 	  }
 	  break;
 
@@ -18197,7 +18197,7 @@ Local Void loadfail(msg, LINK)
 Char *msg;
 struct LOC_loadpage *LINK;
 {
-  strcpy(LINK->reason, msg);
+  strcpy_overlap(LINK->reason, msg);
   _Escape(1);
 }
 
@@ -18239,7 +18239,7 @@ struct LOC_initialize *LINK;
 	P_ioresult = FileNotFound;
 	goto _Ltry31;
       }
-      strcpy(name, fname);
+      strcpy_overlap(name, fname);
       Result = true;
     RECOVER2(try31,_Ltry31);
       if (P_escapecode == -20)
@@ -18293,7 +18293,7 @@ Char *reason_;
   short FORLIM;
   Char *TEMP;
 
-  strcpy(filename, filename_);
+  strcpy_overlap(filename, filename_);
   V.reason = reason_;
   f = NULL;
   *V.reason = '\0';
@@ -18551,7 +18551,7 @@ Char *reason_;
 	newlabel(&l);
 	l->x = x;
 	l->y = y;
-	strcpy(l->name, labelname);
+	strcpy_overlap(l->name, labelname);
 	l->w = m_strwidth(logfont_lfont, l->name) / log_scale0;
 /* p2c: log.text, line 17510:
  * Warning: Symbol 'LOGFONT_LFONT' is not defined [221] */
@@ -18676,7 +18676,7 @@ Char *reason_;
     gg.pagechanged[gg.curpage - 1] = false;
     if (curfilename[gg.curpage - 1] == NULL)
       curfilename[gg.curpage - 1] = (Char *)Malloc(256);
-    strcpy(curfilename[gg.curpage - 1], filename);
+    strcpy_overlap(curfilename[gg.curpage - 1], filename);
   }
   if (f != NULL)
     fclose(f);
@@ -18777,7 +18777,7 @@ Static Void loadcommand()
 	}
       } while (!(pollkbd2() || gg.t.dn));
       if (gg.t.dn && x != -1) {
-	strcpy(filename, dirs[x][y]);
+	strcpy_overlap(filename, dirs[x][y]);
 	nk_gotoxy(24, txdown - 2);
 	printf("%s\t", filename);
       }
@@ -18812,7 +18812,7 @@ Static Void loadcommand()
 	m_graphics_on(); 
       }
   } else
-    strcpy(filename, gg.funcarg);
+    strcpy_overlap(filename, gg.funcarg);
   if (*filename != '\0') {
     beginbottom();
     TRY(try27);
@@ -18859,7 +18859,7 @@ Local Void loadfail_(msg, LINK)
 Char *msg;
 struct LOC_readlgf *LINK;
 {
-  strcpy(LINK->reason, msg);
+  strcpy_overlap(LINK->reason, msg);
   _Escape(1);
 }
 
@@ -19076,7 +19076,7 @@ Local Void loadfail__(msg, LINK)
 Char *msg;
 struct LOC_readpage *LINK;
 {
-  strcpy(LINK->reason, msg);
+  strcpy_overlap(LINK->reason, msg);
   _Escape(1);
 }
 
@@ -19092,7 +19092,7 @@ Char *reason_;
   Char buf[256];
   Char *TEMP;
 
-  strcpy(filename, filename_);
+  strcpy_overlap(filename, filename_);
   V.reason = reason_;
   f = NULL;
   *V.reason = '\0';
@@ -19120,7 +19120,7 @@ Char *reason_;
   gg.pagechanged[gg.curpage - 1] = false;
   if (curfilename[gg.curpage - 1] == NULL)
     curfilename[gg.curpage - 1] = (Char *)Malloc(256);
-  strcpy(curfilename[gg.curpage - 1], filename);
+  strcpy_overlap(curfilename[gg.curpage - 1], filename);
   if (f != NULL)
     fclose(f);
 }
@@ -19138,7 +19138,7 @@ Static Void readcommand()
     readlnpass(filename, 0);
     endbottom();
   } else
-    strcpy(filename, gg.funcarg);
+    strcpy_overlap(filename, gg.funcarg);
   if (*filename != '\0') {
     beginbottom();
     printf("Reading file %s\n", filename);
@@ -19390,9 +19390,9 @@ Char *Result;
 boolean b;
 {
   if (b)
-    return strcpy(Result, "ON ");
+    return strcpy_overlap(Result, "ON ");
   else
-    return strcpy(Result, "OFF");
+    return strcpy_overlap(Result, "OFF");
 }
 
 Local Void status_log()
@@ -19687,7 +19687,7 @@ Char *name_;
   Char STR2[256], STR3[256];
   int n = 0;
 
-  strcpy(name, name_);
+  strcpy_overlap(name, name_);
   clearshowalpha();
   whichmax = 0;
   tp = gg.toolbase;
@@ -19696,7 +19696,7 @@ Char *name_;
       whichmax++;
     tp = tp->next;
   }
-  strupper(name, strcpy(STR2, strltrim(strrtrim(strcpy(STR3, name)))));
+  strupper(name, strcpy_overlap(STR2, strltrim(strrtrim(strcpy_overlap(STR3, name)))));
   if (!strcmp(name, "LOG"))
     which = -2;
   else if (!strcmp(name, "MEMORY"))
@@ -20032,8 +20032,8 @@ short *val, def;
   Char STR2[256];
   Char STR3[256];
 
-  strcpy(name, name_);
-  strupper(name, strcpy(STR2, strltrim(strrtrim(strcpy(STR3, name)))));
+  strcpy_overlap(name, name_);
+  strupper(name, strcpy_overlap(STR2, strltrim(strrtrim(strcpy_overlap(STR3, name)))));
   cp = strlist_find(colorbase, name);
   if (cp != NULL)
     *val = (long)cp->value;
@@ -20149,13 +20149,13 @@ Char key;
 /* p2c: log.text, line 18917: Note: Character >= 128 encountered [281] */
     sprintf(name, "%c key", key);
   } else if (key == ' ')
-    strcpy(name, "Space bar");
+    strcpy_overlap(name, "Space bar");
   else if (key == '\007')
-    strcpy(name, "Backspace key");
+    strcpy_overlap(name, "Backspace key");
   else if (key == '\t')
-    strcpy(name, "Tab key");
+    strcpy_overlap(name, "Tab key");
   else if (key == '\015')
-    strcpy(name, "Enter key");
+    strcpy_overlap(name, "Enter key");
   else
     sprintf(name, "Key #%d", key);
   mp = macrobase;
@@ -20197,7 +20197,7 @@ Char *name;
   else
     mp2->next = mp3;
   mp3->key = key;
-  strcpy(mp3->name, name);
+  strcpy_overlap(mp3->name, name);
 }
 
 
@@ -20211,8 +20211,8 @@ short bool;
   logmenurec *menu;
 
   menu = popupmenus[num - 1];
-  strcpy(menu[part - 1].name, name);
-  strcpy(menu[part - 1].cmd, cmd);
+  strcpy_overlap(menu[part - 1].name, name);
+  strcpy_overlap(menu[part - 1].cmd, cmd);
   switch (bool) {
 
   case 1:
@@ -20276,9 +20276,9 @@ Char *w_;
   Char STR1[256];
   Char STR2[256];
 
-  strcpy(w, w_);
-  strcpy(STR1, strltrim(strrtrim(strupper(STR2, w))));
-  strcpy(w, STR1);
+  strcpy_overlap(w, w_);
+  strcpy_overlap(STR1, strltrim(strrtrim(strupper(STR2, w))));
+  strcpy_overlap(w, STR1);
   i = 15;
   while (i >= 0 && strcmp(cnames[i], w))
     i--;
@@ -20421,7 +20421,7 @@ Static Void docnffunction()
         end;  */
   getword(gg.funcarg, arg);
   if (*arg != '\0' && *gg.funcarg != '\0') {
-    strcpy(arg, strreverse(STR2, arg));
+    strcpy_overlap(arg, strreverse(STR2, arg));
     lspp = &librstrs;
     while (*lspp != NULL && strcmp((*lspp)->name, arg)) {
       if (strcmp(arg, (*lspp)->name) < 0)
@@ -20434,7 +20434,7 @@ Static Void docnffunction()
       *lspp = lsp;
       lsp->left = NULL;
       lsp->right = NULL;
-      strcpy(lsp->name, arg);
+      strcpy_overlap(lsp->name, arg);
       lsp->str = NULL;
     } else
       lsp = *lspp;
@@ -20459,7 +20459,7 @@ Static Void dofunction()
     remcursor();
     doimmedfunction();
     if (*gg.func != '\0') {
-      strcpy(cmd, gg.func);
+      strcpy_overlap(cmd, gg.func);
       tp = gg.toolbase;
       while (tp != NULL && !strcmp(gg.func, cmd)) {
 	if (tp->ready)
@@ -20979,7 +20979,7 @@ struct LOC_initialize *LINK;
   Char fn[256];
   na_strlist *l1;
 
-  strcpy(fn, fn_);
+  strcpy_overlap(fn, fn_);
   newci_fixfname(fn, "gate", "");
   if (!locatefile(fn, LINK))
     *fn = '\0';
@@ -20993,9 +20993,9 @@ struct LOC_initialize *LINK;
 {
   Char dir[256], buf[256];
 
-  strcpy(dir, dir_);
+  strcpy_overlap(dir, dir_);
   strwordx(dir, buf);
-  strcpy(gg.homedirname, buf);
+  strcpy_overlap(gg.homedirname, buf);
   if (buf[strlen(buf) - 1] != ':' && buf[strlen(buf) - 1] != '/')
     strcat(gg.homedirname, "/");
 }
@@ -21008,7 +21008,7 @@ Char *name;
   if (!cp) cp = strrchr(name, '\\');
 #endif
   if (cp)
-     strcpy(name, cp + 1);
+     strcpy_overlap(name, cp + 1);
 #ifdef OS2
   cp = strstr(name, ".exe");
   if (cp)
@@ -21031,18 +21031,18 @@ struct LOC_initialize *LINK;
   cnfrec *cnfp;
   Char *TEMP;
 
-  strcpy(fn, fn_);
+  strcpy_overlap(fn, fn_);
   tx = NULL;
   erasegates = true;
   eraseload = true;
   erasemenu = true;
   flag = false;
   if (!strcmp(fn, "*")) {
-    strcpy(fn, P_argv[0]);
+    strcpy_overlap(fn, P_argv[0]);
     removepath(fn);
     strcat(fn, ".cnf");
     if (!locatefile(fn, LINK)) {
-      strcpy(fn, "log.cnf");
+      strcpy_overlap(fn, "log.cnf");
       if (!locatefile(fn, LINK))
 	*fn = '\0';
     }
@@ -21090,8 +21090,8 @@ struct LOC_initialize *LINK;
 	}
 	if (!strcmp(LINK->cmdbuf, "LOG:"))
 	  getword(txbuf, LINK->cmdbuf);
-	strcpy(gg.func, LINK->cmdbuf);
-	strcpy(gg.funcarg, txbuf);
+	strcpy_overlap(gg.func, LINK->cmdbuf);
+	strcpy_overlap(gg.funcarg, txbuf);
 	if (*LINK->cmdbuf != '\0') {
 	  doimmedcnffunction();
 	  docnffunction();
@@ -21111,8 +21111,8 @@ struct LOC_initialize *LINK;
 	  else
 	    LINK->cnflast->next = cnfp;
 	  cnfp->next = NULL;
-	  strcpy(cnfp->tool, LINK->cmdbuf);
-	  strcpy(cnfp->s, txbuf);
+	  strcpy_overlap(cnfp->tool, LINK->cmdbuf);
+	  strcpy_overlap(cnfp->s, txbuf);
 	  LINK->cnflast = cnfp;
 	  continue;
 	}
@@ -21145,12 +21145,12 @@ struct LOC_initialize *LINK;
 	}
 	if (!strcmp(LINK->cmdbuf, "HELP")) {
 	  if (locatefile(txbuf, LINK))
-	    strcpy(loghelpname, txbuf);
+	    strcpy_overlap(loghelpname, txbuf);
 	  continue;
 	}
 	if (!strcmp(LINK->cmdbuf, "NEWS")) {
 	  if (locatefile(txbuf, LINK))
-	    strcpy(lognewsname, txbuf);
+	    strcpy_overlap(lognewsname, txbuf);
 	  continue;
 	}
 	if (!strcmp(LINK->cmdbuf, "TABLET")) {
@@ -21216,7 +21216,7 @@ struct LOC_initialize *LINK;
 	  newtool(&tp, txarg);
 	  strwordx(txbuf, txarg);
 	  if (*txarg != '\0')
-	    strcpy(tp->comment, txarg);
+	    strcpy_overlap(tp->comment, txarg);
 	  getword(txbuf, txarg);
 	  continue;
 	}
@@ -21310,24 +21310,24 @@ Static Void initialize()
 #ifdef OS2
   _control87(EM_UNDERFLOW, EM_UNDERFLOW);  /* Turn off underflow exception. */
 #endif
-  strcpy(swtab[0].switch_, "cC");   /* CNF file name */
+  strcpy_overlap(swtab[0].switch_, "cC");   /* CNF file name */
   swtab[0].kind = 'M';
-  strcpy(swtab[1].switch_, "vV");   /* Vanilla LOG (no CNF) */
+  strcpy_overlap(swtab[1].switch_, "vV");   /* Vanilla LOG (no CNF) */
   swtab[1].kind = 'B';
-  strcpy(swtab[2].switch_, "zZ");   /* Trace mode initially on */
+  strcpy_overlap(swtab[2].switch_, "zZ");   /* Trace mode initially on */
   swtab[2].kind = 'S';
-  strcpy(swtab[3].switch_, "dD");   /* Dump file name */
+  strcpy_overlap(swtab[3].switch_, "dD");   /* Dump file name */
   swtab[3].kind = 'S';
-  strcpy(swtab[4].switch_, "tT");   /* Trace file name */
+  strcpy_overlap(swtab[4].switch_, "tT");   /* Trace file name */
   swtab[4].kind = 'S';
-  strcpy(swtab[5].switch_, "hH");   /* Home directory name */
+  strcpy_overlap(swtab[5].switch_, "hH");   /* Home directory name */
   swtab[5].kind = 'S';
-  strcpy(swtab[6].switch_, "rR");   /* Tool to run */
+  strcpy_overlap(swtab[6].switch_, "rR");   /* Tool to run */
   swtab[6].kind = 'M';
 
   /* Added X display support.  stafford 7/17/91 */
 
-  strcpy(swtab[7].switch_, "xX");   /* XDisplay name */
+  strcpy_overlap(swtab[7].switch_, "xX");   /* XDisplay name */
   swtab[7].kind = 'M';
 
   newci_parseswitch(swtab, 8L, V.cmdbuf);
@@ -21426,11 +21426,11 @@ Static Void initialize()
   tracefname = (Char *)Malloc(256);
   *tracefname = '\0';
   if (swtab[3].used > 0)
-    strcpy(dumpfname, swtab[3].UU.s);
+    strcpy_overlap(dumpfname, swtab[3].UU.s);
   if (swtab[4].used > 0)
-    strcpy(tracefname, swtab[4].UU.s);
+    strcpy_overlap(tracefname, swtab[4].UU.s);
   else if (swtab[2].used > 0)
-    strcpy(tracefname, swtab[2].UU.s);
+    strcpy_overlap(tracefname, swtab[2].UU.s);
   if (*tracefname != '\0')
     newci_fixfname(tracefname, "text", "");
   gg.traceflag = (swtab[2].used > 0);
@@ -21459,9 +21459,9 @@ Static Void initialize()
   for (i = 0; i <= 8; i++)
     librgroupnames[i] = NULL;
   loghelpname = (Char *)Malloc(256);
-  strcpy(loghelpname, "loghelp");
+  strcpy_overlap(loghelpname, "loghelp");
   lognewsname = (Char *)Malloc(256);
-  strcpy(lognewsname, "lognews");
+  strcpy_overlap(lognewsname, "lognews");
   gg.fastmin = deffastmin;
   gg.fastmax = deffastmax;
   gg.fastrate = deffastrate;
@@ -21493,9 +21493,9 @@ Static Void initialize()
   *cnfname = '\0';
   flag = false;
   if (swtab[0].used > 0)
-    strcpy(cnfname, swtab[0].UU.s);
+    strcpy_overlap(cnfname, swtab[0].UU.s);
   if (*cnfname == '\0' && swtab[1].used == 0)
-    strcpy(cnfname, "*");
+    strcpy_overlap(cnfname, "*");
   if (*cnfname != '\0')
     readcnf(cnfname, &V);
   initcolors();
@@ -21540,7 +21540,7 @@ Static Void initialize()
     if (gatefilenames != NULL) {
       TRY(try35);
 	gatesname[k] = (Char *)Malloc(256);
-	strcpy(gatesname[k], gatefilenames->s);
+	strcpy_overlap(gatesname[k], gatefilenames->s);
 	gatefilenames = gatefilenames->next;
 	libf1[k] = (filerecfilerec *)Malloc(sizeof(filerecfilerec));
 	libf1[k]->f = NULL;
@@ -21595,7 +21595,7 @@ Static Void initialize()
 	    RESETBUF(libf1[k]->f, filerec);
 	    sprintf(STR2, "%s/%s", GetChipmunkPath("LOGLIB", LOGLIB),
 		    gatesname[k]);
-	    strcpy(gatesname[k], STR2);
+	    strcpy_overlap(gatesname[k], STR2);
 	    flag = true;
 	  RECOVER2(try37,_Ltry37);
 	    if (P_escapecode == -20)
@@ -21653,14 +21653,14 @@ Static Void initialize()
   curgate = 1;
   do {
     k = 0;
-    strcpy(s, "\177");
+    strcpy_overlap(s, "\177");
     for (i = 0; i < maxgatesfiles; i++) {
       if (gatesname[i] != NULL && *gname[i] == '\0' && gptr[i] < gsize[i]) {
 	TRY(try38);
 	  gptr[i]++;
 	  if ((gptr[i] & 31) == 0)
 	    GET(libf1[i]->f, filerec);
-	  strcpy(gname[i], "        ");
+	  strcpy_overlap(gname[i], "        ");
 	  strmove(8, GETFBUF(libf1[i]->f, filerec).ix[gptr[i] & 31], 1,
 		  gname[i], 1);
 	  ggroup[i] = 0;
@@ -21680,14 +21680,14 @@ Static Void initialize()
 	ENDTRY(try38);
       }
       if (strcmp(gname[i], s) < 0 && *gname[i] != '\0') {
-	strcpy(s, gname[i]);
+	strcpy_overlap(s, gname[i]);
 	k = i + 1;
       }
     }
     indexfile[curgate - 1] = k;
     indexoffset[curgate - 1] = gptr[k - 1];
     indexgroup[curgate - 1] = ggroup[k - 1];
-    strcpy(index_[curgate - 1], strrtrim(strcpy(STR3, s)));
+    strcpy_overlap(index_[curgate - 1], strrtrim(strcpy_overlap(STR3, s)));
     for (i = 1; i <= maxgatesfiles; i++) {
       if (!strcmp(gname[i - 1], s)) {
 	*gname[i - 1] = '\0';
