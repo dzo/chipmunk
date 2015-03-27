@@ -711,6 +711,9 @@ Analog_32_action *act;
   case Analog_act_probe:
     Probe_Diode1(act);
     break;
+
+  default:
+    break;
   }
 }
 

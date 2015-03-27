@@ -44,6 +44,7 @@ the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 
 char *my_strdup();
+#undef strdup
 #define strdup my_strdup
 
 
@@ -401,7 +402,7 @@ FILE *f;
 hdefrec *hdef;
 boolean incldef;
 {
-  Char buf[256];
+  Char *buf;
   long pc, indent;
 
   pc = 1;
@@ -415,8 +416,9 @@ boolean incldef;
       fprintf(f, "%*s", (int)indent, "");
     if (hdef->proc[pc - 1] < 32 && ((1L << hdef->proc[pc - 1]) & 0xfff8L) != 0)
       indent += 3;
-    dasm_16(buf, hdef->proc, &pc);
+    buf = dasm_16(hdef->proc, &pc);
     fprintf(f, "%s\n", buf);
+    Free(buf);
   }
   if (hdef->proc[pc - 1] != '\0')
     fprintf(f, "# Warning: terminator is not #0\n");
@@ -2026,6 +2028,9 @@ struct LOC_compilepage *LINK;
     WITH = &LINK->things[ip->ival + LINK->thingvars];
     WITH->wasused++;
     break;
+
+  default:
+    break;
   }
   return Result;
 }
@@ -2469,7 +2474,7 @@ struct LOC_simplify *LINK;
       case op_same:
 	if ((*ip)->UU.U1.arg1->ival == (*ip)->UU.U1.arg2->ival)
 	  chgop(*ip, op_one, LINK->LINK);
-	else if ((*ip)->UU.U1.arg1->ival >= 0 || (*ip)->UU.U1.arg1->ival >= 0)
+	else if ((*ip)->UU.U1.arg1->ival >= 0 || (*ip)->UU.U1.arg2->ival >= 0)
 	  chgop(*ip, op_zero, LINK->LINK);
 	break;
 
@@ -2542,6 +2547,9 @@ struct LOC_simplify *LINK;
 
 	case op_none:
 	  chgop(*ip, op_none, LINK->LINK);
+	  break;
+
+	default:
 	  break;
 	}
 	break;
@@ -2616,7 +2624,7 @@ struct LOC_simplify *LINK;
 		 WITH->wasused <= expansioncost(WITH->defn->UU.U1.arg1,
 						LINK->LINK) &&
 		 WITH->defn->opcode == op_pineq &&
-		 (WITH->wasused == 1 && i >= LINK->LINK->numports ||
+		 ((WITH->wasused == 1 && i >= LINK->LINK->numports) ||
 		  !cyclicdefn(WITH->defn->UU.U1.arg1, i, true, LINK->LINK)))
 	  replacetree(ip, copytree(WITH->defn->UU.U1.arg1, LINK->LINK),
 		      LINK->LINK);
@@ -2638,6 +2646,8 @@ struct LOC_simplify *LINK;
 			       LINK->LINK), LINK->LINK);
 	break;
 
+      default:
+	break;
       }
       if (LINK->LINK->changed)
 	oldch = true;
@@ -2690,6 +2700,9 @@ struct LOC_simplstmt *LINK;
 
   case op_iftrue:
     Result = 7;
+    break;
+
+  default:
     break;
   }
   return Result;
@@ -2841,6 +2854,9 @@ struct LOC_simplstmt *LINK;
   case op_vareq:
     P_addset(defv, ip->ival);
     break;
+
+  default:
+    break;
   }
 }
 
@@ -2872,6 +2888,9 @@ struct LOC_simplstmt *LINK;
   case op_vareq:
     if (P_inset(ip->ival, defv) || P_inset(ip->ival, usev))
       *good = false;
+    break;
+
+  default:
     break;
   }
 }
@@ -3090,6 +3109,9 @@ struct LOC_simplify *LINK;
 	  case op_ifzero:
 	    ip1 = makenot(makefix1(ip1, LINK->LINK), LINK->LINK);
 	    break;
+
+	  default:
+	    break;
 	  }
 	  if (thentrail->oldposs == 1L << ((long)log_zero))
 	    ip1 = makenot(ip1, LINK->LINK);
@@ -3145,6 +3167,9 @@ struct LOC_simplify *LINK;
 	  case op_ifconn:
 	    /* blank case */
 	    break;
+
+	  default:
+	    break;
 	  }
 	  break;
 
@@ -3172,6 +3197,9 @@ struct LOC_simplify *LINK;
 	  case op_ifone:
 	  case op_ifzn:
 	    /* blank case */
+	    break;
+
+	  default:
 	    break;
 	  }
 	  break;
@@ -3201,6 +3229,9 @@ struct LOC_simplify *LINK;
 	  case op_ifzero:
 	    /* blank case */
 	    break;
+
+	  default:
+	    break;
 	  }
 	  break;
 
@@ -3224,6 +3255,9 @@ struct LOC_simplify *LINK;
 	  else
 	    chgop(V.ip, op_iffalse, LINK->LINK);
 	  break;
+
+	default:
+	  break;
 	}
 	if (!LINK->LINK->changed && checkconn(V.ip->UU.U1.arg1, LINK->LINK)) {
 	  switch (V.ip->opcode) {
@@ -3242,6 +3276,9 @@ struct LOC_simplify *LINK;
 
 	  case op_ifnone:
 	    chgop(V.ip, op_iffalse, LINK->LINK);
+	    break;
+
+	  default:
 	    break;
 	  }
 	}
@@ -3394,6 +3431,8 @@ struct LOC_simplify *LINK;
       LINK->LINK->changed = true;
       break;
 
+    default:
+      break;
     }
     if (LINK->LINK->changed)
       oldch = true;
@@ -3497,6 +3536,9 @@ struct LOC_compilepage *LINK;
       else
 	WITH->defn = NULL;
       break;
+
+    default:
+      break;
     }
     ip = ip->UU.U1.next;
   }
@@ -3588,6 +3630,9 @@ struct LOC_compilepage *LINK;
     case op_none:   /*should never occur*/
       ip->opcode = op_one;
       break;
+
+    default:
+      break;
     }
     ip = ip->UU.U1.next;
   }
@@ -3664,6 +3709,9 @@ struct LOC_codegen *LINK;
 
       case op_ifzn:
 	store(8L, LINK);
+	break;
+
+      default:
 	break;
       }
       genlist(ip->UU.U1.arg1, LINK);
@@ -3947,6 +3995,7 @@ struct LOC_compilepage *LINK;
   else
     fprintf(f, "None");
   putc('\n', f);
+  fprintf(f, "%sExternal pins:        %d\n", pref, LINK->numports);     
 }
 
 
@@ -4072,6 +4121,8 @@ hdefrec *hdef_;
   noderec *WITH1;
 
 
+  V.instrcount = 0;
+  V.pc = 0;
   V.hdef = hdef_;
   WITH = logsima_action.lact;
   if (V.hdef->gcontrol != NULL)
@@ -4198,7 +4249,7 @@ hdefrec *hdef_;
       if (V.gtempl != NULL) {
 	templs = (log_nrec **)Malloc(V.gtempl->kind->numpins * sizeof(log_nrec *));
 	pnumlist = NULL;
-	examinetemplate(V.gtempl, templs, (long)V.gtempl->kind->numpins, true,
+	examinetemplate(V.gtempl, templs, (long)V.gtempl->kind->numpins, isgenericinstgate(V.gtempl),
 			&pnumlist, &V.hdef->lastnorth, &V.hdef->lasteast,
 			&V.hdef->lastsouth, &V.numports);
 	Free(pnumlist);
@@ -4206,8 +4257,10 @@ hdefrec *hdef_;
 	for (i = 1; i <= FORLIM; i++) {
 	  if ((long)templs[i - 1]->temp == LONG_MIN)
 	    templs[i - 1]->temp = (na_long)(-i);
-	  else
-	    error("Template pins are shorted together", &V);
+	  else {
+	    sprintf(STR3, "Template \"%s\" pin %ld is shorted",V.hdef->name,i);
+	    error(STR3, &V);
+	  }
 	}
 	Free(templs);
       } else {
@@ -4737,7 +4790,7 @@ log_grec *g_;
     return;
   }
   pnum = NULL;
-  examinetemplate(V.g, V.ii->pins, hdef->numports, true, &pnum, &lastnorth,
+  examinetemplate(V.g, V.ii->pins, hdef->numports, isgenericinstgate(V.g), &pnum, &lastnorth,
 		  &lasteast, &lastsouth, &V.lastwest);
   check("north", lastnorth, hdef->lastnorth, &V);
   check("east", lasteast - lastnorth, hdef->lasteast - hdef->lastnorth, &V);
@@ -4850,7 +4903,7 @@ log_grec *g;
   k = g->kind;
   ii = (instinfo *)g->info;
   pnum = (short *)Malloc(k->numpins * 2);
-  examinetemplate(g, NULL, (long)k->numpins, true, &pnum, &lastnorth,
+  examinetemplate(g, NULL, (long)k->numpins, isgenericinstgate(g), &pnum, &lastnorth,
 		  &lasteast, &lastsouth, &numports);
   FORLIM = numports;
   for (i = 1; i <= FORLIM; i++) {
@@ -5123,6 +5176,9 @@ log_16_action *act;
       }
     }
     break;
+
+  default:
+    break;
   }
 }
 
@@ -5323,6 +5379,9 @@ log_16_action *act;
   case act_16_gengate:
     if (!strcmp(WITH->genfunc, "INERT"))
       WITH->actx = -42;   /*kludge!*/
+    break;
+
+  default:
     break;
   }
 }

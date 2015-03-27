@@ -79,7 +79,7 @@ Char *cmd, *args;
     if (j <= i || lp->name[j - 1] != '"')
       return Result;
     strpart(args, lp->name, (int)(i + 1), (int)(j - 1));
-    if (strpbrk(args, " \"") == NULL) {
+    if (((char *) strpbrk(args, " \"")) == NULL) {
       strcpy(cmd, "NAME");
       return true;
     }
@@ -197,6 +197,18 @@ log_grec *g;
   return (attrinstof != 0 && *g->attr[attrinstof - 1].UU.c != '\0');
 }
 
+
+boolean isgenericinstgate(g)
+log_grec *g;
+{
+short num;
+  if (isinstgate(g)) {
+    (*lact->hook2->findattrnum)(g->kind, "is-generic", "V", &num);
+    if (num == 0 || g->attr[num - 1].UU.nv != 0)
+      return true;
+  }
+  return false;
+}
 
 
 Char *gateinstof(Result, g)
@@ -445,7 +457,7 @@ typedef struct ginstinfo {
 
 
 
-Void log_7_ginst(act)
+Void Log_7_ginst(act)
 log_action *act;
 {
   ginstinfo *ii;

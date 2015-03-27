@@ -1678,7 +1678,7 @@ long *Totnodes;
 	  Count->changed = true;
 	}
       } else {
-	if (A_Node->refcnt > 1 || A_Node->refcnt == 1 && A_Node->Ok_Alone) {
+	if (A_Node->refcnt > 1 || (A_Node->refcnt == 1 && A_Node->Ok_Alone)) {
 	  (*Totnodes)++;
 	  A_Node->nodenum = *Totnodes;
 	} else {

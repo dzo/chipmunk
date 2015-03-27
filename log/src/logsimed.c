@@ -48,6 +48,7 @@ the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 /* Local variables for dasm_16: */
 struct LOC_dasm_16 {
   Char *buf;
+  int bufsiz;
   uchar *proc;
   long *pc;
 } ;
@@ -58,6 +59,31 @@ Local Void dasmop PP((struct LOC_dasm_16 *LINK));
 struct LOC_dasmop {
   struct LOC_dasm_16 *LINK;
 } ;
+
+Local Void append PP((struct LOC_dasm_16 *LINK, Char *s));
+
+/* append to the local buffer. */
+/* the buf and bufsiz are initialized in dasm_16() */
+Local Void append(LINK, s)
+struct LOC_dasm_16 *LINK;
+Char *s;
+{
+#define GROW_SIZE 1024
+Char *tmp;
+
+  if (strlen(LINK->buf) + strlen(s) + 1 > LINK->bufsiz) {
+    tmp = strdup(LINK->buf);
+    Free(LINK->buf);
+    LINK->bufsiz = strlen(tmp) + strlen(s) + 1 + GROW_SIZE;  
+    LINK->buf = (Char*)Malloc(LINK->bufsiz);
+    strcpy(LINK->buf, tmp);
+    Free(tmp);
+  }
+
+  strcat(LINK->buf, s);
+  return;
+}
+
 
 Local Char vr(i, LINK)
 long i;
@@ -96,9 +122,9 @@ struct LOC_dasmop *LINK;
   }
 /* p2c: logsimed.text, line 202: Note: Character >= 128 encountered [281] */
 /* p2c: logsimed.text, line 202: Note: Character >= 128 encountered [281] */
-  strcat(LINK->LINK->buf, "(");
+  append(LINK->LINK, "(");
   dasmop(LINK->LINK);
-  strcat(LINK->LINK->buf, ")");
+  append(LINK->LINK, ")");
 }
 
 Local Void dasmop(LINK)
@@ -107,6 +133,7 @@ struct LOC_dasm_16 *LINK;
   struct LOC_dasmop V;
   uchar ch;
   long i;
+  Char STR1[256];
 
   V.LINK = LINK;
   ch = LINK->proc[*LINK->pc - 1];
@@ -126,45 +153,46 @@ struct LOC_dasm_16 *LINK;
       break;
 
     case 2:
-      strcat(LINK->buf, "END");
+      append(LINK, "END");
       break;
 
     case 3:
-      strcat(LINK->buf, "IF ");
+      append(LINK, "IF ");
       dasmop(LINK);
       break;
 
     case 4:
-      strcat(LINK->buf, "IFNONE ");
+      append(LINK, "IFNONE ");
       dasmop(LINK);
       break;
 
     case 5:
-      strcat(LINK->buf, "IFZERO ");
+      append(LINK, "IFZERO ");
       dasmop(LINK);
       break;
 
     case 6:
-      strcat(LINK->buf, "IFONE ");
+      append(LINK, "IFONE ");
       dasmop(LINK);
       break;
 
     case 7:
-      strcat(LINK->buf, "IFCONN ");
+      append(LINK, "IFCONN ");
       dasmop(LINK);
       break;
 
     case 8:
-      strcat(LINK->buf, "IFZN ");
+      append(LINK, "IFZN ");
       dasmop(LINK);
       break;
 
     case 15:
-      strcat(LINK->buf, "ELSE");
+      append(LINK, "ELSE");
       break;
 
     default:
-      sprintf(LINK->buf + strlen(LINK->buf), "<%ld>", i);
+      sprintf(STR1, "<%ld>", i);
+      append(LINK, STR1);
       break;
     }
     break;
@@ -173,161 +201,178 @@ struct LOC_dasm_16 *LINK;
     switch (i & 15) {
 
     case 0:
-      strcat(LINK->buf, "##");
+      append(LINK, "##");
       i = getpseudo(&V);
-      sprintf(LINK->buf + strlen(LINK->buf), "%ld", i);
-      strcat(LINK->buf, " = ");
+      sprintf(STR1, "%ld", i);
+      append(LINK, STR1);
+      append(LINK, " = ");
       dasmop(LINK);
       break;
 
     case 1:
-      strcat(LINK->buf, "##");
+      append(LINK, "##");
       i = getpseudo(&V);
-      sprintf(LINK->buf + strlen(LINK->buf), "%ld", i);
-      strcat(LINK->buf, " < ");
+      sprintf(STR1, "%ld", i);
+      append(LINK, STR1);
+      append(LINK, " < ");
       dasmop(LINK);
       break;
 
     case 2:
-      strcat(LINK->buf, "CALL ");
+      append(LINK, "CALL ");
       i = LINK->proc[*LINK->pc];
       *LINK->pc += 2;
       while (i > 128) {
-	sprintf(LINK->buf + strlen(LINK->buf), "%c",
-		LINK->proc[*LINK->pc - 1]);
+	sprintf(STR1, "%c", LINK->proc[*LINK->pc - 1]);
+        append(LINK, STR1);
 	(*LINK->pc)++;
 	i--;
       }
       break;
 
     case 6:
-      strcat(LINK->buf, "# ");
+      append(LINK, "# ");
       i = LINK->proc[*LINK->pc - 1];
       (*LINK->pc)++;
       while (i > 32) {
-	sprintf(LINK->buf + strlen(LINK->buf), "%c",
-		LINK->proc[*LINK->pc - 1]);
+	sprintf(STR1, "%c", LINK->proc[*LINK->pc - 1]);
+        append(LINK, STR1);
 	(*LINK->pc)++;
 	i--;
       }
       break;
 
     case 7:
-      strcat(LINK->buf, "INST");
+      append(LINK, "INST");
       if (LINK->proc[*LINK->pc - 1] > '"') {
-	strcat(LINK->buf, " ");
-	sprintf(LINK->buf + strlen(LINK->buf), "%ld",
+	append(LINK, " ");
+	sprintf(STR1, "%ld",
 	  (LINK->proc[*LINK->pc + 1] - 32L) * 128 + LINK->proc[*LINK->pc] - 64);
+        append(LINK, STR1);
       }
       if (LINK->proc[*LINK->pc - 1] > '$') {
-	strcat(LINK->buf, ",");
-	sprintf(LINK->buf + strlen(LINK->buf), "%ld",
+	append(LINK, ",");
+	sprintf(STR1, "%ld",
 		(LINK->proc[*LINK->pc + 3] - 32L) * 128 +
 		LINK->proc[*LINK->pc + 2] - 64);
+        append(LINK, STR1);
       }
       *LINK->pc += LINK->proc[*LINK->pc - 1] - 33;
       break;
 
     case 8:
-      strcat(LINK->buf, "V");
+      append(LINK, "V");
       i = getpseudo(&V);
-      sprintf(LINK->buf + strlen(LINK->buf), "%ld", i);
-      strcat(LINK->buf, " = ");
+      sprintf(STR1, "%ld", i);
+      append(LINK, STR1);
+      append(LINK, " = ");
       dasmop(LINK);
       break;
 
     case 9:
-      strcat(LINK->buf, "V");
+      append(LINK, "V");
       i = getpseudo(&V);
-      sprintf(LINK->buf + strlen(LINK->buf), "%ld", i);
-      strcat(LINK->buf, " = NOT V");
-      sprintf(LINK->buf + strlen(LINK->buf), "%ld", i);
+      sprintf(STR1, "%ld", i);
+      append(LINK, STR1);
+      append(LINK, " = NOT V");
+      sprintf(STR1, "%ld", i);
+      append(LINK, STR1);
       break;
 
     case 10:
-      strcat(LINK->buf, "V");
+      append(LINK, "V");
       i = getpseudo(&V);
-      sprintf(LINK->buf + strlen(LINK->buf), "%ld", i);
-      strcat(LINK->buf, " = ZERO");
+      sprintf(STR1, "%ld", i);
+      append(LINK, STR1);
+      append(LINK, " = ZERO");
       break;
 
     case 11:
-      strcat(LINK->buf, "V");
+      append(LINK, "V");
       i = getpseudo(&V);
-      sprintf(LINK->buf + strlen(LINK->buf), "%ld", i);
-      strcat(LINK->buf, " = ONE");
+      sprintf(STR1, "%ld", i);
+      append(LINK, STR1);
+      append(LINK, " = ONE");
       break;
 
     case 12:
       dasmop(LINK);
-      strcat(LINK->buf, " = PULLDN");
+      append(LINK, " = PULLDN");
       break;
 
     case 13:
       dasmop(LINK);
-      strcat(LINK->buf, " = PULLUP");
+      append(LINK, " = PULLUP");
       break;
 
     case 14:
-      strcat(LINK->buf, "#");
-      sprintf(LINK->buf + strlen(LINK->buf), "%ld",
-	      LINK->proc[*LINK->pc - 1] + 1L);
+      append(LINK, "#");
+      sprintf(STR1, "%ld", LINK->proc[*LINK->pc - 1] + 1L);
+      append(LINK, STR1);
       (*LINK->pc)++;
-      strcat(LINK->buf, " = ");
+      append(LINK, " = ");
       dasmop(LINK);
       break;
 
     case 15:
-      strcat(LINK->buf, "#");
-      sprintf(LINK->buf + strlen(LINK->buf), "%ld",
-	      LINK->proc[*LINK->pc - 1] + 1L);
+      append(LINK, "#");
+      sprintf(STR1, "%ld", LINK->proc[*LINK->pc - 1] + 1L);
+      append(LINK, STR1);
       (*LINK->pc)++;
-      strcat(LINK->buf, " < ");
+      append(LINK, " < ");
       dasmop(LINK);
       break;
 
     default:
-      sprintf(LINK->buf + strlen(LINK->buf), "<%ld>", i);
+      sprintf(STR1, "<%ld>", i);
+      append(LINK, STR1);
       break;
     }
     break;
 
   case 2:
   case 3:
-    strcat(LINK->buf, "#");
-    sprintf(LINK->buf + strlen(LINK->buf), "%ld", (i & 31) + 1);
-    strcat(LINK->buf, " = ");
+    append(LINK, "#");
+    sprintf(STR1, "%ld", (i & 31) + 1);
+    append(LINK, STR1);
+    append(LINK, " = ");
     dasmop(LINK);
     break;
 
   case 4:
   case 5:
-    strcat(LINK->buf, "#");
-    sprintf(LINK->buf + strlen(LINK->buf), "%ld", (i & 31) + 1);
-    strcat(LINK->buf, " < ");
+    append(LINK, "#");
+    sprintf(STR1, "%ld", (i & 31) + 1);
+    append(LINK, STR1);
+    append(LINK, " < ");
     dasmop(LINK);
     break;
 
   case 6:
-    sprintf(LINK->buf + strlen(LINK->buf), "%c", vr(i, &V));
-    strcat(LINK->buf, " = ");
+    sprintf(STR1, "%c", vr(i, &V));
+    append(LINK, STR1);
+    append(LINK, " = ");
     dasmop(LINK);
     break;
 
   case 7:
-    sprintf(LINK->buf + strlen(LINK->buf), "%c", vr(i, &V));
-    strcat(LINK->buf, " = NOT ");
-    sprintf(LINK->buf + strlen(LINK->buf), "%c", vr(i, &V));
+    sprintf(STR1, "%c", vr(i, &V));
+    append(LINK, STR1);
+    append(LINK, " = NOT ");
+    sprintf(STR1, "%c", vr(i, &V));
+    append(LINK, STR1);
     break;
 
   case 8:
-    sprintf(LINK->buf + strlen(LINK->buf), "%c", vr(i, &V));
-    strcat(LINK->buf, " = ZERO");
+    sprintf(STR1, "%c", vr(i, &V));
+    append(LINK, STR1);
+    append(LINK, " = ZERO");
     break;
 
   case 9:
-    sprintf(LINK->buf + strlen(LINK->buf), "%c", vr(i, &V));
-    strcat(LINK->buf, " = ONE");
+    sprintf(STR1, "%c", vr(i, &V));
+    append(LINK, STR1);
+    append(LINK, " = ONE");
     break;
 
   case 10:
@@ -336,7 +381,7 @@ struct LOC_dasm_16 *LINK;
 
     case 0:
       dasmoppar(ch, &V);
-      strcat(LINK->buf, " AND ");
+      append(LINK, " AND ");
       dasmoppar(ch, &V);
       break;
 
@@ -344,16 +389,16 @@ struct LOC_dasm_16 *LINK;
       dasmoppar('\0', &V);
       while (LINK->proc[*LINK->pc - 1] == i - 1) {
 	(*LINK->pc)++;
-	strcat(LINK->buf, " NAND ");
+	append(LINK, " NAND ");
 	dasmoppar('\0', &V);
       }
-      strcat(LINK->buf, " NAND ");
+      append(LINK, " NAND ");
       dasmoppar('\0', &V);
       break;
 
     case 2:
       dasmoppar(ch, &V);
-      strcat(LINK->buf, " OR ");
+      append(LINK, " OR ");
       dasmoppar(ch, &V);
       break;
 
@@ -361,105 +406,111 @@ struct LOC_dasm_16 *LINK;
       dasmoppar('\0', &V);
       while (LINK->proc[*LINK->pc - 1] == i - 1) {
 	(*LINK->pc)++;
-	strcat(LINK->buf, " NOR ");
+	append(LINK, " NOR ");
 	dasmoppar('\0', &V);
       }
-      strcat(LINK->buf, " NOR ");
+      append(LINK, " NOR ");
       dasmoppar('\0', &V);
       break;
 
     case 4:
       dasmoppar(ch, &V);
-      strcat(LINK->buf, " XOR ");
+      append(LINK, " XOR ");
       dasmoppar(ch, &V);
       break;
 
     case 5:
-      strcat(LINK->buf, "NOT ");
+      append(LINK, "NOT ");
       dasmoppar('\0', &V);
       break;
 
     case 6:
-      strcat(LINK->buf, "RISE ");
+      append(LINK, "RISE ");
       dasmoppar('\0', &V);
       break;
 
     case 7:
-      strcat(LINK->buf, "FALL ");
+      append(LINK, "FALL ");
       dasmoppar('\0', &V);
       break;
 
     case 8:
-      strcat(LINK->buf, "ZERO");
+      append(LINK, "ZERO");
       break;
 
     case 9:
-      strcat(LINK->buf, "ONE");
+      append(LINK, "ONE");
       break;
 
     case 10:
       dasmop(LINK);
-      strcat(LINK->buf, " SAME ");
+      append(LINK, " SAME ");
       dasmop(LINK);
       break;
 
     case 11:
-      strcat(LINK->buf, "##");
+      append(LINK, "##");
       i = getpseudo(&V);
-      sprintf(LINK->buf + strlen(LINK->buf), "%ld", i);
+      sprintf(STR1, "%ld", i);
+      append(LINK, STR1);
       break;
 
     case 12:
-      strcat(LINK->buf, "V");
+      append(LINK, "V");
       i = getpseudo(&V);
-      sprintf(LINK->buf + strlen(LINK->buf), "%ld", i);
+      sprintf(STR1, "%ld", i);
+      append(LINK, STR1);
       break;
 
     case 13:
-      strcat(LINK->buf, "FIX ");
+      append(LINK, "FIX ");
       dasmoppar('\0', &V);
       break;
 
     case 14:
-      strcat(LINK->buf, "AMP ");
+      append(LINK, "AMP ");
       dasmoppar('\0', &V);
       break;
 
     case 15:
-      strcat(LINK->buf, "WONE");
+      append(LINK, "WONE");
       break;
 
     case 16:
-      strcat(LINK->buf, "#");
-      sprintf(LINK->buf + strlen(LINK->buf), "%ld",
-	      LINK->proc[*LINK->pc - 1] + 1L);
+      append(LINK, "#");
+      sprintf(STR1, "%ld", LINK->proc[*LINK->pc - 1] + 1L);
+      append(LINK, STR1);
       (*LINK->pc)++;
       break;
 
     case 17:
-      strcat(LINK->buf, "STRONG ");
+      append(LINK, "STRONG ");
       dasmoppar('\0', &V);
       break;
 
     default:
-      sprintf(LINK->buf + strlen(LINK->buf), "<%ld>", i);
+      sprintf(STR1, "<%ld>", i);
+      append(LINK, STR1);
       break;
     }
     break;
 
   case 12:
   case 13:
-    strcat(LINK->buf, "#");
-    sprintf(LINK->buf + strlen(LINK->buf), "%ld", (i & 31) + 1);
+    append(LINK, "#");
+    sprintf(STR1, "%ld", (i & 31) + 1);
+    append(LINK, STR1);
     break;
 
   case 14:
-    sprintf(LINK->buf + strlen(LINK->buf), "%c", vr(i, &V));
+    sprintf(STR1, "%c", vr(i, &V));
+    append(LINK, STR1);
     break;
 
   case 15:
-    strcat(LINK->buf, "NOT ");
-    sprintf(LINK->buf + strlen(LINK->buf), "%c", vr(i, &V));
+    append(LINK, "NOT ");
+    sprintf(STR1, "%c", vr(i, &V));
+    append(LINK, STR1);
     break;
   }
 }
@@ -595,14 +646,16 @@ struct LOC_dasm_16 *LINK;
 */
 
 
-Void dasm_16(buf_, proc_, pc_)
-Char *buf_;
+/* dasm_16() returns a pointer to allocated memory. */
+/* the caller must ensure it is freed. */
+Char *dasm_16(proc_, pc_)
 uchar *proc_;
 long *pc_;
 {
   struct LOC_dasm_16 V;
 
-  V.buf = buf_;
+  V.bufsiz = 256;
+  V.buf = (Char*)Malloc(V.bufsiz);
   V.proc = proc_;
   V.pc = pc_;
   *V.buf = '\0';
@@ -610,7 +663,7 @@ long *pc_;
     dasmop(&V);
     if (V.proc[*V.pc - 1] == '\026') {   /*add comment*/
       if (*V.buf != '\0')
-	strcat(V.buf, "  ");
+	append(&V, "  ");
       dasmop(&V);
     }
   RECOVER(try1);
@@ -618,6 +671,7 @@ long *pc_;
       _Escape(P_escapecode);
     *V.buf = '\0';
   ENDTRY(try1);
+  return V.buf;
 }
 
 
@@ -805,8 +859,9 @@ long pc_;
 struct LOC_assem_16 {
   uchar *proc;
   long *pc;
-  Char s[256];
+  Char *s;
   boolean snerr;
+  long procsiz;
 } ;
 
 Local Void assem PP((struct LOC_assem_16 *LINK));
@@ -825,7 +880,7 @@ Char *pref;
 struct LOC_assem_16 *LINK;
 {
   if (strbegins(s, pref)) {
-    strcpy(s, s + strlen(pref));
+    strcpy_overlap(s, s + strlen(pref));
     return true;
   } else
     return false;
@@ -854,11 +909,11 @@ struct LOC_assem *LINK;
     return;
   }
   if (!strncmp(LINK->LINK->s, "##", 2L) && isdigit(LINK->LINK->s[2])) {
-    strcpy(LINK->LINK->s, LINK->LINK->s + 2);
+    strcpy_overlap(LINK->LINK->s, LINK->LINK->s + 2);
     i = 0;
     while (isdigit(LINK->LINK->s[0])) {
       i = i * 10 + LINK->LINK->s[0] - 48;
-      strcpy(LINK->LINK->s, LINK->LINK->s + 1);
+      strcpy_overlap(LINK->LINK->s, LINK->LINK->s + 1);
     }
     if (i > 28735) {
       LINK->LINK->snerr = true;
@@ -902,7 +957,7 @@ struct LOC_assem *LINK;
     i = 0;
     while (isdigit(LINK->LINK->s[0])) {
       i = i * 10 + LINK->LINK->s[0] - 48;
-      strcpy(LINK->LINK->s, LINK->LINK->s + 1);
+      strcpy_overlap(LINK->LINK->s, LINK->LINK->s + 1);
     }
     if (i < 1 || i > 256) {
       LINK->LINK->snerr = true;
@@ -967,13 +1022,13 @@ struct LOC_assem *LINK;
       return;
     }
     if (!strncmp(LINK->LINK->s, "ZERO", 4L) && strlen(LINK->LINK->s) > 4) {
-      strcpy(LINK->LINK->s, LINK->LINK->s + 4);
+      strcpy_overlap(LINK->LINK->s, LINK->LINK->s + 4);
       store(5, LINK->LINK);
       assem(LINK->LINK);
       return;
     }
     if (!strncmp(LINK->LINK->s, "ONE", 3L) && strlen(LINK->LINK->s) > 3) {
-      strcpy(LINK->LINK->s, LINK->LINK->s + 3);
+      strcpy_overlap(LINK->LINK->s, LINK->LINK->s + 3);
       store(6, LINK->LINK);
       assem(LINK->LINK);
       return;
@@ -999,8 +1054,8 @@ struct LOC_assem *LINK;
     }
     store(18, LINK->LINK);
     store(255, LINK->LINK);
-    store((int)(strlen(LINK->LINK->s) + 127), LINK->LINK);
-    FORLIM = strlen(LINK->LINK->s) - 2;
+    store((int)(strlen(LINK->LINK->s) + 128), LINK->LINK);
+    FORLIM = strlen(LINK->LINK->s) - 1;
     for (i = 0; i <= FORLIM; i++)
       store(LINK->LINK->s[i], LINK->LINK);
     strcpy(LINK->LINK->s, "\0");
@@ -1014,7 +1069,7 @@ struct LOC_assem *LINK;
       i = 0;
       while (*LINK->LINK->s != '\0' && isdigit(LINK->LINK->s[0])) {
 	i = i * 10 + LINK->LINK->s[0] - 48;
-	strcpy(LINK->LINK->s, LINK->LINK->s + 1);
+	strcpy_overlap(LINK->LINK->s, LINK->LINK->s + 1);
       }
       if (i > 28735)
 	LINK->LINK->snerr = true;
@@ -1035,7 +1090,7 @@ struct LOC_assem *LINK;
     i = 0;
     while (*LINK->LINK->s != '\0' && isdigit(LINK->LINK->s[0])) {
       i = i * 10 + LINK->LINK->s[0] - 48;
-      strcpy(LINK->LINK->s, LINK->LINK->s + 1);
+      strcpy_overlap(LINK->LINK->s, LINK->LINK->s + 1);
     }
     if (i > 28735)
       LINK->LINK->snerr = true;
@@ -1103,7 +1158,7 @@ struct LOC_assem *LINK;
   }
   if (LINK->LINK->s[0] >= 'A' && LINK->LINK->s[0] <= 'P') {
     i = LINK->LINK->s[0] - 65;
-    strcpy(LINK->LINK->s, LINK->LINK->s + 1);
+    strcpy_overlap(LINK->LINK->s, LINK->LINK->s + 1);
     if (!strcheck(LINK->LINK->s, "=", LINK->LINK)) {
       store((int)(i + 224), LINK->LINK);
       return;
@@ -1133,10 +1188,10 @@ struct LOC_assem *LINK;
     return;
   }
   i = 0;
-  strcpy(LINK->LINK->s, LINK->LINK->s + 1);
+  strcpy_overlap(LINK->LINK->s, LINK->LINK->s + 1);
   while (isdigit(LINK->LINK->s[0])) {
     i = i * 10 + LINK->LINK->s[0] - 48;
-    strcpy(LINK->LINK->s, LINK->LINK->s + 1);
+    strcpy_overlap(LINK->LINK->s, LINK->LINK->s + 1);
   }
   if (i > 28735) {
     LINK->LINK->snerr = true;
@@ -1218,13 +1273,14 @@ long *pc_;
 {
   struct LOC_assem_16 V;
   long Result;
-  Char buf[256];
+  Char *buf;
   long i, j, savepc;
-  Char STR1[256];
-  Char STR2[256];
+  Char *STR2;
   long FORLIM;
 
-  strcpy(buf, buf_);
+
+  buf = strdup(buf_);
+  V.s = strdup(buf_);
   V.proc = proc_;
   V.pc = pc_;
   (*V.pc)--;
@@ -1240,10 +1296,9 @@ long *pc_;
   }
 /* p2c: logsimed.text, line 1093:
  * Note: Null character at end of sprintf control string [148] */
-  strcpy(STR1, V.s);
-  strcpy(V.s, STR1);
-  strcpy(STR2, buf + i - 1);
+  STR2 = strdup(buf + i - 1);
   strcpy(buf, STR2);
+  Free(STR2);
   V.snerr = false;
   if (V.s[0] == '\0') {
     store(1, &V);
@@ -1267,7 +1322,7 @@ long *pc_;
     *V.pc = j;
   }
   if (*buf != '\0') {
-    strcpy(buf, buf + 1);
+    strcpy_overlap(buf, buf + 1);
     strcheck(buf, " ", &V);
     store(22, &V);
     store((int)(strlen(buf) + 32), &V);
@@ -1280,18 +1335,20 @@ long *pc_;
     Result = 0;
   }
   V.proc[*V.pc] = '\0';
+  Free(buf);
+  Free(V.s);
   return Result;
 }
 
 
 /* Local variables for edit_16: */
 struct LOC_edit_16 {
-  uchar **proc;
-  long *proclen;
-  Char name[9];
-  long x, y, pc, pctop, indtop, indent, instrptr, height;
-  uchar instr[1023];
-  uchar ch;
+   uchar **proc;
+   long *proclen;
+   Char name[9];
+   long x, y, pc, pctop, indtop, indent, instrptr, height;
+   uchar instr[1023];
+   uchar ch;
 } ;
 
 Local Void resizeproc(len, LINK)
@@ -1317,7 +1374,7 @@ Local Void dasminst(LINK)
 struct LOC_edit_16 *LINK;
 {
   long ind;
-  Char buf[256];
+  Char *buf;
 
   ind = indent_16(*LINK->proc, LINK->pc);
   if (ind < 0) {
@@ -1329,8 +1386,9 @@ struct LOC_edit_16 *LINK;
     LINK->indent += ind;
   else if ((*LINK->proc)[LINK->pc - 1] == '\017' && LINK->indent >= 3)
     printf("\b\b\b");
-  dasm_16(buf, *LINK->proc, &LINK->pc);
+  buf = dasm_16(*LINK->proc, &LINK->pc);
   printf("%s\t", buf);
+  Free(buf);
 }
 
 Local Void showdef(LINK)
@@ -1430,10 +1488,11 @@ struct LOC_edit_16 *LINK;
 {
   long pos;
 
-  if (!hasdef)
+  if (s && !hasdef)
     *s = '\0';
   nk_ungetkey(LINK->ch);
   pos = 1;
+
 /* p2c: logsimed.text, line 1282:
  * Warning: Type mismatch in VAR parameter term [295] */
   newci_inputstring(s, im_keep, "\015\n\037\003\004", 
@@ -1449,10 +1508,11 @@ Char *name_;
 {
   struct LOC_edit_16 V;
   long x1, y1, pc0, pc1, sx, sy;
-  Char s[256], recallbuf[256];
+  Char *sbuf=NULL;
+  Char *recallbuf=NULL;
   boolean editing;
-  Char STR1[256];
-  Char STR2[256];
+  Char *STR1;
+  Char *STR2;
 
   V.proc = proc_;
   V.proclen = proclen_;
@@ -1462,7 +1522,6 @@ Char *name_;
   V.pctop = 1;
   V.indtop = 0;
   showdef(&V);
-  *recallbuf = '\0';
   do {
     newci_inputmap();
     if ((*V.proc)[V.pc - 1] == '\017')
@@ -1516,22 +1575,24 @@ Char *name_;
       V.ch = '\0';
       showdef(&V);              /* was 152 */
     } else if (V.ch == 25) {  /* changed to 25 for recall buffer == ^Y */
-      if (*recallbuf != '\0') {
+      if (recallbuf && *recallbuf != '\0') {
+	STR2 = (Char*)Malloc(strlen(recallbuf));
 	x1 = strposb(recallbuf, "\0", strlen(recallbuf) - 1L);
 	y1 = doassem(strpart(STR2, recallbuf, (int)(x1 + 1),
 			     (int)(strlen(recallbuf) - 1L)), false, &V);
 	recallbuf[x1] = '\0';
 /* p2c: logsimed.text, line 1342:
  * Note: Modification of string length may translate incorrectly [146] */
+	Free(STR2);
 	showdef(&V);
       }
-    } else if (V.ch == '\b' || V.ch >= 150 && V.ch <= 162 ||
-	       V.ch >= ' ' && V.ch <= '\177') {
+    } else if (V.ch == '\b' || (V.ch >= 150 && V.ch <= 162) ||
+	       (V.ch >= ' ' && V.ch <= '\177')) {
 /* p2c: logsimed.text, line 1346:
  * Note: Character >= 128 encountered [281] */
 /* p2c: logsimed.text, line 1346:
  * Note: Character >= 128 encountered [281] */
-      editing = (V.ch == '\b' || V.ch >= 157 && V.ch <= 162 || V.ch == 154 ||
+      editing = (V.ch == '\b' || (V.ch >= 157 && V.ch <= 162) || V.ch == 154 ||
 		 V.ch == 153 || V.ch == 151 || V.ch == 150);
 /* p2c: logsimed.text, line 1349:
  * Note: Character >= 128 encountered [281] */
@@ -1547,7 +1608,9 @@ Char *name_;
  * Note: Character >= 128 encountered [281] */
       if (editing) {
 	pc0 = V.pc;
-	dasm_16(s, *V.proc, &pc0);
+        if (sbuf)
+          Free(sbuf);
+	sbuf = dasm_16(*V.proc, &pc0);
 	if (V.ch == 161) {   /*EDIT key*/
 	  V.ch = 150;
 /* p2c: logsimed.text, line 1355:
@@ -1559,12 +1622,17 @@ Char *name_;
 	nc_getXY(&sx, &sy);
 	nc_insLine((int)sy, 1); 
       }
-      bogusreadln(s, editing, &V);
-      y1 = doassem(s, editing, &V);
+      if (sbuf == NULL) {
+        sbuf = (Char*)Malloc(1024);
+      }
+      bogusreadln(sbuf, editing, &V);
+      y1 = doassem(sbuf, editing, &V);
       if (y1 == 0) {
 	putchar('\007');
-	sprintf(STR1, "# %s", s);
+        STR1 = (Char*)Malloc(strlen(sbuf) + strlen("# ") + 1);
+	sprintf(STR1, "# %s", sbuf);
 	y1 = doassem(STR1, false, &V);
+        Free(STR1);
       }
       while (V.ch == '\015' && y1 > 1) {
 	nk_ungetkey('\015');
@@ -1600,7 +1668,7 @@ Char *name_;
 	pc0 = V.pc;
 	V.pc += length_16(*V.proc, V.pc);
 	V.indent = V.x;
-	dasminst(&V);
+	showdef(&V);
 	V.pc = pc0;
       }
     } else if (V.ch == '\037' && V.pc > 1) {
@@ -1635,7 +1703,7 @@ Char *name_;
 	    printf("   ");
 	  V.pc = V.pctop;
 	  V.indent = V.indtop + 3;
-	  dasminst(&V);
+	  showdef(&V);
 	}
       } else {
 	if ((*V.proc)[V.pc - 1] == '\002')
@@ -1659,14 +1727,19 @@ Char *name_;
     } else if (V.ch == 11) {      /* was 165, now 11 (^K), delete */
       if ((*V.proc)[V.pc - 1] != '\0') {
 	pc0 = V.pc;
-	dasm_16(s, *V.proc, &pc0);
-/* p2c: logsimed.text, line 1466:
- * Note: Null character at end of sprintf control string [148] */
-	strcpy(STR1, s);
-	strcpy(s, STR1);
-	while (strlen(s) + strlen(recallbuf) > 255)
-	  strcpy(recallbuf, recallbuf + strposc(recallbuf, '\0', 1L));
-	strcat(recallbuf, s);
+        if (sbuf)
+          Free(sbuf);
+	sbuf = dasm_16(*V.proc, &pc0);
+	if (recallbuf == NULL) {
+	  recallbuf = strdup(sbuf);
+        } else {
+          STR2 = strdup(recallbuf);
+          Free(recallbuf);
+	  recallbuf = (Char*)Malloc(strlen(STR2) + strlen(sbuf) + 1 );  
+	  strcpy(recallbuf,STR2);
+	  strcat(recallbuf, sbuf);
+          Free(STR2);
+        }
 	deleteinst(V.pc, length_16(*V.proc, V.pc), &V);
 	showdef(&V);
       }
@@ -1676,6 +1749,10 @@ Char *name_;
 
 /* p2c: logsimed.text, line 1336:
  * Note: Character >= 128 encountered [281] */
+  if (sbuf)
+    Free(sbuf);
+  if (recallbuf)
+    Free(recallbuf);
   /*RECALL*/
 /* p2c: logsimed.text, line 1454:
  * Note: Character >= 128 encountered [281] */
@@ -1695,7 +1772,8 @@ boolean indenting;
 {
   long pc, indent, oindent, proclen;
   na_strlist *l1;
-  Char buf[256];
+  Char *buf;
+  Char *STR1;
   Char STR2[256];
 
   proclen = 1;
@@ -1711,9 +1789,12 @@ boolean indenting;
       oindent = indent;
     if ((*proc)[pc - 1] < 32 && ((1L << (*proc)[pc - 1]) & 0xfff8L) != 0)
       indent += 3;
-    dasm_16(buf, *proc, &pc);
-    sprintf(STR2, "%*s%s", (int)oindent, "", buf);
-    l1 = strlist_append(sl, STR2);
+    buf = dasm_16(*proc, &pc);
+    STR1 = (Char*)Malloc(strlen(buf) + oindent +1);
+    sprintf(STR1, "%*s%s", (int)oindent, "", buf);
+    l1 = strlist_append(sl, STR1);
+    Free(STR1);
+    Free(buf);
   }
   if (!indenting)
     return;
@@ -1735,7 +1816,7 @@ na_strlist *sl;
   long pc, instrptr, i, newlen;
   uchar instr[1023];
   na_strlist *l1;
-  Char STR1[256];
+  Char *STR1;
 
   pc = 1;
   l1 = sl;
@@ -1746,9 +1827,11 @@ na_strlist *sl;
       pc += instrptr;
     else {
       instrptr = 1;
+      STR1 = (Char*)Malloc(strlen(l1->s) + strlen("# ") + 1);
       sprintf(STR1, "# %s", l1->s);
       i = assem_16(STR1, instr, &instrptr);
       pc += instrptr;
+      Free(STR1);
     }
     l1 = l1->next;
   }
@@ -1768,8 +1851,10 @@ na_strlist *sl;
     i = assem_16(l1->s, *proc, &instrptr);
     if (instrptr < pc) {
       instrptr = pc;
+      STR1 = (Char*)Malloc(strlen(l1->s) +2 +1);
       sprintf(STR1, "# %s", l1->s);
       i = assem_16(STR1, *proc, &instrptr);
+      Free(STR1);
     }
     pc = instrptr + 1;
     l1 = l1->next;

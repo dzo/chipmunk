@@ -110,8 +110,6 @@ char *strdup(string)
   if(ptr!=NULL)strcpy(ptr,string);
   return(ptr);
 }
-#elseif
-extern char *strdup();
 #endif
 
 
@@ -140,8 +138,9 @@ ne_desc *desc;
       (*i)++;
     } while (isdigit(s[*i - 1]));
   }
-  if ((s[*i - 1] == 'E' || s[*i - 1] == 'e') && (isdigit(s[*i]) ||
-	(s[*i] == '-' || s[*i] == '+') && isdigit(s[*i + 1]))) {
+  if ((s[*i - 1] == 'E' || s[*i - 1] == 'e') && 
+      ((isdigit(s[*i]) || (s[*i] == '-' || s[*i] == '+')) && 
+       isdigit(s[*i + 1]))) {
     (*i)++;
     if (s[*i - 1] == '-' || s[*i - 1] == '+')
       (*i)++;
@@ -394,7 +393,7 @@ ne_nexrec *nex, **newnex;
   for (i = 0; i < FORLIM; i++)
     ne_copy(nex->UU.U99.pvals[i], &(*newnex)->UU.U99.pvals[i]);
   if (op == ne_sc)
-    nex->UU.s = strdup((*newnex)->UU.s);
+    nex->UU.s = (char *) strdup((*newnex)->UU.s);
 }
 
 
@@ -511,7 +510,7 @@ ne_nexrec *nex;
     buf[i - 1] = '\0';
 /* p2c: numex.text, line 679:
  * Note: Modification of string length may translate incorrectly [146] */
-    strcpy(buf, buf + 3);
+    strcpy_overlap(buf, buf + 3);
     fputs(strlower(STR1, buf), stdout);
     break;
   }
@@ -656,7 +655,7 @@ struct LOC_opt *LINK;
 {
   ne_dispose(LINK->nex);
   newnexrec(LINK->nex, 0L, ne_sc);
-  (*LINK->nex)->UU.s = strdup(res);
+  (*LINK->nex)->UU.s = (char *)strdup(res);
 }
 
 Local boolean istrue(nex, LINK)
@@ -796,7 +795,7 @@ struct LOC_optimize *LINK;
   case ne_sp:
     if (WITH->UU.U12.sps != NULL && makeconstant(WITH->UU.U12.sps->s, &V)) {
       WITH->op = (unsigned)ne_sc;
-      WITH->UU.s = strdup(*WITH->UU.U12.sp);
+      WITH->UU.s = (char *)strdup(*WITH->UU.U12.sp);
     }
     break;
 
@@ -1334,6 +1333,9 @@ struct LOC_optimize *LINK;
     if ((ne_opkind)WITH->UU.U10.p1->op == ne_rc)
       collapsereal(atan(WITH->UU.U10.p1->UU.r), &V);
     break;
+
+  default:
+    break;
   }
   return (*V.nex);
 }
@@ -1587,7 +1589,7 @@ struct LOC_expr *LINK;
   LINK->LINK->p++;
   nex = expr(0L, LINK->LINK);
   ch2 = skipspc(LINK->LINK);
-  if (ch == '(' && ch2 == ')' || ch == '[' && ch2 == ']')
+  if ((ch == '(' && ch2 == ')') || (ch == '[' && ch2 == ']'))
     LINK->LINK->p++;
   else
     error_(ne_syntax, &nex, NULL, LINK->LINK);
@@ -1689,7 +1691,7 @@ struct LOC_expr *LINK;
 
     case ne_kind_strconst:
       nex = make2(ne_sc, NULL, NULL);
-      nex->UU.s = strdup((Char *)value);
+      nex->UU.s = (char *)strdup((Char *)value);
       break;
 
     case ne_kind_strvalue:
@@ -1740,7 +1742,7 @@ struct LOC_expr *LINK;
 	    seterror(ne_syntax, LINK->LINK);
 	}
 	ch2 = skipspc(LINK->LINK);
-	if (ch == '(' && ch2 == ')' || ch == '[' && ch2 == ']')
+	if ((ch == '(' && ch2 == ')') || (ch == '[' && ch2 == ']'))
 	  LINK->LINK->p++;
 	else
 	  seterror(ne_syntax, LINK->LINK);
@@ -1928,7 +1930,7 @@ struct LOC_expr *LINK;
 	done = true;
     } while (!done);
     nex = make2(ne_sc, nex, NULL);
-    nex->UU.s = strdup(name);
+    nex->UU.s = (char *)strdup(name);
     if (allocdone) 
       na_free((Anyptr)&args);
     return nex;
@@ -1947,9 +1949,9 @@ struct LOC_expr *LINK;
   }
   i = 0;
   p0 = LINK->LINK->p;
-  while (isdigit(LINK->LINK->ex[LINK->LINK->p - 1]) && i < 214748364L ||
+  while (isdigit(LINK->LINK->ex[LINK->LINK->p - 1]) && (i < 214748364L ||
 	 (i == 214748364L && LINK->LINK->ex[LINK->LINK->p - 1] >= '0' &&
-	  LINK->LINK->ex[LINK->LINK->p - 1] <= '7')) {
+	  LINK->LINK->ex[LINK->LINK->p - 1] <= '7'))) {
     i = i * 10 + LINK->LINK->ex[LINK->LINK->p - 1] - '0';
     LINK->LINK->p++;
   }
@@ -2191,7 +2193,7 @@ struct LOC_ne_uncompile *LINK;
   buf[i - 1] = '\0';
 /* p2c: numex.text, line 1966:
  * Note: Modification of string length may translate incorrectly [146] */
-  strcpy(buf, buf + 3);
+  strcpy_overlap(buf, buf + 3);
   append(strlower(STR1, buf), LINK);
 }
 
@@ -2549,6 +2551,9 @@ ne_nexrec *nex;
 	na_outeralloc((Anyptr *)(&ne_argarray[i].U16.sp1), strlen(buf) + 1L,
 		      (long)framesize);
 	strcpy(ne_argarray[i].U16.sp1, buf);
+	break;
+
+      default:
 	break;
       }
     }
@@ -3160,7 +3165,7 @@ ne_nexrec *nex, *res;
 
     case ne_string:
       res->op = (unsigned)ne_sc;
-      res->UU.s = strdup(ne_seval(STR1, nex));
+      res->UU.s = (char *)strdup(ne_seval(STR1, nex));
       break;
     }
   RECOVER(try14);
@@ -3235,6 +3240,8 @@ ne_desc *desc;
   if (realp(nex))
     return ((long)floor(ne_reval(nex) + 0.5));
   faileval(nex, desc, -4L);
+
+  return 0L;  /* should never happen */
 }
 
 
@@ -3247,6 +3254,8 @@ ne_desc *desc;
   if (integerp(nex))
     return (ne_ieval(nex));
   faileval(nex, desc, -6L);
+
+  return 0.0; /* should never happen */
 }
 
 
@@ -3365,7 +3374,7 @@ na_strlist *sym;
 Char *s;
 {
   sym->kind = ne_kind_strconst;
-  *(Char **)((Char **)(&sym->value)) = strdup(s);
+  *(Char **)((Char **)(&sym->value)) = (char *)strdup(s);
 }
 
 

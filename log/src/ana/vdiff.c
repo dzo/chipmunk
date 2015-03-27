@@ -959,7 +959,7 @@ Analog_32_action *act;
 
   WITH = AnaLogglobals;
   WITH1 = act->inst;
-  if (WITH->actx != 1 && WITH->actx != 2 || WITH->acty != 0 && WITH->acty != 1)
+  if ((WITH->actx != 1 && WITH->actx != 2) || (WITH->acty != 0 && WITH->acty != 1))
     return;
   WITH1->attr[N_Freeze - 1].UU.b = !WITH1->attr[N_Freeze - 1].UU.b;
   WITH->actflag = true;
@@ -1147,6 +1147,9 @@ Analog_32_action *act;
 
   case Analog_act_probe:
     Probe_Vdiff(act);
+    break;
+
+  default:
     break;
   }
 }

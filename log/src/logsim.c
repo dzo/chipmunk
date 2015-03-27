@@ -233,6 +233,9 @@ log_16_value v;
   case log_one:
     l1 = strlist_append(&lact->actstrlist, "color onled");
     break;
+
+  default:
+    break;
   }
   (*lact->hook2->plainxform)(lact->actgate, &x, &y);
   sprintf(STR2, "fillbox %ld %ld %ld %ld", x - 3L, y - 3L, x + 3L, y + 3L);
@@ -288,6 +291,9 @@ log_16_action *act;
       log_16_plotled(act->lact, 0, 0,
 	log_16_iv[P_getbits_US((unsigned long)WITH1->vars, 0, 1)]);
     break;
+
+  default:
+    break;
   }
 }
 
@@ -316,11 +322,14 @@ log_16_action *act;
       switch (pin1->v) {
 
       case log_zero:
-	WITH1->vars = (na_long)(((unsigned long)WITH1->vars) | (1L << 1));
+	WITH1->vars = (na_long)(((unsigned long)WITH1->vars) | (1L << 0));
 	break;
 
       case log_one:
-	WITH1->vars = (na_long)(((unsigned long)WITH1->vars) | (1L << 0));
+	WITH1->vars = (na_long)(((unsigned long)WITH1->vars) | (1L << 1));
+	break;
+
+      default:
 	break;
       }
     }
@@ -352,6 +361,9 @@ log_16_action *act;
     else if (!strcmp(WITH->genfunc, "PLOT"))
       log_16_plotled(act->lact, 0, 0,
 	log_16_iv[P_getbits_US((unsigned long)WITH1->vars, 0, 1)]);
+    break;
+
+  default:
     break;
   }
 }
@@ -492,6 +504,9 @@ log_16_action *act;
     if (!strcmp(WITH->genfunc, "INERT"))
       WITH->actflag = true;
     break;
+
+  default:
+    break;
   }
 }
 
@@ -564,6 +579,9 @@ log_16_action *act;
     } else if (!strcmp(WITH->genfunc, "CONSTPINS"))
       makeconstpin(act, 1L, (((unsigned long)WITH1->vars) & (1L << 0)) != 0);
     break;
+
+  default:
+    break;
   }
 }
 
@@ -611,6 +629,9 @@ log_16_action *act;
   case act_16_gengate:
     if (!strcmp(WITH->genfunc, "INERT"))
       WITH->actflag = true;
+    break;
+
+  default:
     break;
   }
 }
@@ -733,6 +754,9 @@ log_16_action *act;
   case act_16_gengate:
     if (!strcmp(WITH->genfunc, "INERT"))
       WITH->actflag = true;
+    break;
+
+  default:
     break;
   }
 }
@@ -873,6 +897,9 @@ log_16_action *act_;
 	plotline(tx + 5, ty, tx + 5, ty + 10, &V);
     }
     break;
+
+  default:
+    break;
   }
 }
 
@@ -985,6 +1012,9 @@ log_16_action *act;
       makeconstpin(act, 4L, (((unsigned long)WITH1->vars) & (1L << 2)) != 0);
       makeconstpin(act, 5L, (((unsigned long)WITH1->vars) & (1L << 0)) != 0);
     }
+    break;
+
+  default:
     break;
   }
 }
@@ -1394,6 +1424,7 @@ log_nrec **n;
 
   WITH = lact;
   (*WITH->hook.newnode)(n, log_16_simtype);
+  (*n)->keep = true;
   (*n)->ref = 1;
 }
 
@@ -1405,6 +1436,7 @@ log_nrec **n;
   log_action *WITH;
 
   WITH = lact;
+  (*n)->keep = false;
   (*WITH->hook.switchnode)(n, NULL);
 }
 
@@ -1919,6 +1951,9 @@ log_action *lact;
       }
     } else
       callgate(act_16_gengate);
+    break;
+
+  default:
     break;
   }
 }

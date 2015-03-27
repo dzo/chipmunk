@@ -1050,6 +1050,9 @@ Analog_32_action *act;
   case Analog_act_probe:
     Probe_Npn1(act);
     break;
+
+  default:
+    break;
   }
 }
 

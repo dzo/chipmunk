@@ -976,7 +976,7 @@ Analog_32_action *act;
     (*AnaLogglobals->hook.vmessage)("Restoring accuracy");
     return;
   }
-  if (WITH->actx <= 2 || WITH->acty != 3 && WITH->acty != 4)
+  if (WITH->actx <= 2 || (WITH->acty != 3 && WITH->acty != 4))
     return;
   AnaExact = false;
   AnaScoreboard("#", (long)AnaMessFlags);
@@ -1140,6 +1140,9 @@ Analog_32_action *act;
 
   case Analog_act_probe:
     Probe_Numbers(act);
+    break;
+
+  default:
     break;
   }
 }

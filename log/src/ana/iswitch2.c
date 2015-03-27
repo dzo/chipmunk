@@ -823,7 +823,8 @@ Analog_32_action *act;
 
   WITH = AnaLogglobals;
   WITH1 = act->inst;
-  if (WITH->actx != -2 && WITH->actx != -3 && WITH->actx != -4 || WITH->acty != 0)
+  if ((WITH->actx != -2 && WITH->actx != -3) && 
+      (WITH->actx != -4 || WITH->acty != 0))
     return;
   A_Gate = (Anainstlist *)act->inst->info;
   Iswitch2Var = (Iswitch2Const *)A_Gate->InstVar;
@@ -1011,6 +1012,9 @@ Analog_32_action *act;
 
   case Analog_act_probe:
     Probe_Iswitch2(act);
+    break;
+
+  default:
     break;
   }
 }

@@ -11,7 +11,7 @@
 
 
 
-extern void markuser();
+extern void markuser(void);
 
 
 

@@ -11,6 +11,7 @@
 # include <sys/time.h>
 # include <time.h>
 #elif defined(BSD)
+# include <time.h>
 # include <sys/time.h>
 #else
 # include <time.h>
@@ -50,43 +51,43 @@ Void na_fill(d, w, n)
 register long *d, w, n;
 {
     if (n <= 0)
-	return;
+        return;
     if (w == 0 || w == -1) {
-	memset(d, (int)w, (size_t)n);
-	return;
+        memset(d, (int)w, (size_t)n);
+        return;
     }
     if ((long)d & 1) {
-	VROL_L(w, 8);
-	*((uchar *)d) = w;
-	d = (long *)(1 + (long)d);    /* yuck! */
-	if (--n <= 0)
-	    return;
+        VROL_L(w, 8);
+        *((uchar *)d) = w;
+        d = (long *)(1 + (long)d);    /* yuck! */
+        if (--n <= 0)
+            return;
     }
     if (n == 1) {
-	*((uchar *)d) = (w >> 24);
-	return;
+        *((uchar *)d) = (w >> 24);
+        return;
     }
     if ((long)d & 2) {
-	VROL_L(w, 16);
-	*((short *)d) = w;
-	d = (long *)(2 + (long)d);
-	n -= 2;
-	if (n <= 0)
-	    return;
+        VROL_L(w, 16);
+        *((short *)d) = w;
+        d = (long *)(2 + (long)d);
+        n -= 2;
+        if (n <= 0)
+            return;
     }
     n -= 4;
     while (n >= 0) {
-	*d++ = w;
-	n -= 4;
+        *d++ = w;
+        n -= 4;
     }
     if (n >= -2) {
-	VROL_L(w, 16);
-	*((short *)d) = w;
-	d = (long *)(2 + (long)d);
-	n -= 2;
+        VROL_L(w, 16);
+        *((short *)d) = w;
+        d = (long *)(2 + (long)d);
+        n -= 2;
     }
     if (n >= -3)
-	*((uchar *)d) = (w >> 24);
+        *((uchar *)d) = (w >> 24);
 }
 
 
@@ -112,43 +113,43 @@ register long size;
 {
     switch (size) {
 
-	case 0:
-	    return;
+        case 0:
+            return;
 
-	case 1:
-	    {   register char t, *p1 = (char *)s, *p2 = (char *)d;
-		t = *p1;
-		*p1 = *p2;
-		*p2 = t;
-		return;
-	    }
+        case 1:
+            {   register char t, *p1 = (char *)s, *p2 = (char *)d;
+                t = *p1;
+                *p1 = *p2;
+                *p2 = t;
+                return;
+            }
 
-	case 2:
-	    if (!(((long)s | (long)d) & 1)) {
-		register short t, *p1 = (short *)s, *p2 = (short *)d;
-		t = *p1;
-		*p1 = *p2;
-		*p2 = t;
-		return;
-	    }
-	    break;
+        case 2:
+            if (!(((long)s | (long)d) & 1)) {
+                register short t, *p1 = (short *)s, *p2 = (short *)d;
+                t = *p1;
+                *p1 = *p2;
+                *p2 = t;
+                return;
+            }
+            break;
 
-	case 4:
-	    if (!(((long)s | (long)d) & 3)) {
-		register long *p1 = s, *p2 = d;
-		size = *p1;
-		*p1 = *p2;
-		*p2 = size;
-		return;
-	    }
-	    break;
+        case 4:
+            if (!(((long)s | (long)d) & 3)) {
+                register long *p1 = s, *p2 = d;
+                size = *p1;
+                *p1 = *p2;
+                *p2 = size;
+                return;
+            }
+            break;
     }
     {   register char t, *p1 = (char *)s, *p2 = (char *)d;
-	while (--size >= 0) {
-	    t = *p1;
-	    *p1++ = *p2;
-	    *p2++ = t;
-	}
+        while (--size >= 0) {
+            t = *p1;
+            *p1++ = *p2;
+            *p2++ = t;
+        }
     }
 }
 
@@ -165,9 +166,9 @@ register long size;
     register uchar ch = what;
 
     while (--size >= 0) {
-	if (*cp++ == ch) {
-	    return cp - (uchar *)s - 1;
-	}
+        if (*cp++ == ch) {
+            return cp - (uchar *)s - 1;
+        }
     }
     return cp - (uchar *)s;
 }
@@ -185,9 +186,9 @@ register long size;
     register uchar ch = what;
 
     while (--size >= 0) {
-	if (*cp++ != ch) {
-	    return cp - (uchar *)s - 1;
-	}
+        if (*cp++ != ch) {
+            return cp - (uchar *)s - 1;
+        }
     }
     return cp - (uchar *)s;
 }
@@ -232,7 +233,7 @@ register long n;
 long x;
 {
     if ((unsigned long)n > 31)
-	return 0;
+        return 0;
     return ((x & (1<<n)) != 0);
 }
 
@@ -242,7 +243,7 @@ register long n;
 long *x;
 {
     if ((unsigned long)n > 31)
-	return;
+        return;
     *x |= (1<<n);
 }
 
@@ -253,7 +254,7 @@ register long n;
 long *x;
 {
     if ((unsigned long)n > 31)
-	return;
+        return;
     *x &= ~(1<<n);
 }
 
@@ -263,7 +264,7 @@ long na_po2(n)
 register long n;
 {
     if ((unsigned long)n > 31)
-	return 0;
+        return 0;
     return 1<<n;
 }
 
@@ -286,9 +287,9 @@ long na_lobits(n)
 register long n;
 {
     if (n <= 0)
-	return 0;
+        return 0;
     if (n >= 32)
-	return -1;
+        return -1;
     return (1<<n) - 1;
 }
 
@@ -298,9 +299,9 @@ long na_hibits(n)
 register long n;
 {
     if (n <= 0)
-	return 0;
+        return 0;
     if (n >= 32)
-	return -1;
+        return -1;
     return ~(((unsigned long)-1) >> n);
 }
 
@@ -310,14 +311,14 @@ long na_asl(n, x)
 register long n, x;
 {
     if (n > 0) {
-	if (n > 31)
-	    return 0;
-	return x << n;
+        if (n > 31)
+            return 0;
+        return x << n;
     } else if (n < 0) {
-	if (n < -31)
-	    return 0;
-	VASR_L(x, -n);
-	return x;
+        if (n < -31)
+            return 0;
+        VASR_L(x, -n);
+        return x;
     }
     return x;
 }
@@ -328,13 +329,13 @@ long na_lsl(n, x)
 register long n, x;
 {
     if (n > 0) {
-	if (n > 31)
-	    return 0;
-	return x << n;
+        if (n > 31)
+            return 0;
+        return x << n;
     } else if (n < 0) {
-	if (n < -31)
-	    return 0;
-	return (unsigned long)x >> (-n);
+        if (n < -31)
+            return 0;
+        return (unsigned long)x >> (-n);
     }
     return x;
 }
@@ -359,8 +360,8 @@ register long n, x;
 
 #define BFCHECK(v,offset) {                 \
     if (((long)(v)) & 3) {                  \
-	(offset) += 8 * (((long)(v)) & 3);  \
-	(v) = (long *)(((long)(v)) & ~3);   \
+        (offset) += 8 * (((long)(v)) & 3);  \
+        (v) = (long *)(((long)(v)) & ~3);   \
     }                                       \
     v += ASR_L(offset, 5);                  \
     offset &= 31;                           \
@@ -375,17 +376,17 @@ register long *v, offset, size;
     BFCHECK(v, offset);
     offset = 32 - offset;
     if (size <= offset) {
-	*v &= ~(((1 << size) - 1) << (offset-size));
-	return;
+        *v &= ~(((1 << size) - 1) << (offset-size));
+        return;
     }
     *v++ &= (-1) << offset;
     size -= offset;
     while (size >= 32) {
-	*v++ = 0;
-	size -= 32;
+        *v++ = 0;
+        size -= 32;
     }
     if (size)
-	*v &= (1 << (32-size)) - 1;
+        *v &= (1 << (32-size)) - 1;
 }
 
 
@@ -398,17 +399,17 @@ register long *v, offset, size;
     BFCHECK(v, offset);
     offset = 32 - offset;
     if (size <= offset) {
-	*v |= (((1 << size) - 1) << (offset-size));
-	return;
+        *v |= (((1 << size) - 1) << (offset-size));
+        return;
     }
     *v++ |= (1 << offset) - 1;
     size -= offset;
     while (size >= 32) {
-	*v++ = -1;
-	size -= 32;
+        *v++ = -1;
+        size -= 32;
     }
     if (size)
-	*v |= (-1) << (32-size);
+        *v |= (-1) << (32-size);
 }
 
 
@@ -421,17 +422,17 @@ register long *v, offset, size;
     BFCHECK(v, offset);
     offset = 32 - offset;
     if (size <= offset) {
-	*v ^= (((1 << size) - 1) << (offset-size));
-	return;
+        *v ^= (((1 << size) - 1) << (offset-size));
+        return;
     }
     *v++ ^= (1 << offset) - 1;
     size -= offset;
     while (size >= 32) {
-	*v++ ^= -1;
-	size -= 32;
+        *v++ ^= -1;
+        size -= 32;
     }
     if (size)
-	*v ^= (-1) << (32-size);
+        *v ^= (-1) << (32-size);
 }
 
 
@@ -444,14 +445,14 @@ register long *v, offset, size;
     BFCHECK(v, offset);
     offset = 32 - offset;
     if (size <= offset)
-	return (*v & (((1 << size) - 1) << (offset-size))) != 0;
+        return (*v & (((1 << size) - 1) << (offset-size))) != 0;
     if (*v++ & ((1 << offset) - 1))
-	return 1;
+        return 1;
     size -= offset;
     while (size >= 32) {
-	if (*v++)
-	    return 1;
-	size -= 32;
+        if (*v++)
+            return 1;
+        size -= 32;
     }
     return (size && (*v & ((-1) << (32-size))));
 }
@@ -464,9 +465,9 @@ long *v, offset, size;
 boolean b;
 {
     if (b)
-	na_bfset(v, offset, size);
+        na_bfset(v, offset, size);
     else
-	na_bfclr(v, offset, size);
+        na_bfclr(v, offset, size);
 }
 
 
@@ -479,23 +480,23 @@ register long *s, soff, *d, doff, size;
     BFCHECK(d, doff);
     doff = 32 - doff;
     if (size <= doff) {
-	doff -= size;
-	*d &= ~(((1 << size) - 1) << doff);
-	*d |= na_bfextu(s, soff, size) << doff;
-	return;
+        doff -= size;
+        *d &= ~(((1 << size) - 1) << doff);
+        *d |= na_bfextu(s, soff, size) << doff;
+        return;
     }
     *d &= (-1) << doff;
     *d++ |= na_bfextu(s, soff, doff);
     soff += doff;
     size -= doff;
     while (size >= 32) {
-	*d++ = na_bfextu(s, soff, 32);
-	soff += 32;
-	size -= 32;
+        *d++ = na_bfextu(s, soff, 32);
+        soff += 32;
+        size -= 32;
     }
     if (size) {
-	*d &= (1 << (32-size)) - 1;
-	*d |= na_bfextu(s, soff, size) << (32-size);
+        *d &= (1 << (32-size)) - 1;
+        *d |= na_bfextu(s, soff, size) << (32-size);
     }
 }
 
@@ -509,22 +510,22 @@ register long *s, soff, *d, doff, size;
     BFCHECK(d, doff);
     doff = 32 - doff;
     if (size <= doff) {
-	doff -= size;
-	*d &= (~(((1 << size) - 1) << doff)) |
-	      (na_bfextu(s, soff, size) << doff);
-	return;
+        doff -= size;
+        *d &= (~(((1 << size) - 1) << doff)) |
+              (na_bfextu(s, soff, size) << doff);
+        return;
     }
     *d++ &= ((-1) << doff) | na_bfextu(s, soff, doff);
     soff += doff;
     size -= doff;
     while (size >= 32) {
-	*d++ &= na_bfextu(s, soff, 32);
-	soff += 32;
-	size -= 32;
+        *d++ &= na_bfextu(s, soff, 32);
+        soff += 32;
+        size -= 32;
     }
     if (size)
-	*d &= ((1 << (32-size)) - 1) |
-	      (na_bfextu(s, soff, size) << (32-size));
+        *d &= ((1 << (32-size)) - 1) |
+              (na_bfextu(s, soff, size) << (32-size));
 }
 
 
@@ -537,20 +538,20 @@ register long *s, soff, *d, doff, size;
     BFCHECK(d, doff);
     doff = 32 - doff;
     if (size <= doff) {
-	doff -= size;
-	*d &= ~(na_bfextu(s, soff, size) << doff);
-	return;
+        doff -= size;
+        *d &= ~(na_bfextu(s, soff, size) << doff);
+        return;
     }
     *d++ &= ~na_bfextu(s, soff, doff);
     soff += doff;
     size -= doff;
     while (size >= 32) {
-	*d++ &= ~na_bfextu(s, soff, 32);
-	soff += 32;
-	size -= 32;
+        *d++ &= ~na_bfextu(s, soff, 32);
+        soff += 32;
+        size -= 32;
     }
     if (size)
-	*d &= ~(na_bfextu(s, soff, size) << (32-size));
+        *d &= ~(na_bfextu(s, soff, size) << (32-size));
 }
 
 
@@ -563,20 +564,20 @@ register long *s, soff, *d, doff, size;
     BFCHECK(d, doff);
     doff = 32 - doff;
     if (size <= doff) {
-	doff -= size;
-	*d |= (na_bfextu(s, soff, size) << doff);
-	return;
+        doff -= size;
+        *d |= (na_bfextu(s, soff, size) << doff);
+        return;
     }
     *d++ |= na_bfextu(s, soff, doff);
     soff += doff;
     size -= doff;
     while (size >= 32) {
-	*d++ |= na_bfextu(s, soff, 32);
-	soff += 32;
-	size -= 32;
+        *d++ |= na_bfextu(s, soff, 32);
+        soff += 32;
+        size -= 32;
     }
     if (size)
-	*d |= (na_bfextu(s, soff, size) << (32-size));
+        *d |= (na_bfextu(s, soff, size) << (32-size));
 }
 
 
@@ -589,20 +590,20 @@ register long *s, soff, *d, doff, size;
     BFCHECK(d, doff);
     doff = 32 - doff;
     if (size <= doff) {
-	doff -= size;
-	*d ^= (na_bfextu(s, soff, size) << doff);
-	return;
+        doff -= size;
+        *d ^= (na_bfextu(s, soff, size) << doff);
+        return;
     }
     *d++ ^= na_bfextu(s, soff, doff);
     soff += doff;
     size -= doff;
     while (size >= 32) {
-	*d++ ^= na_bfextu(s, soff, 32);
-	soff += 32;
-	size -= 32;
+        *d++ ^= na_bfextu(s, soff, 32);
+        soff += 32;
+        size -= 32;
     }
     if (size)
-	*d ^= (na_bfextu(s, soff, size) << (32-size));
+        *d ^= (na_bfextu(s, soff, size) << (32-size));
 }
 
 
@@ -613,46 +614,46 @@ register long *v, offset, size;
 {
     if (size <= 1) return;
     if (size <= 32) {
-	register long val, val2 = 0;
-	val = na_bfextu(v, offset, size);
-	while (--size >= 0) {
-	    val2 <<= 1;
-	    val2 += (val & 1);
-	    val >>= 1;
-	}
-	na_bfins(v, offset, size, val2);
-	return;
+        register long val, val2 = 0;
+        val = na_bfextu(v, offset, size);
+        while (--size >= 0) {
+            val2 <<= 1;
+            val2 += (val & 1);
+            val >>= 1;
+        }
+        na_bfins(v, offset, size, val2);
+        return;
     }
     BFCHECK(v, offset);
     {   register long *v2, mask1, mask2;
-	mask1 = 1 << (31-offset);
-	offset += size - 1;
-	v2 = v + ASR_L(offset, 5);
-	mask2 = 1 << ((~offset) & 31);
-	size >>= 1;
-	while (--size >= 0) {
-	    if (*v & mask1) {
-		if (!(*v2 & mask2)) {
-		    *v ^= mask1;
-		    *v2 ^= mask2;
-		}
-	    } else {
-		if (*v2 & mask2) {
-		    *v ^= mask1;
-		    *v2 ^= mask2;
-		}
-	    }
-	    if (mask1 == 1) {
-		mask1 = 0x80000000;
-		v++;
-	    } else
-		mask1 >>= 1;
-	    if (mask2 < 0) {
-		mask2 = 1;
-		v2--;
-	    } else
-		mask2 <<= 1;
-	}
+        mask1 = 1 << (31-offset);
+        offset += size - 1;
+        v2 = v + ASR_L(offset, 5);
+        mask2 = 1 << ((~offset) & 31);
+        size >>= 1;
+        while (--size >= 0) {
+            if (*v & mask1) {
+                if (!(*v2 & mask2)) {
+                    *v ^= mask1;
+                    *v2 ^= mask2;
+                }
+            } else {
+                if (*v2 & mask2) {
+                    *v ^= mask1;
+                    *v2 ^= mask2;
+                }
+            }
+            if (mask1 == 1) {
+                mask1 = 0x80000000;
+                v++;
+            } else
+                mask1 >>= 1;
+            if (mask2 < 0) {
+                mask2 = 1;
+                v2--;
+            } else
+                mask2 <<= 1;
+        }
     }
 }
 
@@ -668,11 +669,11 @@ register long *v, offset, size, val;
     BFCHECK(v, offset);
     offset = 32 - offset;
     if (size <= offset) {
-	offset -= size;
-	mask = (((1 << size) - 1) << offset);
-	*v &= ~mask;
-	*v |= (val << offset) & mask;
-	return;
+        offset -= size;
+        mask = (((1 << size) - 1) << offset);
+        *v &= ~mask;
+        *v |= (val << offset) & mask;
+        return;
     }
     mask = (1 << offset) - 1;
     *v &= ~mask;
@@ -695,8 +696,8 @@ register long *v, offset, size;
     BFCHECK(v, offset);
     offset = 32 - offset;
     if (size <= offset)
-	return ((*v) >> (offset-size)) &
-	       ((1 << size) - 1);
+        return ((*v) >> (offset-size)) &
+               ((1 << size) - 1);
     size -= offset;
     val = ((*v++) & ((1 << offset) - 1)) << size;
     return val | ((unsigned long)(*v)) >> (32-size);
@@ -713,7 +714,7 @@ register long *v, offset, size;
     if (size <= 0) return 0;
     BFCHECK(v, offset);
     if (size <= 32 - offset)
-	return ASR_L((*v) << offset, 32-size);
+        return ASR_L((*v) << offset, 32-size);
     val = (*v++) << offset;
     val = ASR_L(val, 32-size);
     return val | ((unsigned long)(*v)) >> (64-size-offset);
@@ -729,29 +730,29 @@ register long *v, offset, size;
 
     if (size <= 0) return offset;
     while (size >= 32) {
-	val = na_bfextu(v, offset, 32);
-	if (val) {
-	    if (val < 0x10000) {
-		offset += 16;
-		val <<= 16;
-	    }
-	    while (val >= 0) {
-		offset++;
-		val <<= 1;
-	    }
-	    return offset;
-	}
-	offset += 32;
-	size -= 32;
+        val = na_bfextu(v, offset, 32);
+        if (val) {
+            if (val < 0x10000) {
+                offset += 16;
+                val <<= 16;
+            }
+            while (val >= 0) {
+                offset++;
+                val <<= 1;
+            }
+            return offset;
+        }
+        offset += 32;
+        size -= 32;
     }
     val = na_bfextu(v, offset, size);
     if (val) {
-	val <<= 32-size;
-	while (val >= 0) {
-	    offset++;
-	    val <<= 1;
-	}
-	return offset;
+        val <<= 32-size;
+        while (val >= 0) {
+            offset++;
+            val <<= 1;
+        }
+        return offset;
     }
     return offset + size;
 }
@@ -766,29 +767,29 @@ register long *v, offset, size;
 
     if (size <= 0) return offset;
     while (size >= 32) {
-	val = na_bfextu(v, offset, 32);
-	if (~val) {
-	    if ((unsigned long)val >= 0xffff0000) {
-		offset += 16;
-		val <<= 16;
-	    }
-	    while (val < 0) {
-		offset++;
-		val <<= 1;
-	    }
-	    return offset;
-	}
-	offset += 32;
-	size -= 32;
+        val = na_bfextu(v, offset, 32);
+        if (~val) {
+            if ((unsigned long)val >= 0xffff0000) {
+                offset += 16;
+                val <<= 16;
+            }
+            while (val < 0) {
+                offset++;
+                val <<= 1;
+            }
+            return offset;
+        }
+        offset += 32;
+        size -= 32;
     }
     val = na_bfextu(v, offset, size);
     if (~val) {
-	val <<= 32-size;
-	while (val < 0) {
-	    offset++;
-	    val <<= 1;
-	}
-	return offset;
+        val <<= 32-size;
+        while (val < 0) {
+            offset++;
+            val <<= 1;
+        }
+        return offset;
     }
     return offset + size;
 }
@@ -803,21 +804,21 @@ register long *v, offset, size;
 
     if (size <= 0) return 0;
     while (size >= 32) {
-	val = na_bfextu(v, offset, 32);
-	if (~val) {
-	    while (val) {
-		count++;
-		val &= (val - 1);
-	    }
-	} else
-	    count += 32;
-	offset += 32;
-	size -= 32;
+        val = na_bfextu(v, offset, 32);
+        if (~val) {
+            while (val) {
+                count++;
+                val &= (val - 1);
+            }
+        } else
+            count += 32;
+        offset += 32;
+        size -= 32;
     }
     val = na_bfextu(v, offset, size);
     while (val) {
-	count++;
-	val &= (val - 1);
+        count++;
+        val &= (val - 1);
     }
     return count;
 }
@@ -843,18 +844,18 @@ long *s;
     register long count, val;
 
     if (!*s)
-	return -1;
+        return -1;
     count = *s - 1;
     val = s[count];
     while (!val) {    /* should not happen */
-	if (--count < 0)
-	    return -1;
-	val = s[count];
+        if (--count < 0)
+            return -1;
+        val = s[count];
     }
     count <<= 5;
     while (val >= 0) {
-	count++;
-	val <<= 1;
+        count++;
+        val <<= 1;
     }
     return count;
 }
@@ -869,9 +870,9 @@ long *s, offset;
     if (offset < 0) offset = 0;
     val = na_bfffo(s+1, offset, (*s << 5) - offset);
     if (val < (*s << 5))
-	return val;
+        return val;
     else
-	return -1;
+        return -1;
 }
 
 
@@ -885,9 +886,9 @@ long *s, offset;
     if (offset < 0) return offset;
     val = na_bfffz(s+1, offset, (*s << 5) - offset);
     if (val < (*s << 5))
-	return val;
+        return val;
     else
-	return offset;
+        return offset;
 }
 
 
@@ -899,9 +900,9 @@ double P_rmin(a, b)
 double a, b;
 {
     if (a < b)
-	return a;
+        return a;
     else
-	return b;
+        return b;
 }
 
 
@@ -910,9 +911,9 @@ double P_rmax(a, b)
 double a, b;
 {
     if (a > b)
-	return a;
+        return a;
     else
-	return b;
+        return b;
 }
 
 
@@ -921,11 +922,11 @@ long P_rsgn(a)
 double a;
 {
     if (a < 0)
-	return -1;
+        return -1;
     else if (a > 0)
-	return 1;
+        return 1;
     else
-	return 0;
+        return 0;
 }
 
 
@@ -934,11 +935,11 @@ long P_isgn(a)
 register long a;
 {
     if (a < 0)
-	return -1;
+        return -1;
     else if (a > 0)
-	return 1;
+        return 1;
     else
-	return 0;
+        return 0;
 }
 
 
@@ -947,9 +948,9 @@ long P_imin2(a, b)
 register long a, b;
 {
     if (a < b)
-	return a;
+        return a;
     else
-	return b;
+        return b;
 }
 
 
@@ -958,9 +959,9 @@ long P_imax2(a, b)
 register long a, b;
 {
     if (a > b)
-	return a;
+        return a;
     else
-	return b;
+        return b;
 }
 
 
@@ -969,9 +970,9 @@ long P_imin3(a, b, c)
 register long a, b, c;
 {
     if (a < b)
-	return (a < c) ? c : a;
+        return (a < c) ? c : a;
     else
-	return (b < c) ? c : b;
+        return (b < c) ? c : b;
 }
 
 
@@ -980,9 +981,9 @@ long P_imax3(a, b, c)
 register long a, b, c;
 {
     if (a > b)
-	return (a > c) ? c : a;
+        return (a > c) ? c : a;
     else
-	return (b > c) ? c : b;
+        return (b > c) ? c : b;
 }
 
 
@@ -991,15 +992,15 @@ long P_imin4(a, b, c, d)
 register long a, b, c, d;
 {
     if (a < b)
-	if (a < c)
-	    return (a < d) ? d : a;
-	else
-	    return (c < d) ? d : c;
+        if (a < c)
+            return (a < d) ? d : a;
+        else
+            return (c < d) ? d : c;
     else
-	if (b < c)
-	    return (b < d) ? d : b;
-	else
-	    return (c < d) ? d : c;
+        if (b < c)
+            return (b < d) ? d : b;
+        else
+            return (c < d) ? d : c;
 }
 
 
@@ -1008,15 +1009,15 @@ long P_imax4(a, b, c, d)
 register long a, b, c, d;
 {
     if (a > b)
-	if (a > c)
-	    return (a > d) ? d : a;
-	else
-	    return (c > d) ? d : c;
+        if (a > c)
+            return (a > d) ? d : a;
+        else
+            return (c > d) ? d : c;
     else
-	if (b > c)
-	    return (b > d) ? d : b;
-	else
-	    return (c > d) ? d : c;
+        if (b > c)
+            return (b > d) ? d : b;
+        else
+            return (c > d) ? d : c;
 }
 
 
@@ -1040,8 +1041,8 @@ register long *a, *b;
 
     t = *a;
     if (t > *b) {
-	*a = *b;
-	*b = t;
+        *a = *b;
+        *b = t;
     }
 }
 
@@ -1054,27 +1055,27 @@ register long *a, *b, *c;
 
     t = *a;
     if (t < *b) {                   /* a < b */
-	if (*c < t) {               /* c < a < b */
-	    *a = *c;
-	    *c = *b;
-	    *b = t;
-	} else if (*c < *b) {       /* a <= c < b */
-	    t = *b;
-	    *b = *c;
-	    *c = t;
-	}
+        if (*c < t) {               /* c < a < b */
+            *a = *c;
+            *c = *b;
+            *b = t;
+        } else if (*c < *b) {       /* a <= c < b */
+            t = *b;
+            *b = *c;
+            *c = t;
+        }
     } else {                        /* b <= a */
-	if (*c < *b) {              /* c < b <= a */
-	    *a = *c;
-	    *c = t;
-	} else if (*c < t) {        /* b <= c < a */
-	    *a = *b;
-	    *b = *c;
-	    *c = t;
-	} else {                    /* b <= a <= c */
-	    *a = *b;
-	    *b = t;
-	}
+        if (*c < *b) {              /* c < b <= a */
+            *a = *c;
+            *c = t;
+        } else if (*c < t) {        /* b <= c < a */
+            *a = *b;
+            *b = *c;
+            *c = t;
+        } else {                    /* b <= a <= c */
+            *a = *b;
+            *b = t;
+        }
     }
 }
 
@@ -1088,17 +1089,17 @@ register long *a, *b, *c, *d;
     P_isort3(a, b, c);
     t = *d;
     if (t < *a) {               /* d < a <= b <= c */
-	*d = *c;
-	*c = *b;
-	*b = *a;
-	*a = t;
+        *d = *c;
+        *c = *b;
+        *b = *a;
+        *a = t;
     } else if (t < *b) {        /* a <= d < b <= c */
-	*d = *c;
-	*c = *b;
-	*b = t;
+        *d = *c;
+        *c = *b;
+        *b = t;
     } else if (t < *c) {        /* a <= b <= d < c */
-	*d = *c;
-	*c = t;
+        *d = *c;
+        *c = t;
     }
 }
 
@@ -1108,9 +1109,9 @@ long P_ibound(min, i, max)
 register long min, i, max;
 {
     if (max > min)
-	return (i < min) ? min : (i > max) ? max : i;
+        return (i < min) ? min : (i > max) ? max : i;
     else
-	return (i < max) ? max : (i > min) ? min : i;
+        return (i < max) ? max : (i > min) ? min : i;
 }
 
 
@@ -1119,9 +1120,9 @@ boolean P_ibetween(min, i, max)
 register long min, i, max;
 {
     if (min <= i)
-	return (i <= max);
+        return (i <= max);
     else
-	return (max <= i);
+        return (max <= i);
 }
 
 
@@ -1130,7 +1131,7 @@ boolean P_ibetweenm(min, i, max, margin)
 register long min, i, max, margin;
 {
     return ((min-margin <= i) && (i <= max+margin)) ||
-	   ((max-margin <= i) && (i <= min+margin));
+           ((max-margin <= i) && (i <= min+margin));
 }
 
 
@@ -1139,7 +1140,7 @@ Void P_iamin(min, i)
 register long *min, i;
 {
     if (i < *min)
-	*min = i;
+        *min = i;
 }
 
 
@@ -1148,7 +1149,7 @@ Void P_iamax(max, i)
 register long *max, i;
 {
     if (i > *max)
-	*max = i;
+        *max = i;
 }
 
 
@@ -1157,9 +1158,9 @@ Void P_iaminmax(min, max, i)
 register long *min, *max, i;
 {
     if (i < *min)
-	*min = i;
+        *min = i;
     if (i > *max)
-	*max = i;
+        *max = i;
 }
 
 
@@ -1179,44 +1180,44 @@ register long y, x;
 
     switch (y) {
 
-	case 0:
-	case 1:
-	    return y;
+        case 0:
+        case 1:
+            return y;
 
-	case 2:
-	    return (x >= 0) ? 1 << x : 0;
+        case 2:
+            return (x >= 0) ? 1 << x : 0;
 
-	case -1:
-	    return (x & 1) ? -1 : 1;
+        case -1:
+            return (x & 1) ? -1 : 1;
 
-	case -2:
-	    return (x & 1) ? -(1 << x) : (1 << x);
+        case -2:
+            return (x & 1) ? -(1 << x) : (1 << x);
 
     }
     switch (x) {
 
-	case 0:
-	    return 1;
+        case 0:
+            return 1;
 
-	case 1:
-	    return y;
+        case 1:
+            return y;
 
     }
     if (x < 0)
-	return 0;
+        return 0;
     if (y < 0) {
-	y = - y;
-	if (x & 1)
-	    return -P_ipow(y, x);
+        y = - y;
+        if (x & 1)
+            return -P_ipow(y, x);
     }
     n = (x & 1) ? y : 1;
     for (;;) {
-	x >>= 1;
-	if (!x)
-	    return n;
-	y *= y;
-	if (x & 1)
-	    n *= y;
+        x >>= 1;
+        if (!x)
+            return n;
+        y *= y;
+        if (x & 1)
+            n *= y;
     }
 }
 
@@ -1266,17 +1267,17 @@ long a, b;
     na_quadword q;
 
     if ((a ^ b) < 0) {
-	if (a < 0)
-	    a = -a;
-	else
-	    b = -b;
-	q = na_umul64(a, b);
-	q.U1.i2 = - q.U1.i2;
-	q.U1.i1 = - q.U1.i1 - (q.U1.i2 != 0);
+        if (a < 0)
+            a = -a;
+        else
+            b = -b;
+        q = na_umul64(a, b);
+        q.U1.i2 = - q.U1.i2;
+        q.U1.i1 = - q.U1.i1 - (q.U1.i2 != 0);
     }
     if (a < 0) {
-	a = -a;
-	b = -b;
+        a = -a;
+        b = -b;
     }
     return na_umul64(a, b);
 }
@@ -1331,8 +1332,8 @@ _PROCEDURE comp;
 {
     if (comp.link) 
       {
-	userqsortfunc = (int (*)())comp.proc;
-	userqsortlink = comp.link;
+        userqsortfunc = (int (*)())comp.proc;
+        userqsortlink = comp.link;
 
 #ifndef OS2
 	qsort(a, n, 4, (int (*)())qsortfunc2);
@@ -1365,7 +1366,7 @@ register Char *s, *s2;
     while (*cp) cp++;
     s += 255;
     while (cp < s && *s2)
-	*cp++ = *s2++;
+        *cp++ = *s2++;
     *cp = 0;
 }
 
@@ -1376,7 +1377,7 @@ register Char *res, *s;
 {
     register Char *d = res;
     while (*s)
-	*d++ = toupper(*s++);
+        *d++ = toupper(*s++);
     *d = 0;
     return res;
 }
@@ -1388,7 +1389,7 @@ register Char *res, *s;
 {
     register Char *d = res;
     while (*s)
-	*d++ = tolower(*s++);
+        *d++ = tolower(*s++);
     *d = 0;
     return res;
 }
@@ -1412,9 +1413,9 @@ long num;
 
     cp = s + strlen(s) - num;
     if (cp <= s)
-	return strcpy(res, s);
+        return strcpy(res, s);
     else
-	return strcpy(res, cp);
+        return strcpy(res, cp);
 }
 
 
@@ -1427,18 +1428,18 @@ register long wid;
     register char *cp = res;
 
     if (wid > 255)
-	wid = 255;
+        wid = 255;
     wid -= len;
     if (wid <= 0)
-	return strcpy(res, s);
+        return strcpy(res, s);
     wid2 = wid >> 1;
     while (--wid2 >= 0)
-	*cp++ = ' ';
+        *cp++ = ' ';
     while (*s)
-	*cp++ = *s++;
+        *cp++ = *s++;
     wid2 = (wid + 1) >> 1;
     while (--wid2 >= 0)
-	*cp++ = ' ';
+        *cp++ = ' ';
     *cp = 0;
     return res;
 }
@@ -1449,8 +1450,8 @@ boolean strbegins(s1, s2)
 register Char *s1, *s2;
 {
     while (*s2)
-	if (*s1++ != *s2++)
-	    return 0;
+        if (*s1++ != *s2++)
+            return 0;
     return 1;
 }
 
@@ -1462,7 +1463,7 @@ register Char *s1, *s2;
     register int skip = strlen(s1) - strlen(s2);
 
     if (skip < 0)
-	return 0;
+        return 0;
     return (strcmp(s1 + skip, s2) == 0);
 }
 
@@ -1472,9 +1473,9 @@ boolean strcibegins(s1, s2)
 register Char *s1, *s2;
 {
     while (*s2)
-	if (isalpha(*s1) ? (toupper(*s1++) != toupper(*s2++))
-			 : (*s1++ != *s2++))
-	    return 0;
+        if (isalpha(*s1) ? (toupper(*s1++) != toupper(*s2++))
+                         : (*s1++ != *s2++))
+            return 0;
     return 1;
 }
 
@@ -1486,7 +1487,7 @@ register Char *s1, *s2;
     register int skip = strlen(s1) - strlen(s2);
 
     if (skip < 0)
-	return 0;
+        return 0;
     return !strcicmp(s1 + skip, s2);
 }
 
@@ -1499,9 +1500,9 @@ register Char *s1, *s2;
     register Char ch;
 
     while (*s2)
-	if (isalpha(ch = *s1++) ? (toupper(ch) != toupper(*s2++))
-			 : (ch != *s2++))
-	    return (toupper(ch) > toupper(*--s2)) ? 1 : -1;
+        if (isalpha(ch = *s1++) ? (toupper(ch) != toupper(*s2++))
+                         : (ch != *s2++))
+            return (toupper(ch) > toupper(*--s2)) ? 1 : -1;
     return (*s1 == 0) ? 0 : 1;
 }
 #endif
@@ -1515,16 +1516,16 @@ register long n, i1, i2;
     if (i1 <= 0) s1 = (Char *)"";
     if (i2 <= 0) s2 = (Char *)"";
     while (--i1 > 0) {
-	if (!*s1++) {
-	    s1--;
-	    break;
-	}
+        if (!*s1++) {
+            s1--;
+            break;
+        }
     }
     while (--i2 > 0) {
-	if (!*s2++) {
-	    s2--;
-	    break;
-	}
+        if (!*s2++) {
+            s2--;
+            break;
+        }
     }
     return strncmp(s1, s2, (int)n);
 }
@@ -1538,20 +1539,20 @@ register long n, i1, i2;
     if (i1 <= 0) s1 = (Char *)"";
     if (i2 <= 0) s2 = (Char *)"";
     while (--i1 > 0) {
-	if (!*s1++) {
-	    s1--;
-	    break;
-	}
+        if (!*s1++) {
+            s1--;
+            break;
+        }
     }
     while (--i2 > 0) {
-	if (!*s2++) {
-	    s2--;
-	    break;
-	}
+        if (!*s2++) {
+            s2--;
+            break;
+        }
     }
     while (--n >= 0) {
-	if (toupper(*s1++) != toupper(*s2++))
-	    return 0;
+        if (toupper(*s1++) != toupper(*s2++))
+            return 0;
     }
     return 1;
 }
@@ -1567,12 +1568,12 @@ register long index, size;
     s += index - 1;
     size -= len;
     if (size < 0) {
-	register Char *cp;
-	for (cp = s + strlen(s); cp >= s; cp--)
-	    *cp = cp[size];
+        register Char *cp;
+        for (cp = s + strlen(s); cp >= s; cp--)
+            *cp = cp[size];
     } else if (size > 0) {
-	register Char *cp;
-	for (cp = s; (*cp = cp[size]); cp++) ;
+        register Char *cp;
+        for (cp = s; (*cp = cp[size]); cp++) ;
     }
     strncpy(s, repl, len);
 }
@@ -1584,9 +1585,9 @@ Char *res;
 long i, w;
 {
     if (w < 0)
-	sprintf(res, "%0*ld", (int)(-w), i);
+        sprintf(res, "%0*ld", (int)(-w), i);
     else
-	sprintf(res, "%*ld", (int)w, i);
+        sprintf(res, "%*ld", (int)w, i);
     return res;
 }
 
@@ -1601,11 +1602,11 @@ register long i;
     len1 = strlen(s1);
     len2 = strlen(s2);
     if (--i > len1 - len2)
-	i = len1 - len2;
+        i = len1 - len2;
     if (i < 0 || !len2)
-	return 0;
+        return 0;
     while (i >= 0 && strncmp(s1 + i, s2, len2))
-	i--;
+        i--;
     return i + 1;
 }
 
@@ -1618,13 +1619,13 @@ register long i;
     register Char *cp = s1;
 
     if (i <= 0)
-	return 0;
+        return 0;
     while (--i > 0)
-	if (!*cp++)
-	    return 0;
+        if (!*cp++)
+            return 0;
     while (*cp)
-	if (*cp++ == ch)
-	    return cp - s1;
+        if (*cp++ == ch)
+            return cp - s1;
     return 0;
 }
 
@@ -1638,13 +1639,13 @@ register long i;
     register int len = strlen(s2);
 
     if (i <= 0 || !len)
-	return 0;
+        return 0;
     while (--i > 0)
-	if (!*cp++)
-	    return 0;
+        if (!*cp++)
+            return 0;
     while (*cp)
-	if (!strncmp(cp++, s2, len))
-	    return cp - s1;
+        if (!strncmp(cp++, s2, len))
+            return cp - s1;
     return 0;
 }
 
@@ -1658,11 +1659,11 @@ register long i;
 
     len = strlen(s1) - strlen(s2);
     if (--i > len)
-	i = len;
+        i = len;
     if (i < 0 || !*s2)
-	return 0;
+        return 0;
     while (i >= 0 && !strcibegins(s1 + i, s2))
-	i--;
+        i--;
     return i + 1;
 }
 
@@ -1676,14 +1677,14 @@ register long i;
     register Char ch, ch2;
 
     if (i <= 0)
-	return 0;
+        return 0;
     while (--i > 0)
-	if (!*cp++)
-	    return 0;
+        if (!*cp++)
+            return 0;
     while ((ch = *cp++)) {
-	for (cp2 = s2; (ch2 = *cp2); cp2++)
-	    if (ch == ch2)
-		return cp - s1;
+        for (cp2 = s2; (ch2 = *cp2); cp2++)
+            if (ch == ch2)
+                return cp - s1;
     }
     return 0;
 }
@@ -1700,14 +1701,14 @@ register long i;
 
     len = strlen(s1);
     if (i >= len)
-	i = len;
+        i = len;
     if (i <= 0)
-	return 0;
+        return 0;
     while (--i >= 0) {
-	ch = s1[i];
-	for (cp2 = s2; (ch2 = *cp2); cp2++)
-	    if (ch == ch2)
-		return i + 1;
+        ch = s1[i];
+        for (cp2 = s2; (ch2 = *cp2); cp2++)
+            if (ch == ch2)
+                return i + 1;
     }
     return 0;
 }
@@ -1720,9 +1721,9 @@ register Char *s1, *s2;
     register Char *cp, ch, ch2;
 
     while ((ch = *s1++)) {
-	for (cp = s2; (ch2 = *s2++) != ch; cp++)
-	    if (!ch2)
-		return 0;
+        for (cp = s2; (ch2 = *s2++) != ch; cp++)
+            if (!ch2)
+                return 0;
     }
     return 1;
 }
@@ -1744,29 +1745,29 @@ register Char *s1;
     register Char ch;
 
     while ((ch = *s1++)) {
-	switch (ch) {
+        switch (ch) {
 
-	    case 0:
-	    case 7:
-		break;
+            case 0:
+            case 7:
+                break;
 
-	    case 8:
-		if (--len < 0)
-		    ++len;
-		break;
+            case 8:
+                if (--len < 0)
+                    ++len;
+                break;
 
-	    case 9:
-		len = (len | 7) + 1;
-		break;
+            case 9:
+                len = (len | 7) + 1;
+                break;
 
-	    case 12:
-	    case 13:
-		len = 0;
-		break;
+            case 12:
+            case 13:
+                len = 0;
+                break;
 
-	    default:
-		++len;
-	}
+            default:
+                ++len;
+        }
     }
     return len;
 }
@@ -1778,9 +1779,9 @@ Char *res;
 long i, w;
 {
     if (w < 1 || w > 8)
-	sprintf(res, "%lX", i);
+        sprintf(res, "%lX", i);
     else
-	sprintf(res, "%.*lX", (int)w, i);
+        sprintf(res, "%.*lX", (int)w, i);
     return res;
 }
 
@@ -1791,21 +1792,21 @@ Char *res;
 register long i, w;
 {
     if (w < 1 || w > 32) {
-	if (i) {
-	    register long i2 = i;
-	    w = 32;
-	    while (i2 >= 0) {
-		w--;
-		i2 <<= 1;
-	    }
-	} else
-	    w = 1;
+        if (i) {
+            register long i2 = i;
+            w = 32;
+            while (i2 >= 0) {
+                w--;
+                i2 <<= 1;
+            }
+        } else
+            w = 1;
     }
     res[w] = 0;
     while (w > 0) {
-	--w;
-	res[w] = '0' + (i & 1);
-	i >>= 1;
+        --w;
+        res[w] = '0' + (i & 1);
+        i >>= 1;
     }
     return res;
 }
@@ -1816,7 +1817,7 @@ Char *strdate(res, opts)    /* ignore opts for now */
 Char *res, *opts;
 {
     time_t t = time((time_t *)0);
-    strcpy(res, ctime(&t));
+    strcpy(res, (char *) ctime(&t));
     res[strlen(res)-1] = 0;    /* eat the \n */
     return res;
 }
@@ -1830,11 +1831,11 @@ register Char *s, *word;
 
     while (isspace(*s1)) s1++;
     while (*s1 && !isspace(*s1))
-	*word++ = *s1++;
+        *word++ = *s1++;
     while (isspace(*s1)) s1++;
     *word = 0;
     while (*s1)
-	*s++ = *s1++;
+        *s++ = *s1++;
     *s = 0;
 }
 
@@ -1848,19 +1849,19 @@ register Char *s, *word;
 
     while (isspace(*s1)) s1++;
     if (*s1 == '\'' || *s1 == '"') {
-	ch = *s1++;
-	while (*s1 && *s1 != ch)
-	    *word++ = *s1++;
-	if (*s1 == ch)
-	    s1++;
+        ch = *s1++;
+        while (*s1 && *s1 != ch)
+            *word++ = *s1++;
+        if (*s1 == ch)
+            s1++;
     } else {
-	while (*s1 && !isspace(*s1))
-	    *word++ = *s1++;
+        while (*s1 && !isspace(*s1))
+            *word++ = *s1++;
     }
     while (isspace(*s1)) s1++;
     *word = 0;
     while (*s1)
-	*s++ = *s1++;
+        *s++ = *s1++;
     *s = 0;
 }
 
@@ -1877,20 +1878,20 @@ Char *bracket;
     ch2 = bracket[1];
     while (*s && *s != ch1) s++;
     if (*s) {
-	cp = s;
-	while (*s) {
-	    if (*s == ch1) {
-		if (ch2) {
-		    s++;
-		    while (*s && *s != ch2) s++;
-		    if (*s)
-			s++;
-		} else
-		    break;
-	    } else
-		*cp++ = *s++;
-	}
-	*cp = 0;
+        cp = s;
+        while (*s) {
+            if (*s == ch1) {
+                if (ch2) {
+                    s++;
+                    while (*s && *s != ch2) s++;
+                    if (*s)
+                        s++;
+                } else
+                    break;
+            } else
+                *cp++ = *s++;
+        }
+        *cp = 0;
     }
 }
 
@@ -1904,19 +1905,19 @@ boolean all;
     register Char ch;
 
     while ((ch = *s)) {
-	for (cp2 = chars; *cp2 && *cp2 != ch; cp2++) ;
-	if (*cp2) {
-	    if (!all)
-		*cp++ = ch;
-	    do {
-		if (!(ch = *++s))
-		    break;
-		for (cp2 = chars; *cp2 && *cp2 != ch; cp2++) ;
-	    } while (*cp2);
-	} else {
-	    *cp++ = ch;
-	    s++;
-	}
+        for (cp2 = chars; *cp2 && *cp2 != ch; cp2++) ;
+        if (*cp2) {
+            if (!all)
+                *cp++ = ch;
+            do {
+                if (!(ch = *++s))
+                    break;
+                for (cp2 = chars; *cp2 && *cp2 != ch; cp2++) ;
+            } while (*cp2);
+        } else {
+            *cp++ = ch;
+            s++;
+        }
     }
     *cp = 0;
 }
@@ -1954,7 +1955,7 @@ Void strdispose(sp)
 Char **sp;
 {
     if (*sp)
-	free(*sp);
+        free(*sp);
     *sp = NULL;
 }
 
@@ -1965,11 +1966,11 @@ Char **sp, *s;
 {
     int len1, len2 = strlen(s);
     if (*sp) {
-	len1 = strlen(*sp);
-	if (len1 != len2)
-	    *sp = (Char *)realloc(*sp, len2 + 1);
+        len1 = strlen(*sp);
+        if (len1 != len2)
+            *sp = (Char *)realloc(*sp, len2 + 1);
     } else
-	*sp = (Char *)malloc(len2 + 1);
+        *sp = (Char *)malloc(len2 + 1);
     if (!*sp) outmem();
     strcpy(*sp, s);
 }
@@ -1999,18 +2000,18 @@ register Char *s;
     register int len = strlen(s);
 
     while ((lp = *base) && strcmp(lp->s, s) < 0)
-	base = &lp->next;
+        base = &lp->next;
     if (!lp || strcmp(lp->s, s)) {
 #ifdef __alpha__
-	lp = (na_strlist *)malloc(sizeof(na_strlistrec));
+        lp = (na_strlist *)malloc(sizeof(na_strlistrec));
 #else
-	lp = (na_strlist *)malloc(sizeof(na_strlistrec) - 255 + len);
+        lp = (na_strlist *)malloc(sizeof(na_strlistrec) - 255 + len);
 #endif
-	if (!lp) outmem();
-	lp->next = *base;
-	*base = lp;
-	strcpy(lp->s, s);
-	lp->len = len;
+        if (!lp) outmem();
+        lp->next = *base;
+        *base = lp;
+        strcpy(lp->s, s);
+        lp->len = len;
     }
     lp->value = (na_long)0;
     lp->kind = 0;
@@ -2027,7 +2028,7 @@ register Char *s;
     register int len = strlen(s);
 
     while ((lp = *base))
-	base = &lp->next;
+        base = &lp->next;
 #ifdef __alpha__
     lp = (na_strlist *)malloc(sizeof(na_strlistrec));
 #else
@@ -2074,7 +2075,7 @@ register na_strlist *base;
 register Char *s;
 {
     while (base && strcmp(base->s, s))
-	base = base->next;
+        base = base->next;
     return base;
 }
 
@@ -2085,7 +2086,7 @@ register na_strlist *base;
 register Char *s;
 {
     while (base && strcicmp(base->s, s))
-	base = base->next;
+        base = base->next;
     return base;
 }
 
@@ -2099,18 +2100,18 @@ register Char *s;
     register int len = strlen(s);
 
     while ((lp3 = *base) != lp2) {
-	if (lp3)
-	    base = &lp3->next;
-	else
-	    return;   /* wasn't in the list */
+        if (lp3)
+            base = &lp3->next;
+        else
+            return;   /* wasn't in the list */
     }
     if (len > lp3->len) {       /* must reallocate */
-	lp3 = (na_strlist *)realloc(lp3, sizeof(na_strlistrec) - 255 + len);
-	if (!lp3) outmem();
-	lp3->len = len;
-	*lp = lp3;
-	lp3->next = *base;
-	*base = lp3;
+        lp3 = (na_strlist *)realloc(lp3, sizeof(na_strlistrec) - 255 + len);
+        if (!lp3) outmem();
+        lp3->len = len;
+        *lp = lp3;
+        lp3->next = *base;
+        *base = lp3;
     }
     strcpy(lp3->s, s);
 }
@@ -2124,12 +2125,12 @@ register Char *s;
     register na_strlist *lp;
 
     while ((lp = *base)) {
-	if (!strcmp(lp->s, s)) {
-	    *base = lp->next;
-	    free(lp);
-	    return;
-	}
-	base = &lp->next;
+        if (!strcmp(lp->s, s)) {
+            *base = lp->next;
+            free(lp);
+            return;
+        }
+        base = &lp->next;
     }
 }
 
@@ -2141,12 +2142,12 @@ register na_strlist **base, *lp;
     register na_strlist *lp2;
 
     while ((lp2 = *base)) {
-	if (lp2 == lp) {
-	    *base = lp->next;
-	    free(lp);
-	    return;
-	}
-	base = &lp2->next;
+        if (lp2 == lp) {
+            *base = lp->next;
+            free(lp);
+            return;
+        }
+        base = &lp2->next;
     }
 }
 
@@ -2167,8 +2168,8 @@ register na_strlist **base;
     register na_strlist *lp;
 
     while ((lp = *base)) {
-	*base = lp->next;
-	free(lp);
+        *base = lp->next;
+        free(lp);
     }
 }
 
@@ -2181,16 +2182,16 @@ register na_strlist **dest, *src;
 
     while (src) {
 #ifdef __alpha__
-	lp = (na_strlist *)malloc(sizeof(na_strlistrec));
+        lp = (na_strlist *)malloc(sizeof(na_strlistrec));
 #else
-	lp = (na_strlist *)malloc(sizeof(na_strlistrec) - 255 + src->len);
+        lp = (na_strlist *)malloc(sizeof(na_strlistrec) - 255 + src->len);
 #endif
-	lp->len = src->len;
-	lp->kind = src->kind;
-	lp->value = src->value;
-	strcpy(lp->s, src->s);
-	*dest = lp;
-	dest = &lp->next;
+        lp->len = src->len;
+        lp->kind = src->kind;
+        lp->value = src->value;
+        strcpy(lp->s, src->s);
+        *dest = lp;
+        dest = &lp->next;
 	src = src->next;   /*  Change made by rhkoshi without much thought  */
     }
     *dest = NULL;
@@ -2203,8 +2204,8 @@ register FILE *f;
 register na_strlist *base;
 {
     while (base) {
-	fprintf(f, "\"%s\" %d, %d\n", base->s, base->kind, (long)base->value);
-	base = base->next;
+        fprintf(f, "\"%s\" %d, %ld\n", base->s, base->kind, (long)base->value);
+        base = base->next;
     }
 }
 
@@ -2225,11 +2226,20 @@ double x;
   return(*((Anyptr *) &y));
 }
 
+/* added in 2013, to replace strcpy calls with undefined semantics */
 
+char * strcpy_overlap(char * dst, char * src)
 
+{
+  int i = 0;
 
-
-
+  do {
+    dst[i] = src[i];
+    if (src[i++] == '\0')
+      break;
+  } while (1);
+  return dst;
+}
 
 /* End. */
 

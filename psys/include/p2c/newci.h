@@ -122,6 +122,8 @@ extern Void newci_reescape PV();
 extern Void newci_checkior PV();
 extern Void newci_iorecover PV();
 extern Anyptr *newci_findsymbol PP((Char *name));
+extern Void newci_fixfname PP((Char *s, Char * ext, Char * home));
+
 
 /*case sensitive*/
 extern Void newci_initfindsymbol2 PP((newci_fshandle *handle));

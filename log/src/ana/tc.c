@@ -812,8 +812,8 @@ Analog_32_action *act;
     VPinSet = PinSetPtr->last;
     break;
   }
-  TCAmpVar->NewLimit = (VPinSet >= WITH1->attr[N_Vt - 1].UU.r ||
-			VPinplus >= AnaVdd && VPinMinus >= AnaVdd);
+  TCAmpVar->NewLimit = ((VPinSet >= WITH1->attr[N_Vt - 1].UU.r) ||
+			(VPinplus >= AnaVdd && VPinMinus >= AnaVdd));
 }
 
 
@@ -1901,6 +1901,9 @@ Analog_32_action *act;
   case Analog_act_probe:
     Probe_TCAmp(act);
     break;
+
+  default:
+    break;
   }
 }
 
@@ -2128,7 +2131,7 @@ Analog_32_action *act;
     dIhighdVout = -(InvBlendDel * dItop1dVout + BlendDel * dItop2dVout);
     dIhighdVset = -BlendDel * dItop2dVset;
   } else {
-    if (Sign == Negative && AmpRange == Hwr || AmpRange == Fwr) {
+    if (Sign == Negative && (AmpRange == Hwr || AmpRange == Fwr)) {
       Vtop2 = VPin3 + VPin4 - AnaVdd;
       ExpVtop2 = AnaExpo(TCAmpVar->Kn2 * Vtop2);
       BlendVtop2Temp = TCAmpVar->Kn5 * ExpVtop2;
@@ -2430,7 +2433,7 @@ Analog_32_action *act;
 	  BlendDel * (TCAmpVar->Kp1 * ExpVtop2 * BlendVtop2 +
 		      (1 - BlendVtop2) * TCAmpVar->Kp4 * Vtop2 * Vtop2));
     } else {
-      if (Sign == Negative && AmpRange == Hwr || AmpRange == Fwr) {
+      if (Sign == Negative && (AmpRange == Hwr || AmpRange == Fwr)) {
 	Vtop2 = VPin3 + VPin4 - AnaVdd;
 	ExpVtop2 = AnaExpo(TCAmpVar->Kn2 * Vtop2);
 	BlendVtop2 = 1 / (1 + TCAmpVar->Kn5 * ExpVtop2);
@@ -2568,6 +2571,9 @@ Analog_32_action *act;
 
   case Analog_act_probe:
     Probe_TCAmp(act);
+    break;
+
+  default:
     break;
   }
 }

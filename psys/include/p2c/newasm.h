@@ -366,6 +366,8 @@ extern Void strlist_dump PP((FILE *f, na_strlistrec *base));
 
 #undef vextern
 
+extern char * strcpy_overlap(char * dst, char * src);
+
 #endif /*NEWASM_H*/
 
 /* End. */

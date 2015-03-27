@@ -9,6 +9,7 @@
  * by the licence agreement accompanying p2c itself.
  */
 
+
 #ifdef OS2
 /* The pragmas below are needed for OS/2 C++ due to _ prepend problem **mdg** */
       #pragma map( access    , "_access"     )
@@ -71,23 +72,22 @@
   
 
 #ifdef BSD
-# include <strings.h>
+#include <strings.h>
 #ifdef __MACHTEN__
 extern char *strdup(const char *);
-#else
-extern char *strdup();
 #endif
-extern char *strpbrk(/* const char *s1, const char *s2 */);
-# define memcpy(a,b,n) (bcopy(b,a,n),a)
-# define memcmp(a,b,n) bcmp(a,b,n)
-# define strchr(s,c) index(s,c)
-# define strrchr(s,c) rindex(s,c)
 #else
 # include <string.h>
 #endif
 
+#ifdef linux
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#endif
+
 #if (!defined(BSD) && !defined(__sgi) && !defined(__alpha__)) 
-//#define log1p(x) log(1+(x))
+//# define log1p(X) log(1+(X))
 #endif
 
 #if defined(rs6000) || defined(ultrix)
@@ -222,7 +222,9 @@ typedef const char *Constptr;
 #endif
 
 typedef Signed   char schar;
+#if !( defined( __osf__ ) && defined( __GNUC__ ) )
 typedef unsigned char uchar;
+#endif
 typedef unsigned char boolean;
 
 #ifndef true
@@ -282,6 +284,7 @@ extern Void     free        PP( (Anyptr) );
 extern int      _OutMem     PV();
 extern int      _CaseCheck  PV();
 extern int      _NilCheck   PV();
+extern char   *_ShowEscape  PP( (char *, int, int, char *) );
 extern int	_Escape     PP( (int) );
 extern int	_EscIO      PP( (int) );
 
@@ -293,6 +296,10 @@ extern Char    *strrtrim    PP( (Char *) );
 extern Char    *strrpt      PP( (Char *, Char *, int) );
 extern Char    *strpad      PP( (Char *, Char *, int, int) );
 extern int      strpos2     PP( (Char *, Char *, int) );
+extern void    strmove      PP((int len, char * s, int spos, char * d, int dpos));
+extern int     strcicmp     PP((char * s1, char * s2));
+extern int       my_toupper PP((int c));
+extern int       my_tolower PP((int c));
 extern long     memavail    PV();
 extern int      P_peek      PP( (FILE *) );
 extern int      P_eof       PP( (FILE *) );
@@ -319,6 +326,8 @@ extern Void     TimeStamp   PP( (int *Day, int *Month, int *Year,
 				 int *Hour, int *Min, int *Sec) );
 extern Void	P_sun_argv  PP( (char *, int, int) );
 
+extern void     _local_p2c_init PP((void));
+
 
 /* I/O error handling */
 #define _CHKIO(cond,ior,val,def)  ((cond) ? P_ioresult=0,(val)  \
@@ -333,6 +342,11 @@ extern Void	P_sun_argv  PP( (char *, int, int) );
 #define EndOfFile        30
 
 /* Creating temporary files */
+
+#if (defined(linux))
+#define HAVE_TMPFILE
+#endif
+
 #if (defined(BSD) || defined(NO_TMPFILE)) && !defined(HAVE_TMPFILE)
 # define tmpfile()  (fopen(tmpnam(NULL), "w+"))
 #endif
@@ -397,24 +411,24 @@ extern Anyptr __MallocTemp__;
 #define SEXT(x,n)   ((x) | -(((x) & (1L<<((n)-1))) << 1))
 
 /* packed arrays */   /* BEWARE: these are untested! */
-#define P_getbits_UB(a,i,n,L)   ((int)((a)[(i)>>(L)-(n)] >>   \
-				       (((~(i))&((1<<(L)-(n))-1)) << (n)) &  \
+#define P_getbits_UB(a,i,n,L)   ((int)((a)[(i)>>((L)-(n))] >>   \
+				       (((~(i))&((1<<((L)-(n)))-1)) << (n)) &  \
 				       (1<<(1<<(n)))-1))
 
-#define P_getbits_SB(a,i,n,L)   ((int)((a)[(i)>>(L)-(n)] <<   \
-				       (16 - ((((~(i))&((1<<(L)-(n))-1))+1) <<\
+#define P_getbits_SB(a,i,n,L)   ((int)((a)[(i)>>((L)-(n))] <<   \
+				       (16 - ((((~(i))&((1<<((L)-(n)))-1))+1) <<\
 					      (n)) >> (16-(1<<(n))))))
 
-#define P_putbits_UB(a,i,x,n,L) ((a)[(i)>>(L)-(n)] |=   \
-				 (x) << (((~(i))&((1<<(L)-(n))-1)) << (n)))
+#define P_putbits_UB(a,i,x,n,L) ((a)[(i)>>((L)-(n))] |=   \
+				 (x) << (((~(i))&((1<<((L)-(n)))-1)) << (n)))
 
-#define P_putbits_SB(a,i,x,n,L) ((a)[(i)>>(L)-(n)] |=   \
+#define P_putbits_SB(a,i,x,n,L) ((a)[(i)>>((L)-(n))] |=   \
 				 ((x) & (1<<(1<<(n)))-1) <<   \
-				 (((~(i))&((1<<(L)-(n))-1)) << (n)))
+				 (((~(i))&((1<<((L)-(n)))-1)) << (n)))
 
-#define P_clrbits_B(a,i,n,L)    ((a)[(i)>>(L)-(n)] &=   \
+#define P_clrbits_B(a,i,n,L)    ((a)[(i)>>((L)-(n))] &=   \
 				 ~( ((1<<(1<<(n)))-1) <<   \
-				   (((~(i))&((1<<(L)-(n))-1)) << (n))) )
+				   (((~(i))&((1<<((L)-(n)))-1)) << (n))) )
 
 /* small packed arrays */
 #define P_getbits_US(v,i,n)     ((int)((v) >> ((i)<<(n)) & (1<<(1<<(n)))-1))
@@ -426,6 +440,7 @@ extern Anyptr __MallocTemp__;
 #define P_max(a,b)   ((a) > (b) ? (a) : (b))
 #define P_min(a,b)   ((a) < (b) ? (a) : (b))
 
+#if ! defined( __osf__ )
 
 /* Fix toupper/tolower on Suns and other stupid BSD systems */
 #ifdef toupper
@@ -444,6 +459,8 @@ extern Anyptr __MallocTemp__;
 #  define _tolower(c)  tolower(c)
 # endif
 #endif
+
+#endif
   
 #ifdef ultrix
 extern double strtod();
@@ -454,6 +471,11 @@ extern double strtod();
 /* ifdefs for microsleep here */
 
 #define BSDMICROSLEEP
+
+#if !defined(L_cuserid)
+#define L_cuserid 32
+extern char * cuserid(char *);
+#endif
 
 /* End. */
 

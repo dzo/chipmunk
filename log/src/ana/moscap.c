@@ -584,6 +584,9 @@ Analog_32_action *act;
   case Analog_act_probe:
     Probe_MosCap(act);
     break;
+
+  default:
+    break;
   }
 }
 
