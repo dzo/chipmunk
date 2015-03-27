@@ -65,7 +65,7 @@ XINCLUDEDIR = .
 ## For AmigaOS, ADE (Amiga Development Enviroment) with gcc is recommended.
 ##
 
-CHIPMUNKCC = gcc -x c -Os -fomit-frame-pointer -fpermissive
+CHIPMUNKCC = gcc -x c -Os -fomit-frame-pointer
 ##CHIPMUNKCC = gcc -x c -g -DF_OK=0
 
 ##CHIPMUNKCC = gcc -pg
