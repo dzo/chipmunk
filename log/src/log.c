@@ -2865,8 +2865,8 @@ Static boolean pollkbd2(void);
 Static Void pen()
 {
 
-#define ALERTNESS 1000 /* Time to get bored (in cs) */
-#define DOZETIME  20  /* Time to sleep after nodding off */
+#define ALERTNESS 2 /* Time to get bored (in cs) */
+#define DOZETIME  5  /* Time to sleep after nodding off */
 
   long x, y;
   short i, rx, ry, cred;
