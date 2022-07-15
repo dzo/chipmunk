@@ -1,8 +1,8 @@
 #define MYLIB_G
 #define XK_MISCELLANY
 #include <windows.h>
-#include <wingdi.h>   // these are needed because I took them out of windows.h to make console
-#include <winuser.h>  // apps compile a bit faster.
+//#include <wingdi.h>   // these are needed because I took them out of windows.h to make console
+//#include <winuser.h>  // apps compile a bit faster.
 #include <stdio.h>
 #include <signal.h>
 #include <fcntl.h>
@@ -867,7 +867,7 @@ m_noclip();
 cursorxor();
 curcursor=n;
 SetCursor(cursors[n]);
-SetClassLong(hwnd,GCL_HCURSOR,(long)cursors[n]);
+SetClassLongPtr(hwnd,GCLP_HCURSOR,(LONG_PTR)&cursors[n]);
 cursorxor(); 
 }
 }
@@ -2634,7 +2634,7 @@ void addkey(int n) {
 }
 
 char s[256];
-extern LRESULT FAR PASCAL _export WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+extern LRESULT FAR PASCAL WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void handle_events() {
 //GrMouseEvent event; 

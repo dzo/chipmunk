@@ -10,7 +10,7 @@ extern int WindowWidth,WindowHeight ,m_initialized;
 extern void addkey(int);
 FILE* trace;
 
-LRESULT FAR PASCAL _export WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT FAR PASCAL  WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
    char s[100];
    MSG m;

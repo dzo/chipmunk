@@ -122,7 +122,7 @@ OTHERLIBS= -lm  ${LIBP2C} -mwindows
   
 ##CHIPMUNKCC = gcc -pg -DF_OK=0
 
-CHIPMUNKCC = gcc -x c  -Os -fomit-frame-pointer -DF_OK=0
+CHIPMUNKCC = x86_64-w64-mingw32-gcc -x c  -Os -fomit-frame-pointer -DF_OK=0
 
 ##CHIPMUNKCC = gcc -x c -g -DF_OK=0
 
@@ -253,7 +253,7 @@ main: log loged
 LOGOBJ = log.o $(TOOLOBJ) logstuff.o logdef.o
 
 log:    $(LOGOBJ) tooldir.o $(LIBP2C)
-	gcc $(CFLAGS) -Wl,-s tooldir.o $(LOGOBJ) $(OTHERLIBS) -o log
+	x86_64-w64-mingw32-gcc $(CFLAGS) -Wl,-s tooldir.o $(LOGOBJ) $(OTHERLIBS) -o log
 
 ## The following permits you to link properly with AmigaOS and 
 ## X shared libraries used in ADE
@@ -282,7 +282,7 @@ LOGEDOBJ = loged.o simdir.o $(SIMOBJ) logstuff.o logedwinmain.o
 
 
 loged: $(LOGEDOBJ) simdir.o $(LIBP2C)
-	gcc $(CFLAGS) -mwindows  $(LOGEDOBJ) $(LIBP2C) $(LIBX11) $(OTHERLIBS) -o loged
+	x86_64-w64-mingw32-gcc $(CFLAGS) -mwindows  $(LOGEDOBJ) $(LIBP2C) $(LIBX11) $(OTHERLIBS) -o loged
 
  
  
