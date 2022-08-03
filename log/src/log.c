@@ -20186,7 +20186,7 @@ Char *name;
   }
 /* p2c: log.text, line 18951:
  * Note: Suspicious mixture of sizes in NA_NEW [173] */
-  mp3 = (macrorec *)Malloc(strlen(name) + 9L);
+  mp3 = (macrorec *)Malloc(sizeof(macrorec));
   if (mp != NULL && mp->key == key) {
     mp3->next = mp->next;
     Free(mp);
