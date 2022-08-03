@@ -117,6 +117,12 @@ boolean force;
     if (i > 0 && name[i - 1] == '.')
       name[i - 1] = '\0';
   }
+  // remove quotes
+  if(strlen(name) > 1 && name[0]=='"' && name[strlen(name)-1]=='"') {
+    strcpy(STR1,name);
+    STR1[strlen(STR1)-1]='\0';
+    strcpy(name,STR1+1);
+  }
   if (*name == '\0')
     return;
   if (name[strlen(name) - 1] == '.') {
