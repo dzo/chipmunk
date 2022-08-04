@@ -984,14 +984,22 @@ char *s;
 }
 #endif
 
+char *ChipmunkPath=NULL;
+
 char *GetChipmunkPath(ev, deft)
 char *ev, *deft;
 {
-    char *s;
-
-    if ((s= getenv(ev)) != (char *) NULL)
-	return(s);
-    else return(deft);
+    if(ChipmunkPath==NULL) {
+		ChipmunkPath  = malloc(1024);
+		DWORD err=GetModuleFileName(0, ChipmunkPath, 1023);
+        for(int i=0;i<strlen(ChipmunkPath);i++) {
+            if(ChipmunkPath[strlen(ChipmunkPath)-i-1]=='\\') {
+                ChipmunkPath[strlen(ChipmunkPath)-i-1]=0;
+                break;
+            }
+        }
+	}
+	return ChipmunkPath;
 }
 
 /* the following are two different ways to implement the microsleep    */

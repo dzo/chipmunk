@@ -2529,7 +2529,7 @@ long pat;
 
 
 
-
+extern char *GetChipmunkPath();
 
 Void plot_initfonts()
 {
@@ -2539,7 +2539,7 @@ Void plot_initfonts()
   ix = NULL;
   plot_fontbase = NULL;
   plot_namebase = NULL;
-  sprintf(STR1,"%s","plot.fon");
+  sprintf(STR1,"%s/%s",GetChipmunkPath("", ""), "plot.fon");
   strcpy(fontfn, STR1);
   P_expset(loadft, 0L);
 }
